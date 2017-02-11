@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ms-crud-rest", "ms-crud-rest\ms-crud-rest.csproj", "{853DF228-B7FB-4570-B586-FB919977B1F8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassesMarmitex", "ClassesMarmitex\ClassesMarmitex.csproj", "{CE40617B-0C7B-45BA-A4AD-F06FCC674747}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{853DF228-B7FB-4570-B586-FB919977B1F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{853DF228-B7FB-4570-B586-FB919977B1F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{853DF228-B7FB-4570-B586-FB919977B1F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{853DF228-B7FB-4570-B586-FB919977B1F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE40617B-0C7B-45BA-A4AD-F06FCC674747}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE40617B-0C7B-45BA-A4AD-F06FCC674747}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE40617B-0C7B-45BA-A4AD-F06FCC674747}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE40617B-0C7B-45BA-A4AD-F06FCC674747}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
