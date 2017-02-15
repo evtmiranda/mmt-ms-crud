@@ -26,7 +26,7 @@ namespace ms_crud_rest.DAO
             }
         }
 
-        public T Read(int id)
+        public T BuscarPorId(int id)
         {
             using (ISession session = NHibernateHelper.AbreSession())
             {

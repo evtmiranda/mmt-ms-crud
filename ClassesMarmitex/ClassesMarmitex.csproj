@@ -40,6 +40,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dinheiro.cs" />
+    <Compile Include="FormaDePagamento.cs" />
+    <Compile Include="Produto.cs" />
+    <Compile Include="Carrinho.cs" />
+    <Compile Include="DadosAdicionaisProduto.cs" />
+    <Compile Include="MenuCardapio.cs" />
     <Compile Include="Usuario.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

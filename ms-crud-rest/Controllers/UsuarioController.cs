@@ -16,10 +16,25 @@ namespace ms_crud_rest.Controllers
             this.usuarioDAO = usuarioDAO;
         }
 
+        //busca um usuário pelo id
+        [HttpGet]
+        public Usuario ConsultarUsuario(int id)
+        {
+            return usuarioDAO.BuscarPorId(id);
+        }
+
+        //retorna todos os usuários existentes
         [HttpGet]
         public IList<Usuario> ConsultarUsuario()
         {
             return usuarioDAO.Buscar();
+        }
+
+        //faz o cadastro do usuário no banco
+        [HttpPost]
+        public void CadastrarUsuario(Usuario usuario)
+        {
+            usuarioDAO.Adicionar(usuario);
         }
     }
 }
