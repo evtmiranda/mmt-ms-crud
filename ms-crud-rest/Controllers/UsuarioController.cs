@@ -2,6 +2,9 @@
 using ClassesMarmitex;
 using System.Web.Http;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Net;
+using System;
 
 namespace ms_crud_rest.Controllers
 {
@@ -16,25 +19,95 @@ namespace ms_crud_rest.Controllers
             this.usuarioDAO = usuarioDAO;
         }
 
-        //busca um usuário pelo id
-        [HttpGet]
-        public Usuario ConsultarUsuario(int id)
+        public HttpResponseMessage Get(int id)
         {
-            return usuarioDAO.BuscarPorId(id);
+            try
+            {
+                Usuario usuario = usuarioDAO.BuscarPorId(id);
+                return Request.CreateResponse(HttpStatusCode.OK, usuario);
+            }
+            catch (KeyNotFoundException)
+            {
+                string mensagem = string.Format("O usuario {0} não foi encontrado", id);
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+            }
+        }
+
+        public HttpResponseMessage Post([FromBody] Usuario usuario)
+        {
+            try
+            {
+                usuarioDAO.Adicionar(usuario);
+
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created);
+                string location = Url.Link("DefaultApi", new { controller = "usuario", id = usuario.Id });
+                response.Headers.Location = new Uri(location);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                string mensagem = string.Format("nao foi possivel cadastrar o usuario. erro: {0}", ex);
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        public HttpResponseMessage Delete([FromUri] int id)
+        {
+            try
+            {
+                usuarioDAO.ExcluirPorId(id);
+
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                string mensagem = string.Format("nao foi possivel cadastrar o usuario. erro: {0}", ex);
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        public HttpResponseMessage Patch([FromBody] Usuario usuario, [FromUri] int id)
+        {
+            try
+            {
+                Usuario usuarioAtual = usuarioDAO.BuscarPorId(id);
+
+                if (usuarioAtual == null)
+                    return Request.CreateResponse(HttpStatusCode.NotFound);
+
+                usuarioAtual.Email = usuario.Email;
+                usuarioDAO.Atualizar(usuarioAtual);
+
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                string mensagem = string.Format("nao foi possivel atualizar o usuario. erro: {0}", ex);
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
         }
 
         //retorna todos os usuários existentes
         [HttpGet]
-        public IList<Usuario> ConsultarUsuario()
+        [Route("api/usuario/listar")]
+        public HttpResponseMessage ListarUsuarios()
         {
-            return usuarioDAO.Buscar();
-        }
-
-        //faz o cadastro do usuário no banco
-        [HttpPost]
-        public void CadastrarUsuario(Usuario usuario)
-        {
-            usuarioDAO.Adicionar(usuario);
+            try
+            {
+                IList<Usuario> usuarios = usuarioDAO.Buscar();
+                return Request.CreateResponse(HttpStatusCode.OK, usuarios);
+            }
+            catch (KeyNotFoundException)
+            {
+                string mensagem = string.Format("nao foram encontrados usuarios");
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+            }
         }
     }
 }

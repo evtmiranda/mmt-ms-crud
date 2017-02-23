@@ -53,5 +53,17 @@ namespace ms_crud_rest.DAO
                 tx.Commit();
             }
         }
+
+        public virtual void ExcluirPorId(int id)
+        {
+            using (ISession session = NHibernateHelper.AbreSession())
+            {
+                T t = BuscarPorId(id);
+
+                ITransaction tx = session.BeginTransaction();
+                session.Delete(t);
+                tx.Commit();
+            }
+        }
     }
 }
