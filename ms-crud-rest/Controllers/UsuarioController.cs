@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net;
 using System;
+using ms_crud_rest.Exceptions;
 
 namespace ms_crud_rest.Controllers
 {
@@ -119,17 +120,14 @@ namespace ms_crud_rest.Controllers
         {
             try
             {
-                bool usuarioAutenticado = usuarioDAO.AutenticarUsuario(usuario);
-
-                HttpResponseMessage response;
-
-                if (usuarioAutenticado)
-                    response = Request.CreateResponse(HttpStatusCode.Accepted);
-                else
-                    response = Request.CreateResponse(HttpStatusCode.Unauthorized);
-
-                return response;
+                usuarioDAO.AutenticarUsuario(usuario);
+                return Request.CreateResponse(HttpStatusCode.Accepted);
             }
+            //se o usuário não for autenticado
+            catch (UsuarioNaoAutenticadoException) { 
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
+            }
+            //se ocorrer algum erro no processamento
             catch (Exception ex)
             {
                 //grava log do erro
