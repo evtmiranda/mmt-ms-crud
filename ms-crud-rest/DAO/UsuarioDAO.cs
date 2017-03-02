@@ -15,11 +15,11 @@ namespace ms_crud_rest.DAO
         public bool AutenticarUsuario(Usuario usuario)
         {
             //executa o select e retorna uma lista de posts
-            string hql = "select u from Usuario u where u.email = " + usuario.Email;
+            string hql = string.Format("select u from Usuario u where u.Email = '{0}' and u.Senha = '{1}'", usuario.Email, usuario.Senha);
             IQuery query = session.CreateQuery(hql);
             var result = query.List<Usuario>();
 
-            if (result.Count == 1)
+            if (result.Count >= 1)
                 return true;
             else
                 return false;

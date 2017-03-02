@@ -11,12 +11,14 @@ namespace ms_crud_rest.Controllers
     public class UsuarioController : ApiController
     {
         private UsuarioDAO usuarioDAO;
+        private LogDAO logDAO;
 
-        //construtor do controller, recebe um usuarioDAO, que por sua vez recebe uma ISession.
+        //construtor do controller, recebe um usuarioDAO e um logDAO, que por sua vez recebe uma ISession.
         //O Ninject é o responsável por cuidar da criação de todos esses objetos
-        public UsuarioController(UsuarioDAO usuarioDAO)
+        public UsuarioController(UsuarioDAO usuarioDAO, LogDAO logDAO)
         {
             this.usuarioDAO = usuarioDAO;
+            this.logDAO = logDAO;
         }
 
         public HttpResponseMessage Get(int id)
@@ -107,6 +109,36 @@ namespace ms_crud_rest.Controllers
                 string mensagem = string.Format("nao foram encontrados usuarios");
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.NotFound, error);
+            }
+        }
+
+        //método para autenticação de usuário
+        [HttpPost]
+        [Route("api/usuario/autenticar")]
+        public HttpResponseMessage AutenticarUsuario([FromBody] Usuario usuario)
+        {
+            try
+            {
+                bool usuarioAutenticado = usuarioDAO.AutenticarUsuario(usuario);
+
+                HttpResponseMessage response;
+
+                if (usuarioAutenticado)
+                    response = Request.CreateResponse(HttpStatusCode.Accepted);
+                else
+                    response = Request.CreateResponse(HttpStatusCode.Unauthorized);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                //grava log do erro
+                logDAO.Adicionar(new Log { Mensagem = "Erro ao autenticar usuário", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+
+                //retorna mensagem de erro e status de erro
+                string mensagem = string.Format("nao foi possivel autenticar o usuario. erro: {0}", ex);
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
     }
