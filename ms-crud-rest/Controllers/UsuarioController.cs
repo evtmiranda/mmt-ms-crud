@@ -118,14 +118,19 @@ namespace ms_crud_rest.Controllers
         [Route("api/usuario/autenticar")]
         public HttpResponseMessage AutenticarUsuario([FromBody] Usuario usuario)
         {
+            //bloco de tratamento de erros
             try
             {
+                //faz a autenticação do usuário
                 usuarioDAO.AutenticarUsuario(usuario);
+                //se for autenticado, retorna mensagem de aceito
                 return Request.CreateResponse(HttpStatusCode.Accepted);
             }
-            //se o usuário não for autenticado
-            catch (UsuarioNaoAutenticadoException) { 
-                return Request.CreateResponse(HttpStatusCode.Unauthorized);
+            //se o usuário não for autenticado, retorna mensagem de não autorizado
+            catch (UsuarioNaoAutenticadoException)
+            {
+                string error = "Usuário ou senha inválida";
+                return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, error);
             }
             //se ocorrer algum erro no processamento
             catch (Exception ex)

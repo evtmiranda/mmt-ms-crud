@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="Dinheiro.cs" />
     <Compile Include="FormaDePagamento.cs" />
+    <Compile Include="Log.cs" />
     <Compile Include="Produto.cs" />
     <Compile Include="Carrinho.cs" />
     <Compile Include="DadosAdicionaisProduto.cs" />
