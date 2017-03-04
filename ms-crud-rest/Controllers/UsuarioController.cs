@@ -27,6 +27,9 @@ namespace ms_crud_rest.Controllers
             try
             {
                 Usuario usuario = usuarioDAO.BuscarPorId(id);
+                if (usuario == null)
+                    throw new KeyNotFoundException();
+
                 return Request.CreateResponse(HttpStatusCode.OK, usuario);
             }
             catch (KeyNotFoundException)

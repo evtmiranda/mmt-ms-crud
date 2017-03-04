@@ -3,7 +3,7 @@ using NHibernate;
 using NHibernate.Cfg;
 using System.Reflection;
 
-namespace ms_crud_rest.Infra
+namespace ms_crud_rest.HelperClasses
 {
     class NHibernateHelper
     {

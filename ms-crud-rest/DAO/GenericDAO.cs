@@ -1,4 +1,4 @@
-﻿using ms_crud_rest.Infra;
+﻿using ms_crud_rest.HelperClasses;
 using NHibernate;
 using System.Collections.Generic;
 
