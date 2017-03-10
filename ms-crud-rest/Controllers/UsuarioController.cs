@@ -105,7 +105,7 @@ namespace ms_crud_rest.Controllers
         {
             try
             {
-                IList<Usuario> usuarios = usuarioDAO.Buscar();
+                IList<Usuario> usuarios = usuarioDAO.Listar();
                 return Request.CreateResponse(HttpStatusCode.OK, usuarios);
             }
             catch (KeyNotFoundException)

@@ -16,7 +16,7 @@ namespace ms_crud_rest.DAO
             }
         }
 
-        public virtual IList<T> Buscar()
+        public virtual IList<T> Listar()
         {
             using (ISession session = NHibernateHelper.AbreSession())
             {
