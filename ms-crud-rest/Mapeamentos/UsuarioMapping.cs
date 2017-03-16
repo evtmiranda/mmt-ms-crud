@@ -1,8 +1,8 @@
-﻿using FluentNHibernate.Mapping;
-using ClassesMarmitex;
-
-namespace ms_crud_rest.Mapeamentos
+﻿namespace ms_crud_rest.Mapeamentos
 {
+    using FluentNHibernate.Mapping;
+    using ClassesMarmitex;
+
     public class UsuarioMapping : ClassMap<Usuario>
     {
         public UsuarioMapping()

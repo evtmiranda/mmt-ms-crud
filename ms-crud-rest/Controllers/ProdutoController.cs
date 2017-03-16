@@ -92,7 +92,6 @@ namespace ms_crud_rest.Controllers
                     return Request.CreateResponse(HttpStatusCode.NotFound);
 
                 produtoAtual.Ativo = produto.Ativo;
-                produtoAtual.DadosAdicionaisProdutos = produto.DadosAdicionaisProdutos;
                 produtoAtual.Descricao = produto.Descricao;
                 produtoAtual.IdMenuCardapio = produto.IdMenuCardapio;
                 produtoAtual.Nome = produto.Nome;

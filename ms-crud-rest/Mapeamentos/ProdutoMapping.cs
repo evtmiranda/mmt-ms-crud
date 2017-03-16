@@ -1,8 +1,8 @@
-﻿using ClassesMarmitex;
-using FluentNHibernate.Mapping;
-
-namespace ms_crud_rest.Mapeamentos
+﻿namespace ms_crud_rest.Mapeamentos
 {
+    using ClassesMarmitex;
+    using FluentNHibernate.Mapping;
+
     public class ProdutoMapping : ClassMap<Produto>
     {
         public ProdutoMapping()
@@ -13,11 +13,7 @@ namespace ms_crud_rest.Mapeamentos
             Map(p => p.Valor);
             Map(p => p.Imagem);
             Map(p => p.IdMenuCardapio);
-            Map(p => p.DadosAdicionaisProdutos);
             Map(p => p.Ativo);
-
-            //cria uma foreign key com a tab MenuCardapio
-            //References(p => p.IdMenuCardapio, "Id").Not.LazyLoad();
         }
     }
 }

@@ -40,14 +40,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Dinheiro.cs" />
-    <Compile Include="FormaDePagamento.cs" />
-    <Compile Include="Log.cs" />
-    <Compile Include="Produto.cs" />
-    <Compile Include="Carrinho.cs" />
-    <Compile Include="DadosAdicionaisProduto.cs" />
-    <Compile Include="MenuCardapio.cs" />
-    <Compile Include="Usuario.cs" />
+    <Compile Include="Empresa\Beneficios.cs" />
+    <Compile Include="Empresa\Empresa.cs" />
+    <Compile Include="Pagamento\FormaDePagamento.cs" />
+    <Compile Include="LogAplicacao\Log.cs" />
+    <Compile Include="Pedido\Pedido.cs" />
+    <Compile Include="Produto\Produto.cs" />
+    <Compile Include="Carrinho\Carrinho.cs" />
+    <Compile Include="Produto\DadosAdicionaisProduto.cs" />
+    <Compile Include="Cardapio\MenuCardapio.cs" />
+    <Compile Include="Produto\ProdutoPedido.cs" />
+    <Compile Include="Usuario\Usuario.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

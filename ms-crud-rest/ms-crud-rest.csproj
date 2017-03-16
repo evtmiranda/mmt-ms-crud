@@ -157,6 +157,7 @@
   <ItemGroup>
     <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\CarrinhoController.cs" />
     <Compile Include="Controllers\MenuCardapioController.cs" />
     <Compile Include="Controllers\ProdutoController.cs" />
     <Compile Include="Controllers\UsuarioController.cs" />
@@ -170,6 +171,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="HelperClasses\NHibernateHelper.cs" />
+    <Compile Include="Mapeamentos\DadosAdicionaisProdutoMapping.cs" />
+    <Compile Include="Mapeamentos\EmpresaMapping.cs" />
     <Compile Include="Mapeamentos\LogMapping.cs" />
     <Compile Include="Mapeamentos\MenuCardapioMapping.cs" />
     <Compile Include="Mapeamentos\ProdutoMapping.cs" />

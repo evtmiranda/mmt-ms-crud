@@ -1,8 +1,8 @@
-﻿using ClassesMarmitex;
-using FluentNHibernate.Mapping;
-
-namespace ms_crud_rest.Mapeamentos
+﻿namespace ms_crud_rest.Mapeamentos
 {
+    using ClassesMarmitex;
+    using FluentNHibernate.Mapping;
+
     public class LogMapping : ClassMap<Log>
     {
         public LogMapping()
