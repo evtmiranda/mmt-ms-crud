@@ -1,14 +1,14 @@
-﻿using ms_crud_rest.DAO;
-using ClassesMarmitex;
-using System.Web.Http;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net;
-using System;
-using ms_crud_rest.Exceptions;
-
-namespace ms_crud_rest.Controllers
+﻿namespace ms_crud_rest.Controllers
 {
+    using DAO;
+    using Exceptions;
+    using ClassesMarmitex;
+    using System.Web.Http;
+    using System.Collections.Generic;
+    using System.Net.Http;
+    using System.Net;
+    using System;
+
     public class UsuarioController : ApiController
     {
         private UsuarioDAO usuarioDAO;
@@ -36,6 +36,7 @@ namespace ms_crud_rest.Controllers
             {
                 string mensagem = string.Format("O usuario {0} não foi encontrado", id);
                 HttpError error = new HttpError(mensagem);
+
                 return Request.CreateResponse(HttpStatusCode.NotFound, error);
             }
         }
@@ -144,6 +145,36 @@ namespace ms_crud_rest.Controllers
                 //retorna mensagem de erro e status de erro
                 string mensagem = string.Format("nao foi possivel autenticar o usuario. erro: {0}", ex);
                 HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        //método para buscar os dados de um usuário através do seu e-mail
+        [HttpPost]
+        [Route("api/usuario/buscarPorEmail")]
+        public HttpResponseMessage BuscarUsuarioPorEmail(Usuario usuario)
+        {
+            try
+            {
+                Usuario usuarioCompleto = usuarioDAO.BuscarPorEmail(usuario.Email);
+
+                if (usuarioCompleto == null)
+                    throw new Exception();
+
+                return Request.CreateResponse(HttpStatusCode.OK, usuarioCompleto);
+            }
+            catch (KeyNotFoundException)
+            {
+                string mensagem = string.Format("O usuario com e-mail {0} não foi encontrado", usuario.Email);
+                HttpError error = new HttpError(mensagem);
+
+                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+            }
+            catch (Exception)
+            {
+                string mensagem = string.Format("Estamos com dificuldade em consultar os dados. Por favor, tente novamente");
+                HttpError error = new HttpError(mensagem);
+
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }

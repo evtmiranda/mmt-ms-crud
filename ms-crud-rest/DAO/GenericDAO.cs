@@ -34,6 +34,16 @@ namespace ms_crud_rest.DAO
             }
         }
 
+        public T BuscarPorEmail(string email)
+        {
+            using (ISession session = NHibernateHelper.AbreSession())
+            {
+                string hql = string.Format("select t from {0} t where Email = '{1}'", typeof(T).Name, email);
+                IQuery query = session.CreateQuery(hql);
+                return query.List<T>()[0];
+            }
+        }
+
         public virtual void Atualizar(T t)
         {
             using (ISession session = NHibernateHelper.AbreSession())

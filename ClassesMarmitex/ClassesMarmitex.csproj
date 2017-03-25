@@ -45,6 +45,7 @@
     <Compile Include="Pagamento\FormaDePagamento.cs" />
     <Compile Include="LogAplicacao\Log.cs" />
     <Compile Include="Pedido\Pedido.cs" />
+    <Compile Include="Produto\DadosAtualizarProduto.cs" />
     <Compile Include="Produto\Produto.cs" />
     <Compile Include="Carrinho\Carrinho.cs" />
     <Compile Include="Produto\DadosAdicionaisProduto.cs" />
@@ -52,6 +53,8 @@
     <Compile Include="Produto\ProdutoPedido.cs" />
     <Compile Include="Usuario\Usuario.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\DadosGet.cs" />
+    <Compile Include="Utils\DadosPostAjax.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
