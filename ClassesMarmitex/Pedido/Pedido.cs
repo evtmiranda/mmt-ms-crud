@@ -12,4 +12,12 @@
         public virtual DateTime DataEntrega { get; set; }
         public virtual string Observacao { get; set; }
     }
+
+    public class DetalhePedido
+    {
+        public string HorarioEntrega { get; set; }
+        public string FormaPagamento { get; set; }
+        public string Troco { get; set; }
+        public string Observacao { get; set; }
+    }
 }
