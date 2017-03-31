@@ -119,14 +119,19 @@
 
         //método para autenticação de usuário
         [HttpPost]
-        [Route("api/usuario/autenticar")]
-        public HttpResponseMessage AutenticarUsuario([FromBody] Usuario usuario)
+        [Route("api/usuario/autenticar/{tipoUsuario}")]
+        public HttpResponseMessage AutenticarUsuario([FromBody] Usuario usuario, int tipoUsuario)
         {
             //bloco de tratamento de erros
             try
             {
                 //faz a autenticação do usuário
-                usuarioDAO.AutenticarUsuario(usuario);
+                //se for usuario empresa
+                if (tipoUsuario == 1)
+                    usuarioDAO.AutenticarUsuarioEmpresa(usuario);
+                else
+                    usuarioDAO.AutenticarUsuarioParceiro(usuario);
+
                 //se for autenticado, retorna mensagem de aceito
                 return Request.CreateResponse(HttpStatusCode.Accepted);
             }

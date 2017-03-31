@@ -1,17 +1,31 @@
-﻿namespace ClassesMarmitex
-{
-    using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
+namespace ClassesMarmitex
+{
     public class Empresa
     {
-        public virtual int Id { get; set; }
-        public virtual string Nome { get; set; }
-        public virtual string Cep { get; set; }
-        public virtual string UF { get; set; }
-        public virtual string Cidade { get; set; }
-        public virtual string Bairro { get; set; }
-        public virtual string Logradouro { get; set; }
-        public virtual string NumeroEndereco { get; set; }
-        public virtual string ComplementoEndereco { get; set; }
+        public int Id { get; set; }
+        public string Nome { get; set; }
+        public Endereco Endereco { get; set; }
+        public List<Parceiro> Parceiros { get; set; }
+        public bool Ativo { get; set; }
+    }
+
+    [Table("Empresa")]
+    public class EmpresaEntidade
+    {
+        [Column("id_empresa")]
+        public int Id { get; set; }
+
+        [Column("nm_nome_empresa")]
+        public string Nome { get; set; }
+
+        [Column("id_endereco")]
+        public int IdEndereco { get; set; }
+
+        [Column("bol_ativo")]
+        public bool Ativo { get; set; }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using ClassesMarmitex;
 using ms_crud_rest.Exceptions;
-using NHibernate;
 using System.Data.SqlClient;
 
 namespace ms_crud_rest.DAO
@@ -18,28 +17,24 @@ namespace ms_crud_rest.DAO
             this.logDAO = logDAO;
         }
 
-        public void AutenticarUsuario(Usuario usuario)
+        public void AutenticarUsuarioEmpresa(Usuario usuario)
         {
             try
             {
                 int qtdUsuario = 0;
 
-                using (sqlConn) { 
+                using (sqlConn) {
+
+                    sqlConn.Open();
+
                     SqlCommand sqlCommand = new SqlCommand();
 
+                    sqlCommand.Connection = sqlConn;
                     sqlCommand.CommandType = System.Data.CommandType.Text;
-                    sqlCommand.CommandText = string.Format("SELECT COUNT(1) FROM usuario where email = @email and senha = @senha");
+                    sqlCommand.CommandText = string.Format("SELECT COUNT(1) FROM tab_usuario_empresa where email = @email and senha = @senha");
 
-                    SqlParameter pEmail = new SqlParameter();
-                    pEmail.ParameterName = "@email";
-                    pEmail.Value = usuario.Email;
-
-                    SqlParameter pSenha = new SqlParameter();
-                    pSenha.ParameterName = "@senha";
-                    pSenha.Value = usuario.Senha;
-
-                    sqlCommand.Parameters.Add(pEmail);
-                    sqlCommand.Parameters.Add(pSenha);
+                    sqlCommand.Parameters.AddWithValue("@email", usuario.Email);
+                    sqlCommand.Parameters.AddWithValue("@senha", usuario.Senha);
 
                     qtdUsuario = (int)sqlCommand.ExecuteScalar();
                 }
@@ -54,5 +49,41 @@ namespace ms_crud_rest.DAO
                 throw ex;
             }
         }
+
+        public void AutenticarUsuarioParceiro(Usuario usuario)
+        {
+            try
+            {
+                int qtdUsuario = 0;
+
+                using (sqlConn)
+                {
+
+                    sqlConn.Open();
+
+                    SqlCommand sqlCommand = new SqlCommand();
+
+                    sqlCommand.Connection = sqlConn;
+                    sqlCommand.CommandType = System.Data.CommandType.Text;
+                    sqlCommand.CommandText = string.Format("SELECT COUNT(1) FROM tab_usuario_parceiro where email = @email and senha = @senha");
+
+                    sqlCommand.Parameters.AddWithValue("@email", usuario.Email);
+                    sqlCommand.Parameters.AddWithValue("@senha", usuario.Senha);
+
+                    qtdUsuario = (int)sqlCommand.ExecuteScalar();
+                }
+
+                //verifica se o retorno foi positivo
+                if (qtdUsuario == 0)
+                    throw new UsuarioNaoAutenticadoException();
+            }
+            catch (System.Exception ex)
+            {
+                logDAO.Adicionar(new Log { Mensagem = "Erro ao autenticar usuário", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+                throw ex;
+            }
+        }
+
+
     }
 }
