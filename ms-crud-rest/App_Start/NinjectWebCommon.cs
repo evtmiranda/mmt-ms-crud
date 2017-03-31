@@ -12,6 +12,7 @@ namespace ms_crud_rest.App_Start
     using Ninject.Web.Common;
     using HelperClasses;
     using NHibernate;
+    using System.Data.SqlClient;
 
     public static class NinjectWebCommon
     {
@@ -63,8 +64,8 @@ namespace ms_crud_rest.App_Start
         /// <param name="kernel">The kernel</param>
         private static void RegisterServices(IKernel kernel)
         {
-            kernel.Bind<ISession>()
-                    .ToMethod(x => NHibernateHelper.AbreSession()).InRequestScope();
+            kernel.Bind<SqlConnection>()
+                    .ToMethod(x => SqlHelper.AbreConexao()).InRequestScope();
         }
     }
 }

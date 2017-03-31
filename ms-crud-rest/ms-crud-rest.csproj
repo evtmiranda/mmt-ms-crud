@@ -162,6 +162,7 @@
     <Compile Include="Controllers\ProdutoController.cs" />
     <Compile Include="Controllers\UsuarioController.cs" />
     <Compile Include="DAO\GenericDAO.cs" />
+    <Compile Include="DAO\GenericDAONHibernate.cs" />
     <Compile Include="DAO\LogDAO.cs" />
     <Compile Include="DAO\MenuCardapioDAO.cs" />
     <Compile Include="DAO\ProdutoDAO.cs" />
@@ -171,6 +172,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="HelperClasses\NHibernateHelper.cs" />
+    <Compile Include="HelperClasses\SqlHelper.cs" />
     <Compile Include="Mapeamentos\DadosAdicionaisProdutoMapping.cs" />
     <Compile Include="Mapeamentos\EmpresaMapping.cs" />
     <Compile Include="Mapeamentos\LogMapping.cs" />
