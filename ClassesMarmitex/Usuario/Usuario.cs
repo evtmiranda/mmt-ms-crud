@@ -85,5 +85,10 @@ namespace ClassesMarmitex
 
         [Column("bol_ativo")]
         public bool Ativo { get; set; }
+
+        public UsuarioParceiro ToUsuarioParceiro()
+        {
+            return new UsuarioParceiro { Id = this.Id, Id_parceiro = this.Id_parceiro, Nome = this.Nome, Apelido = this.Apelido, Email = this.Email, Senha = this.Senha, Ativo = this.Ativo };
+        }
     }
 }

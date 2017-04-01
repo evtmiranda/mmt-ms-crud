@@ -1,17 +1,42 @@
 ﻿namespace ClassesMarmitex
 {
     using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations.Schema;
 
     public class Produto
     {
-        public virtual int Id { get; set; }
-        public virtual int IdEmpresa { get; set; }
-        public virtual string Nome { get; set; }
-        public virtual string Descricao { get; set; }
-        public virtual decimal Valor { get; set; }
-        public virtual byte[] Imagem { get; set; }
-        //public virtual List<DadosAdicionaisProduto> DadosAdicionaisProdutos { get; set; }
-        public virtual int IdMenuCardapio { get; set; }
-        public virtual bool Ativo { get; set; }
+        public int Id { get; set; }
+        public int IdMenuCardapio { get; set; }
+        public string Nome { get; set; }
+        public string Descricao { get; set; }
+        public decimal Valor { get; set; }
+        public byte[] Imagem { get; set; }
+        public List<DadosAdicionaisProduto> DadosAdicionaisProdutos { get; set; }
+        public bool Ativo { get; set; }
+    }
+
+    [Table("tab_produto")]
+    public class ProdutoEntidade
+    {
+        [Column("id_produto")]
+        public int Id { get; set; }
+
+        [Column("id_menu_cardapio")]
+        public int IdMenuCardapio { get; set; }
+
+        [Column("nm_produto")]
+        public string Nome { get; set; }
+
+        [Column("nm_descricao")]
+        public string Descricao { get; set; }
+
+        [Column("vlr_produto")]
+        public decimal Valor { get; set; }
+
+        [Column("img_imagem")]
+        public byte[] Imagem { get; set; }
+
+        [Column("bol_ativo")]
+        public bool Ativo { get; set; }
     }
 }

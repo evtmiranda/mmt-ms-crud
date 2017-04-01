@@ -2,9 +2,15 @@
 {
     public class FormaDePagamento
     {
-        public virtual int ID { get; set; }
-        public virtual int IdEmpresa { get; set; }
-        public virtual string  Nome { get; set; }
-        public virtual decimal Troco { get; set; }
+        public int Id { get; set; }
+        public string  Nome { get; set; }
+        public virtual bool Ativo { get; set; }
+    }
+
+    public class FormaDePagamentoEntidade
+    {
+        public int Id { get; set; }
+        public string Nome { get; set; }
+        public virtual bool Ativo { get; set; }
     }
 }

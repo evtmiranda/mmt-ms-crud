@@ -6,7 +6,7 @@ namespace ClassesMarmitex
     public class Parceiro
     {
         public int Id { get; set; }
-        public int IdEmpresa { get; set; }
+        public int IdLoja{ get; set; }
         public string Nome { get; set; }
         public string Descricao { get; set; }
         public Endereco Endereco { get; set; }
@@ -21,8 +21,8 @@ namespace ClassesMarmitex
         [Column("id_parceiro")]
         public int Id { get; set; }
 
-        [Column("id_empresa")]
-        public int IdEmpresa { get; set; }
+        [Column("id_loja")]
+        public int IdLoja { get; set; }
 
         [Column("nm_nome")]
         public string Nome { get; set; }

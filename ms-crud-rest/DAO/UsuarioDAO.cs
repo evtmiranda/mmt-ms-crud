@@ -31,14 +31,19 @@ namespace ms_crud_rest.DAO
 
                     sqlCommand.Connection = sqlConn;
                     sqlCommand.CommandType = System.Data.CommandType.Text;
-                    sqlCommand.CommandText = string.Format(@"SELECT 
-                                                                COUNT(1) 
-                                                             FROM tab_usuario_loja 
-                                                             INNER JOIN tab_rede
-                                                             ON tab_rede.id_rede = tab_usuario_loja.id_rede
-                                                             WHERE nm_email = @email 
-                                                             AND nm_senha = @senha 
-                                                             AND nm_dominio_rede = @dominio_rede");
+                    sqlCommand.CommandText = string.Format(@"SELECT
+	                                                            COUNT(1) 
+                                                            FROM tab_usuario_parceiro AS tup
+                                                            INNER JOIN tab_parceiro AS tp
+                                                                ON tup.id_parceiro = tp.id_parceiro
+                                                            INNER JOIN tab_loja AS tl
+                                                                ON tl.id_loja = tp.id_loja
+                                                            INNER JOIN tab_rede AS tr
+                                                                ON tr.id_rede = tl.id_rede
+                                                            WHERE tup.nm_email = @email 
+                                                            AND tup.nm_senha = @senha 
+                                                            AND tr.nm_dominio_rede = @dominio_rede
+                                                            AND tup.bol_ativo = 1");
 
                     sqlCommand.Parameters.AddWithValue("@email", usuario.Email);
                     sqlCommand.Parameters.AddWithValue("@senha", usuario.Senha);
@@ -58,7 +63,7 @@ namespace ms_crud_rest.DAO
             }
         }
 
-        public void AutenticarUsuarioParceiro(Usuario usuario)
+        public void AutenticarUsuarioParceiro(Usuario usuario, string dominioRede)
         {
             try
             {
@@ -73,10 +78,18 @@ namespace ms_crud_rest.DAO
 
                     sqlCommand.Connection = sqlConn;
                     sqlCommand.CommandType = System.Data.CommandType.Text;
-                    sqlCommand.CommandText = string.Format("SELECT COUNT(1) FROM tab_usuario_parceiro where email = @email and senha = @senha");
+                    sqlCommand.CommandText = string.Format(@"SELECT 
+                                                                COUNT(1) 
+                                                             FROM tab_usuario_loja 
+                                                             INNER JOIN tab_rede
+                                                             ON tab_rede.id_rede = tab_usuario_loja.id_rede
+                                                             WHERE nm_email = @email 
+                                                             AND nm_senha = @senha 
+                                                             AND nm_dominio_rede = @dominio_rede");
 
                     sqlCommand.Parameters.AddWithValue("@email", usuario.Email);
                     sqlCommand.Parameters.AddWithValue("@senha", usuario.Senha);
+                    sqlCommand.Parameters.AddWithValue("@dominio_rede", dominioRede.Replace("'", ""));
 
                     qtdUsuario = (int)sqlCommand.ExecuteScalar();
                 }
@@ -151,6 +164,7 @@ namespace ms_crud_rest.DAO
         public UsuarioParceiro BuscarUsuarioParceiroPorEmail(Usuario usuario)
         {
             UsuarioParceiro usuarioParceiro;
+            UsuarioParceiroEntidade usuarioParceiroEntidade;
 
             try
             {
@@ -171,14 +185,16 @@ namespace ms_crud_rest.DAO
                                                                 nm_senha,
                                                                 bol_ativo  
                                                             FROM tab_usuario_parceiro 
-                                                            WHERE email = @email");
+                                                            WHERE nm_email = @email");
 
                     sqlCommand.Parameters.AddWithValue("@email", usuario.Email);
 
                     SqlDataReader reader;
                     reader = sqlCommand.ExecuteReader();
 
-                    usuarioParceiro = new ModuloClasse().PreencheClassePorDataReader<UsuarioParceiro>(reader)[0];
+                    usuarioParceiroEntidade = new ModuloClasse().PreencheClassePorDataReader<UsuarioParceiroEntidade>(reader)[0];
+
+                    usuarioParceiro = usuarioParceiroEntidade.ToUsuarioParceiro();
 
                     //fecha o reader
                     if (!reader.IsClosed)

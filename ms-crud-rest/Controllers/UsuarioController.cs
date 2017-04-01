@@ -130,7 +130,7 @@
                 if (tipoUsuario == TipoUsuario.Loja)
                     usuarioDAO.AutenticarUsuarioLoja(usuario, dominioRede);
                 else
-                    usuarioDAO.AutenticarUsuarioParceiro(usuario);
+                    usuarioDAO.AutenticarUsuarioParceiro(usuario, dominioRede);
 
                 //se for autenticado, retorna mensagem de aceito
                 return Request.CreateResponse(HttpStatusCode.Accepted);

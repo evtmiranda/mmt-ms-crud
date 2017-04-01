@@ -48,13 +48,12 @@
     <Compile Include="Loja\Loja.cs" />
     <Compile Include="Endereco\Endereco.cs" />
     <Compile Include="Pagamento\FormaDePagamento.cs" />
-    <Compile Include="LogAplicacao\Log.cs" />
+    <Compile Include="Utils\Log.cs" />
     <Compile Include="Parceiro\Beneficio.cs" />
     <Compile Include="Parceiro\Parceiro.cs" />
     <Compile Include="Pedido\Pedido.cs" />
     <Compile Include="Produto\DadosAtualizarProduto.cs" />
     <Compile Include="Produto\Produto.cs" />
-    <Compile Include="Carrinho\Carrinho.cs" />
     <Compile Include="Produto\DadosAdicionaisProduto.cs" />
     <Compile Include="Cardapio\MenuCardapio.cs" />
     <Compile Include="Produto\ProdutoPedido.cs" />
