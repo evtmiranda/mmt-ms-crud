@@ -1,25 +1,28 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 
 namespace ClassesMarmitex
 {
-    public class Empresa
+    public class Loja
     {
         public int Id { get; set; }
+        public Rede Rede { get; set; }
         public string Nome { get; set; }
         public Endereco Endereco { get; set; }
         public List<Parceiro> Parceiros { get; set; }
         public bool Ativo { get; set; }
     }
 
-    [Table("Empresa")]
-    public class EmpresaEntidade
+    [Table("tab_loja")]
+    public class LojaEntidade
     {
-        [Column("id_empresa")]
+        [Column("id_loja")]
         public int Id { get; set; }
 
-        [Column("nm_nome_empresa")]
+        [Column("id_rede")]
+        public int IdRede { get; set; }
+
+        [Column("nm_nome_loja")]
         public string Nome { get; set; }
 
         [Column("id_endereco")]

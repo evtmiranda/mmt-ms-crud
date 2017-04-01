@@ -173,12 +173,6 @@
     </Compile>
     <Compile Include="HelperClasses\NHibernateHelper.cs" />
     <Compile Include="HelperClasses\SqlHelper.cs" />
-    <Compile Include="Mapeamentos\DadosAdicionaisProdutoMapping.cs" />
-    <Compile Include="Mapeamentos\EmpresaMapping.cs" />
-    <Compile Include="Mapeamentos\LogMapping.cs" />
-    <Compile Include="Mapeamentos\MenuCardapioMapping.cs" />
-    <Compile Include="Mapeamentos\ProdutoMapping.cs" />
-    <Compile Include="Mapeamentos\UsuarioMapping.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

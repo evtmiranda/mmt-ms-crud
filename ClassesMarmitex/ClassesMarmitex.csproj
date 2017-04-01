@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -41,7 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Empresa\Empresa.cs" />
+    <Compile Include="Loja\Loja.cs" />
     <Compile Include="Endereco\Endereco.cs" />
     <Compile Include="Pagamento\FormaDePagamento.cs" />
     <Compile Include="LogAplicacao\Log.cs" />
@@ -54,12 +58,18 @@
     <Compile Include="Produto\DadosAdicionaisProduto.cs" />
     <Compile Include="Cardapio\MenuCardapio.cs" />
     <Compile Include="Produto\ProdutoPedido.cs" />
+    <Compile Include="Rede\Rede.cs" />
     <Compile Include="Usuario\Usuario.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\DadosGet.cs" />
     <Compile Include="Utils\DadosPostAjax.cs" />
+    <Compile Include="Utils\HttpRequestMarmitex.cs" />
+    <Compile Include="Utils\Requisicoes.cs" />
+    <Compile Include="Utils\RequisicoesREST.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
