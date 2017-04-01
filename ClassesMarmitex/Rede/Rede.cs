@@ -7,6 +7,7 @@ namespace ClassesMarmitex
         public int Id { get; set; }
         public string Nome { get; set; }
         public string Descricao { get; set; }
+        public string Dominio { get; set; }
         public bool Ativo { get; set; }
     }
 
@@ -21,6 +22,9 @@ namespace ClassesMarmitex
 
         [Column("nm_descricao_rede")]
         public string Descricao { get; set; }
+
+        [Column("nm_dominio_rede")]
+        public string Dominio { get; set; }
 
         [Column("bol_ativo")]
         public bool Ativo { get; set; }

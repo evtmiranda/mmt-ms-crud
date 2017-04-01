@@ -61,9 +61,11 @@
     <Compile Include="Rede\Rede.cs" />
     <Compile Include="Usuario\Usuario.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\Criptografia.cs" />
     <Compile Include="Utils\DadosGet.cs" />
     <Compile Include="Utils\DadosPostAjax.cs" />
     <Compile Include="Utils\HttpRequestMarmitex.cs" />
+    <Compile Include="Utils\ModuloClasse.cs" />
     <Compile Include="Utils\Requisicoes.cs" />
     <Compile Include="Utils\RequisicoesREST.cs" />
   </ItemGroup>

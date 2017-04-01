@@ -26,7 +26,7 @@
         {
             try
             {
-                Usuario usuario = usuarioDAO.BuscarPorId(id);
+                Usuario usuario = null;
                 if (usuario == null)
                     throw new KeyNotFoundException();
 
@@ -102,7 +102,7 @@
         //retorna todos os usuários existentes
         [HttpGet]
         [Route("api/usuario/listar")]
-        public HttpResponseMessage ListarUsuarios()
+        public HttpResponseMessage ListarUsuarios(TipoUsuario tipoUsuario)
         {
             try
             {
@@ -119,16 +119,16 @@
 
         //método para autenticação de usuário
         [HttpPost]
-        [Route("api/usuario/autenticar/{tipoUsuario}")]
-        public HttpResponseMessage AutenticarUsuario([FromBody] Usuario usuario, int tipoUsuario)
+        [Route("api/usuario/autenticar/{tipoUsuario}/{dominioRede}")]
+        public HttpResponseMessage AutenticarUsuario([FromBody] Usuario usuario, [FromUri] TipoUsuario tipoUsuario, [FromUri] string dominioRede)
         {
             //bloco de tratamento de erros
             try
             {
                 //faz a autenticação do usuário
-                //se for usuario empresa
-                if (tipoUsuario == 1)
-                    usuarioDAO.AutenticarUsuarioEmpresa(usuario);
+                //se for usuario loja
+                if (tipoUsuario == TipoUsuario.Loja)
+                    usuarioDAO.AutenticarUsuarioLoja(usuario, dominioRede);
                 else
                     usuarioDAO.AutenticarUsuarioParceiro(usuario);
 
@@ -154,19 +154,34 @@
             }
         }
 
-        //método para buscar os dados de um usuário através do seu e-mail
+        /// <summary>
+        /// Busca os dados de um usuário através do seu e-mail
+        /// </summary>
+        /// <param name="usuario">Dados do usuário</param>
+        /// <param name="tipoUsuario">Define se é usuario de loja ou de parceiro</param>
+        /// <returns></returns>
         [HttpPost]
-        [Route("api/usuario/buscarPorEmail")]
-        public HttpResponseMessage BuscarUsuarioPorEmail(Usuario usuario)
+        [Route("api/usuario/buscarPorEmail/{tipoUsuario}")]
+        public HttpResponseMessage BuscarUsuarioPorEmail([FromBody] Usuario usuario, [FromUri] TipoUsuario tipoUsuario)
         {
             try
             {
-                Usuario usuarioCompleto = usuarioDAO.BuscarPorEmail(usuario.Email);
+                if (tipoUsuario == TipoUsuario.Loja)
+                {
+                    UsuarioLoja usuarioLoja;
 
-                if (usuarioCompleto == null)
-                    throw new Exception();
+                    usuarioLoja = usuarioDAO.BuscarUsuarioLojaPorEmail(usuario);
 
-                return Request.CreateResponse(HttpStatusCode.OK, usuarioCompleto);
+                    return Request.CreateResponse(HttpStatusCode.OK, usuarioLoja);
+                }
+                else
+                {
+                    UsuarioParceiro usuarioParceiro;
+
+                    usuarioParceiro = usuarioDAO.BuscarUsuarioParceiroPorEmail(usuario);
+
+                    return Request.CreateResponse(HttpStatusCode.OK, usuarioParceiro);
+                }
             }
             catch (KeyNotFoundException)
             {

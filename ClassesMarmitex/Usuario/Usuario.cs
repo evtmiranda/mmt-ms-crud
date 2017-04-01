@@ -3,6 +3,12 @@
 namespace ClassesMarmitex
 {
 
+    public enum TipoUsuario
+    {
+        Loja,
+        Parceiro
+    }
+
     public class Usuario
     {
         public int Id { get; set; }
@@ -12,20 +18,20 @@ namespace ClassesMarmitex
         public string Senha { get; set; }
         public bool Ativo { get; set; }
     }
-    public class UsuarioEmpresa
+    public class UsuarioLoja : Usuario
     {
-        public int Id_empresa { get; set; }
+        public int IdLoja { get; set; }
         public int NivelPermissao { get; set; }
     }
 
-    [Table("tab_usuario_empresa")]
-    public class UsuarioEmpresaEntidade
+    [Table("tab_usuario_loja")]
+    public class UsuarioLojaEntidade
     {
-        [Column("id_usuario_empresa")]
+        [Column("id_usuario_loja")]
         public int Id { get; set; }
 
-        [Column("id_empresa")]
-        public int Id_empresa { get; set; }
+        [Column("id_loja")]
+        public int IdLoja { get; set; }
 
         [Column("nm_nome")]
         public string Nome { get; set; }
@@ -44,9 +50,14 @@ namespace ClassesMarmitex
 
         [Column("bol_ativo")]
         public bool Ativo { get; set; }
+
+        public UsuarioLoja ToUsuarioLoja()
+        {
+            return new UsuarioLoja { Id = this.Id, IdLoja = this.IdLoja, Nome = this.Nome, Apelido = this.Apelido, Email = this.Email, Senha = this.Senha, NivelPermissao = this.NivelPermissao, Ativo = this.Ativo};
+        }
     }
 
-    public class UsuarioParceiro
+    public class UsuarioParceiro : Usuario
     {
         public string Id_parceiro { get; set; }
     }
