@@ -17,6 +17,53 @@ namespace ms_crud_rest.DAO
             this.logDAO = logDAO;
         }
 
+        /// <summary>
+        /// Faz o cadastro de um usuário no banco de dados
+        /// </summary>
+        /// <param name="usuario">dados do usuário</param>
+        /// <param name="chaveParceiro">chave do parceiro</param>
+        public void CadastrarUsuarioParceiro(UsuarioParceiro usuario, string chaveParceiro)
+        {
+            try
+            {
+                //busca o parceiro
+                int idParceiro = BuscarIdParceiro(chaveParceiro);
+
+                using (sqlConn)
+                {
+                    sqlConn.Open();
+
+                    SqlCommand sqlCommand = new SqlCommand();
+
+                    sqlCommand.Connection = sqlConn;
+                    sqlCommand.CommandType = System.Data.CommandType.Text;
+                    sqlCommand.CommandText = string.Format(@"INSERT INTO tab_usuario_parceiro(id_parceiro, nm_nome, nm_apelido, nm_email, nm_senha)
+                                                            VALUES(@id_parceiro, @nm_nome, @nm_apelido, @nm_email, @nm_senha); SELECT @@IDENTITY;");
+
+
+                    sqlCommand.Parameters.AddWithValue("@id_parceiro", idParceiro);
+                    sqlCommand.Parameters.AddWithValue("@nm_nome", usuario.Nome);
+                    sqlCommand.Parameters.AddWithValue("@nm_apelido", usuario.Apelido);
+                    sqlCommand.Parameters.AddWithValue("@email", usuario.Email);
+                    sqlCommand.Parameters.AddWithValue("@senha", usuario.Senha);
+
+                    //verifica se o retorno foi positivo
+                    if ((int)sqlCommand.ExecuteScalar() != 0)
+                        throw new System.Exception("usuário não cadastrado. \n erro: ");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                logDAO.Adicionar(new Log { Mensagem = "Erro ao cadastrar usuário", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// Autentica um usuário do tipo loja
+        /// </summary>
+        /// <param name="usuario">Dados do usuário para autenticacai</param>
+        /// <param name="dominioRede">Rede que o usuário pertence</param>
         public void AutenticarUsuarioLoja(Usuario usuario, string dominioRede)
         {
             try
@@ -63,6 +110,11 @@ namespace ms_crud_rest.DAO
             }
         }
 
+        /// <summary>
+        /// Autentica um usuário do tipo parceiro
+        /// </summary>
+        /// <param name="usuario">Dados do usuário para autenticacai</param>
+        /// <param name="dominioRede">Rede que o usuário pertence</param>
         public void AutenticarUsuarioParceiro(Usuario usuario, string dominioRede)
         {
             try
@@ -161,6 +213,11 @@ namespace ms_crud_rest.DAO
             }
         }
 
+        /// <summary>
+        /// Faz a busca de um usuário de loja através do e-mail
+        /// </summary>
+        /// <param name="usuario">Dados do usuario para consulta</param>
+        /// <returns></returns>
         public UsuarioParceiro BuscarUsuarioParceiroPorEmail(Usuario usuario)
         {
             UsuarioParceiro usuarioParceiro;

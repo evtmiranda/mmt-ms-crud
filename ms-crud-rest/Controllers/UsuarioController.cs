@@ -22,7 +22,8 @@
             this.logDAO = logDAO;
         }
 
-        public HttpResponseMessage Get(int id)
+        [HttpGet]
+        public HttpResponseMessage BuscarUsuario(int id)
         {
             try
             {
@@ -41,7 +42,8 @@
             }
         }
 
-        public HttpResponseMessage Post([FromBody] Usuario usuario)
+        [HttpPost]
+        public HttpResponseMessage CadastrarUsuario([FromBody] Usuario usuario, [FromUri] TipoUsuario tipoUsuario, [FromUri] string dominioRede)
         {
             try
             {
@@ -61,7 +63,8 @@
             }
         }
 
-        public HttpResponseMessage Delete([FromUri] int id)
+        [HttpDelete]
+        public HttpResponseMessage ExcluirUsuario([FromUri] int id)
         {
             try
             {
@@ -77,7 +80,8 @@
             }
         }
 
-        public HttpResponseMessage Patch([FromBody] Usuario usuario, [FromUri] int id)
+        [HttpPatch]
+        public HttpResponseMessage AtualizarUsuario([FromBody] Usuario usuario, [FromUri] int id)
         {
             try
             {

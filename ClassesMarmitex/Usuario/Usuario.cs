@@ -59,7 +59,8 @@ namespace ClassesMarmitex
 
     public class UsuarioParceiro : Usuario
     {
-        public string Id_parceiro { get; set; }
+        public string IdParceiro { get; set; }
+        public string ChaveParceiro { get; set; }
     }
 
     [Table("tab_usuario_parceiro")]
@@ -69,7 +70,7 @@ namespace ClassesMarmitex
         public int Id { get; set; }
 
         [Column("id_parceiro")]
-        public string Id_parceiro { get; set; }
+        public string IdParceiro { get; set; }
 
         [Column("nm_nome")]
         public string Nome { get; set; }
@@ -88,7 +89,7 @@ namespace ClassesMarmitex
 
         public UsuarioParceiro ToUsuarioParceiro()
         {
-            return new UsuarioParceiro { Id = this.Id, Id_parceiro = this.Id_parceiro, Nome = this.Nome, Apelido = this.Apelido, Email = this.Email, Senha = this.Senha, Ativo = this.Ativo };
+            return new UsuarioParceiro { Id = this.Id, IdParceiro = this.IdParceiro, Nome = this.Nome, Apelido = this.Apelido, Email = this.Email, Senha = this.Senha, Ativo = this.Ativo };
         }
     }
 }
