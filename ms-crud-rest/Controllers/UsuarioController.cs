@@ -43,7 +43,8 @@
         }
 
         [HttpPost]
-        public HttpResponseMessage CadastrarUsuario([FromBody] Usuario usuario, [FromUri] TipoUsuario tipoUsuario, [FromUri] string dominioRede)
+        [Route("api/usuario/cadastrar/usuarioLoja/{dominioRede}")]
+        public HttpResponseMessage CadastrarUsuarioLoja([FromBody] UsuarioLoja usuario, [FromUri] string dominioRede)
         {
             try
             {
@@ -51,6 +52,29 @@
 
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created);
                 string location = Url.Link("DefaultApi", new { controller = "usuario", id = usuario.Id });
+                response.Headers.Location = new Uri(location);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                string mensagem = string.Format("nao foi possivel cadastrar o usuario. erro: {0}", ex);
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/usuario/cadastrar/usuarioParceiro/{dominioRede}")]
+        public HttpResponseMessage CadastrarUsuarioParceiro([FromBody] UsuarioParceiro usuario, [FromUri] string dominioRede)
+        {
+            try
+            {
+                int idUsuarioCadastrado = usuarioDAO.CadastrarUsuarioParceiro(usuario);
+
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created);
+
+                string location = Url.Link("DefaultApi", new { controller = "Usuario", id = idUsuarioCadastrado });
                 response.Headers.Location = new Uri(location);
 
                 return response;

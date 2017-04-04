@@ -22,12 +22,12 @@ namespace ms_crud_rest.DAO
         /// </summary>
         /// <param name="usuario">dados do usuário</param>
         /// <param name="chaveParceiro">chave do parceiro</param>
-        public void CadastrarUsuarioParceiro(UsuarioParceiro usuario, string chaveParceiro)
+        public int CadastrarUsuarioParceiro(UsuarioParceiro usuario)
         {
             try
             {
                 //busca o parceiro
-                int idParceiro = BuscarIdParceiro(chaveParceiro);
+                int idParceiro = BuscarIdParceiro(usuario.CodigoParceiro);
 
                 using (sqlConn)
                 {
@@ -47,14 +47,18 @@ namespace ms_crud_rest.DAO
                     sqlCommand.Parameters.AddWithValue("@email", usuario.Email);
                     sqlCommand.Parameters.AddWithValue("@senha", usuario.Senha);
 
+                    int retorno = (int)sqlCommand.ExecuteScalar();
+
                     //verifica se o retorno foi positivo
-                    if ((int)sqlCommand.ExecuteScalar() != 0)
-                        throw new System.Exception("usuário não cadastrado. \n erro: ");
+                    if (retorno == 0)
+                        throw new CadastroNaoRealizadoClienteException();
+
+                    return retorno;
                 }
             }
             catch (System.Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao cadastrar usuário", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+                logDAO.Adicionar(new Log { Mensagem = "erro ao cadastrar usuário", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
                 throw ex;
             }
         }
@@ -70,7 +74,8 @@ namespace ms_crud_rest.DAO
             {
                 int qtdUsuario = 0;
 
-                using (sqlConn) {
+                using (sqlConn)
+                {
 
                     sqlConn.Open();
 
@@ -94,7 +99,7 @@ namespace ms_crud_rest.DAO
 
                     sqlCommand.Parameters.AddWithValue("@email", usuario.Email);
                     sqlCommand.Parameters.AddWithValue("@senha", usuario.Senha);
-                    sqlCommand.Parameters.AddWithValue("@dominio_rede", dominioRede.Replace("'",""));
+                    sqlCommand.Parameters.AddWithValue("@dominio_rede", dominioRede.Replace("'", ""));
 
                     qtdUsuario = (int)sqlCommand.ExecuteScalar();
                 }
@@ -265,6 +270,46 @@ namespace ms_crud_rest.DAO
                 logDAO.Adicionar(new Log { Mensagem = "Erro ao buscar os dados do usuário", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
                 throw ex;
             }
+        }
+
+        private int BuscarIdParceiro(string sCodigoParceiro)
+        {
+            try
+            {
+                using (sqlConn)
+                {
+                    sqlConn.Open();
+
+                    SqlCommand sqlCommand = new SqlCommand();
+
+                    sqlCommand.Connection = sqlConn;
+                    sqlCommand.CommandType = System.Data.CommandType.Text;
+                    sqlCommand.CommandText = string.Format(@"SELECT id_parceiro FROM tab_parceiro
+                                                            WHERE nm_codigo = @codigoParceiro");
+
+
+                    sqlCommand.Parameters.AddWithValue("@codigoParceiro", sCodigoParceiro);
+
+                    int retorno = (int)sqlCommand.ExecuteScalar();
+
+                    //se não encontrar uma empresa com o código digitado
+                    if (retorno == 0)
+                        throw new EmpresaNaoEncontradaException();
+
+                    return retorno;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                logDAO.Adicionar(new Log
+                {
+                    Mensagem = "erro ao consultar a empresa",
+                    Descricao = ex.Message,
+                    StackTrace = ex.StackTrace == null ? "" : ex.StackTrace
+                });
+                throw ex;
+            }
+
         }
     }
 }

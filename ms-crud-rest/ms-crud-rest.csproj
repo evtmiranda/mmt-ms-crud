@@ -167,7 +167,7 @@
     <Compile Include="DAO\MenuCardapioDAO.cs" />
     <Compile Include="DAO\ProdutoDAO.cs" />
     <Compile Include="DAO\UsuarioDAO.cs" />
-    <Compile Include="Exceptions\UsuarioNaoAutenticadoException.cs" />
+    <Compile Include="Exceptions\ApiException.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

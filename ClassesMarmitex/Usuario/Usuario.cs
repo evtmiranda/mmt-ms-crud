@@ -60,7 +60,7 @@ namespace ClassesMarmitex
     public class UsuarioParceiro : Usuario
     {
         public string IdParceiro { get; set; }
-        public string ChaveParceiro { get; set; }
+        public string CodigoParceiro { get; set; }
     }
 
     [Table("tab_usuario_parceiro")]
