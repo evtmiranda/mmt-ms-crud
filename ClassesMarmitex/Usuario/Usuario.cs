@@ -61,6 +61,7 @@ namespace ClassesMarmitex
     {
         public int IdParceiro { get; set; }
         public string CodigoParceiro { get; set; }
+        public string NumeroCelular { get; set; }
     }
 
     [Table("tab_usuario_parceiro")]
@@ -80,6 +81,9 @@ namespace ClassesMarmitex
 
         [Column("nm_email")]
         public string Email { get; set; }
+
+        [Column("nm_celular")]
+        public string NumeroCelular { get; set; }
 
         [Column("nm_senha")]
         public string Senha { get; set; }

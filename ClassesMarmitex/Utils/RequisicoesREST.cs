@@ -10,6 +10,7 @@
         public DadosRequisicaoRest Post(string recurso, object objeto)
         {
             DadosRequisicaoRest dadosPost = new DadosRequisicaoRest();
+            string conteudo = "";
 
             //faz o post de um objeto em um determinado recurso
             try
@@ -29,6 +30,14 @@
 
                 dadosPost.HttpStatusCode = response.StatusCode;
 
+                using (Stream responseStream = response.GetResponseStream())
+                {
+                    StreamReader reader = new StreamReader(responseStream, Encoding.UTF8);
+                    conteudo = reader.ReadToEnd();
+                }
+
+                dadosPost.objeto = conteudo;
+
                 return dadosPost;
             }
             //se for algum erro do protocolo HTTP, captura o retorno HTTP para utilizar no retorno do método
@@ -40,18 +49,21 @@
                 //verifica se não é erro do protocolo HTTP. Se não for, devolve um InternalServerError
                 if (wEx.Status != WebExceptionStatus.ProtocolError) {
                     dadosPost.HttpStatusCode = HttpStatusCode.InternalServerError;
+                    dadosPost.objeto = wEx.Message != null ? wEx.Message : "";
                     return dadosPost;
                 }
 
                 //Retorna o status HTTP
                 dadosPost.HttpStatusCode = webResponse.StatusCode;
+                dadosPost.objeto = wEx.Message != null ? wEx.Message : "";
 
                 return dadosPost;
             }
             //Se ocorrer qualquer outra exceção retorna um InternalServerError
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
                 dadosPost.HttpStatusCode = HttpStatusCode.InternalServerError;
+                dadosPost.objeto = ex.Message != null ? ex.Message : "";
 
                 return dadosPost;
             }
@@ -91,23 +103,28 @@
             catch (WebException wEx)
             {
                 //cria um webResponse
-                var webResponse = wEx.Response as HttpWebResponse;
+                var webResponse = wEx.Response as System.Net.HttpWebResponse;
 
                 //verifica se não é erro do protocolo HTTP. Se não for, devolve um InternalServerError
                 if (wEx.Status != WebExceptionStatus.ProtocolError)
                 {
                     retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
+                    retorno.objeto = wEx.Message != null ? wEx.Message : "";
                     return retorno;
                 }
 
                 //Retorna o status HTTP
                 retorno.HttpStatusCode = webResponse.StatusCode;
+                retorno.objeto = wEx.Message != null ? wEx.Message : "";
+
                 return retorno;
             }
             //Se ocorrer qualquer outra exceção retorna um InternalServerError
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
                 retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
+                retorno.objeto = ex.Message != null ? ex.Message : "";
+
                 return retorno;
             }
         }
@@ -156,18 +173,21 @@
                 if (wEx.Status != WebExceptionStatus.ProtocolError)
                 {
                     retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
+                    retorno.objeto = wEx.Message != null ? wEx.Message : "";
                     return retorno;
                 }
 
                 //Retorna o status HTTP
                 retorno.HttpStatusCode = webResponse.StatusCode;
+                retorno.objeto = wEx.Message != null ? wEx.Message : "";
 
                 return retorno;
             }
             //Se ocorrer qualquer outra exceção retorna um InternalServerError
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
                 retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
+                retorno.objeto = ex.Message != null ? ex.Message : "";
 
                 return retorno;
             }

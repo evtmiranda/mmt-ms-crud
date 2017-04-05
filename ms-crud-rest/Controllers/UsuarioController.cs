@@ -84,6 +84,12 @@
 
                 return response;
             }
+            catch (EmpresaNaoEncontradaException eneEx)
+            {
+                string mensagem = eneEx.Message;
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+            }
             catch (Exception ex)
             {
                 string mensagem = string.Format("nao foi possivel cadastrar o usuario. erro: {0}", ex);

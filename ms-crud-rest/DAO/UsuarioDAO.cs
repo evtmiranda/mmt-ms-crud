@@ -307,7 +307,7 @@ namespace ms_crud_rest.DAO
 
                     sqlCommand.Parameters.AddWithValue("@codigoParceiro", sCodigoParceiro);
 
-                    int retorno = (int)sqlCommand.ExecuteScalar();
+                    int retorno = Convert.ToInt32(sqlCommand.ExecuteScalar());
 
                     //se não encontrar uma empresa com o código digitado
                     if (retorno == 0)
@@ -315,6 +315,10 @@ namespace ms_crud_rest.DAO
 
                     return retorno;
                 }
+            }
+            catch (EmpresaNaoEncontradaException)
+            {
+                throw;
             }
             catch (System.Exception ex)
             {
