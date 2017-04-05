@@ -1,5 +1,7 @@
 ﻿using ClassesMarmitex;
 using ms_crud_rest.Exceptions;
+using ms_crud_rest.HelperClasses;
+using System;
 using System.Data.SqlClient;
 
 namespace ms_crud_rest.DAO
@@ -26,11 +28,11 @@ namespace ms_crud_rest.DAO
         {
             try
             {
-                //busca o parceiro
-                int idParceiro = BuscarIdParceiro(usuario.CodigoParceiro);
-
                 using (sqlConn)
                 {
+                    if (string.IsNullOrEmpty(sqlConn.ConnectionString))
+                        sqlConn = SqlHelper.AbreConexao();
+
                     sqlConn.Open();
 
                     SqlCommand sqlCommand = new SqlCommand();
@@ -41,13 +43,15 @@ namespace ms_crud_rest.DAO
                                                             VALUES(@id_parceiro, @nm_nome, @nm_apelido, @nm_email, @nm_senha); SELECT @@IDENTITY;");
 
 
-                    sqlCommand.Parameters.AddWithValue("@id_parceiro", idParceiro);
+                    sqlCommand.Parameters.AddWithValue("@id_parceiro", usuario.IdParceiro);
                     sqlCommand.Parameters.AddWithValue("@nm_nome", usuario.Nome);
                     sqlCommand.Parameters.AddWithValue("@nm_apelido", usuario.Apelido);
-                    sqlCommand.Parameters.AddWithValue("@email", usuario.Email);
-                    sqlCommand.Parameters.AddWithValue("@senha", usuario.Senha);
+                    sqlCommand.Parameters.AddWithValue("@nm_email", usuario.Email);
+                    sqlCommand.Parameters.AddWithValue("@nm_senha", usuario.Senha);
 
-                    int retorno = (int)sqlCommand.ExecuteScalar();
+                    var varRetorno = sqlCommand.ExecuteScalar();
+
+                    int retorno = Convert.ToInt32(varRetorno);
 
                     //verifica se o retorno foi positivo
                     if (retorno == 0)
@@ -76,6 +80,8 @@ namespace ms_crud_rest.DAO
 
                 using (sqlConn)
                 {
+                    if (string.IsNullOrEmpty(sqlConn.ConnectionString))
+                        sqlConn = SqlHelper.AbreConexao();
 
                     sqlConn.Open();
 
@@ -128,6 +134,8 @@ namespace ms_crud_rest.DAO
 
                 using (sqlConn)
                 {
+                    if (string.IsNullOrEmpty(sqlConn.ConnectionString))
+                        sqlConn = SqlHelper.AbreConexao();
 
                     sqlConn.Open();
 
@@ -176,6 +184,9 @@ namespace ms_crud_rest.DAO
             {
                 using (sqlConn)
                 {
+                    if (string.IsNullOrEmpty(sqlConn.ConnectionString))
+                        sqlConn = SqlHelper.AbreConexao();
+
                     sqlConn.Open();
 
                     SqlCommand sqlCommand = new SqlCommand();
@@ -232,6 +243,9 @@ namespace ms_crud_rest.DAO
             {
                 using (sqlConn)
                 {
+                    if (string.IsNullOrEmpty(sqlConn.ConnectionString))
+                        sqlConn = SqlHelper.AbreConexao();
+
                     sqlConn.Open();
 
                     SqlCommand sqlCommand = new SqlCommand();
@@ -272,12 +286,15 @@ namespace ms_crud_rest.DAO
             }
         }
 
-        private int BuscarIdParceiro(string sCodigoParceiro)
+        public int BuscarIdParceiro(string sCodigoParceiro)
         {
             try
             {
                 using (sqlConn)
                 {
+                    if (string.IsNullOrEmpty(sqlConn.ConnectionString))
+                        sqlConn = SqlHelper.AbreConexao();
+
                     sqlConn.Open();
 
                     SqlCommand sqlCommand = new SqlCommand();

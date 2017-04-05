@@ -65,7 +65,7 @@ namespace ms_crud_rest.App_Start
         private static void RegisterServices(IKernel kernel)
         {
             kernel.Bind<SqlConnection>()
-                    .ToMethod(x => SqlHelper.AbreConexao()).InRequestScope();
+                    .ToMethod(x => SqlHelper.AbreConexao());
         }
     }
 }

@@ -59,7 +59,7 @@ namespace ClassesMarmitex
 
     public class UsuarioParceiro : Usuario
     {
-        public string IdParceiro { get; set; }
+        public int IdParceiro { get; set; }
         public string CodigoParceiro { get; set; }
     }
 
@@ -70,7 +70,7 @@ namespace ClassesMarmitex
         public int Id { get; set; }
 
         [Column("id_parceiro")]
-        public string IdParceiro { get; set; }
+        public int IdParceiro { get; set; }
 
         [Column("nm_nome")]
         public string Nome { get; set; }

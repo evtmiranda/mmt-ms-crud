@@ -11,8 +11,8 @@
 
     public class UsuarioController : ApiController
     {
-        private UsuarioDAO usuarioDAO;
-        private LogDAO logDAO;
+        public UsuarioDAO usuarioDAO;
+        public LogDAO logDAO;
 
         //construtor do controller, recebe um usuarioDAO e um logDAO, que por sua vez recebe uma ISession.
         //O Ninject é o responsável por cuidar da criação de todos esses objetos
@@ -70,6 +70,11 @@
         {
             try
             {
+                //busca o parceiro
+                int idParceiro = usuarioDAO.BuscarIdParceiro(usuario.CodigoParceiro);
+
+                usuario.IdParceiro = idParceiro;
+
                 int idUsuarioCadastrado = usuarioDAO.CadastrarUsuarioParceiro(usuario);
 
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created);
