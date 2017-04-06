@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HorarioEntrega\HorarioEntrega.cs" />
     <Compile Include="Loja\Loja.cs" />
     <Compile Include="Endereco\Endereco.cs" />
     <Compile Include="Pagamento\FormaDePagamento.cs" />

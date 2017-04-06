@@ -23,15 +23,13 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
                 sqlConn.Command.CommandText = string.Format(@"SELECT 
 	                                                            id_menu_cardapio,
-	                                                            tmc.id_rede,
+	                                                            tmc.id_loja,
 	                                                            nm_cardapio,
 	                                                            nr_ordem_exibicao,
 	                                                            tmc.bol_ativo
                                                             FROM tab_menu_cardapio as tmc
-                                                            INNER JOIN tab_loja AS tl
-                                                            ON tl.id_rede = tmc.id_rede
                                                             INNER JOIN tab_parceiro AS tp
-                                                            ON tp.id_loja = tl.id_loja
+                                                            ON tp.id_loja = tmc.id_loja
                                                             WHERE tp.id_parceiro = @id_parceiro
                                                             AND tmc.bol_ativo = 1;");
                         

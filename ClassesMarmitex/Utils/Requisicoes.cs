@@ -50,5 +50,23 @@
 
             return listaProdutos;
         }
+
+        public List<FormaDePagamento> ListarFormasPagamento(int idParceiro)
+        {
+            DadosRequisicaoRest retornoGet = new DadosRequisicaoRest();
+
+            List<FormaDePagamento> listaFormaPagamento;
+
+            retornoGet = rest.Get("/formaPagamento/listar/" + idParceiro);
+
+            if (retornoGet.HttpStatusCode != HttpStatusCode.OK)
+                return null;
+
+            string json = retornoGet.objeto.ToString();
+
+            listaFormaPagamento = JsonConvert.DeserializeObject<List<FormaDePagamento>>(json);
+
+            return listaFormaPagamento;
+        }
     }
 }

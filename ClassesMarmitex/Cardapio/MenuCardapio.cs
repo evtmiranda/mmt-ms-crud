@@ -6,7 +6,7 @@ namespace ClassesMarmitex
     public class MenuCardapio
     {
         public int Id { get; set; }
-        public int IdRede { get; set; }
+        public int IdLoja { get; set; }
         public string Nome { get; set; }
         public List<Produto> Produtos { get; set; }
         public int OrdemExibicao { get; set; }
@@ -19,8 +19,8 @@ namespace ClassesMarmitex
         [Column("id_menu_cardapio")]
         public int Id { get; set; }
 
-        [Column("id_rede")]
-        public int IdRede { get; set; }
+        [Column("id_loja")]
+        public int IdLoja { get; set; }
 
         [Column("nm_cardapio")]
         public string Nome { get; set; }
@@ -33,7 +33,7 @@ namespace ClassesMarmitex
 
         public MenuCardapio ToMenuCardapio()
         {
-            return new MenuCardapio { Id = this.Id, IdRede = this.IdRede, Nome = this.Nome, OrdemExibicao = this.OrdemExibicao, Ativo = this.Ativo};
+            return new MenuCardapio { Id = this.Id, IdLoja = this.IdLoja, Nome = this.Nome, OrdemExibicao = this.OrdemExibicao, Ativo = this.Ativo};
         }
     }
 }

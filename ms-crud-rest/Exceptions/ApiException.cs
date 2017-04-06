@@ -49,4 +49,26 @@ namespace ms_crud_rest.Exceptions
             }
         }
     }
+
+    public class PagamentoNaoEncontradoException : Exception
+    {
+        public override string Message
+        {
+            get
+            {
+                return "nenhuma forma de pagamento encontrada";
+            }
+        }
+    }
+
+    public class HorarioNaoEncontradoException : Exception
+    {
+        public override string Message
+        {
+            get
+            {
+                return "nenhum horário de entrega encontrado";
+            }
+        }
+    }
 }

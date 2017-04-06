@@ -158,10 +158,14 @@
     <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\CarrinhoController.cs" />
+    <Compile Include="Controllers\FormaPagamentoController.cs" />
+    <Compile Include="Controllers\HorarioEntregaController.cs" />
     <Compile Include="Controllers\MenuCardapioController.cs" />
     <Compile Include="Controllers\ProdutoController.cs" />
     <Compile Include="Controllers\UsuarioController.cs" />
+    <Compile Include="DAO\FormaPagamentoDAO.cs" />
     <Compile Include="DAO\GenericDAO.cs" />
+    <Compile Include="DAO\HorarioEntregaDAO.cs" />
     <Compile Include="DAO\LogDAO.cs" />
     <Compile Include="DAO\MenuCardapioDAO.cs" />
     <Compile Include="DAO\ProdutoDAO.cs" />
@@ -184,6 +188,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Models\" />
+    <Folder Include="Views\FormaPagamento\" />
     <Folder Include="Views\Parceiro\" />
   </ItemGroup>
   <ItemGroup>
