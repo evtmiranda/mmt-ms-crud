@@ -49,6 +49,7 @@
     <Compile Include="Loja\Loja.cs" />
     <Compile Include="Endereco\Endereco.cs" />
     <Compile Include="Pagamento\FormaDePagamento.cs" />
+    <Compile Include="Utils\Constantes.cs" />
     <Compile Include="Utils\Log.cs" />
     <Compile Include="Parceiro\Beneficio.cs" />
     <Compile Include="Parceiro\Parceiro.cs" />

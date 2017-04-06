@@ -2,7 +2,11 @@
 
 namespace ms_crud_rest.DAO
 {
-    public class LogDAO : GenericDAO<Log>
+    public class LogDAO
     {
+        public void Adicionar(Log log)
+        {
+
+        }
     }
 }

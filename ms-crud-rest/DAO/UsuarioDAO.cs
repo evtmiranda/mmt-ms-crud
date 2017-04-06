@@ -1,5 +1,4 @@
 ﻿using ClassesMarmitex;
-using ClassesMarmitex.Utils;
 using ms_crud_rest.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -8,16 +7,7 @@ namespace ms_crud_rest.DAO
 {
     public class UsuarioDAO : GenericDAO<Usuario>
     {
-        //recebe uma conexão e atribui à sessão da classe
-        //recebe também um logDAO
-        private SqlServer sqlConn;
-        private LogDAO logDAO;
-
-        public UsuarioDAO(SqlServer sqlConn, LogDAO logDAO)
-        {
-            this.sqlConn = sqlConn;
-            this.logDAO = logDAO;
-        }
+        public UsuarioDAO(SqlServer sqlConn, LogDAO logDAO) : base(sqlConn, logDAO) { }
 
         /// <summary>
         /// Faz o cadastro de um usuário no banco de dados
@@ -52,6 +42,10 @@ namespace ms_crud_rest.DAO
 
 
                 return retorno;
+            }
+            catch (CadastroNaoRealizadoClienteException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
@@ -98,6 +92,10 @@ namespace ms_crud_rest.DAO
                     throw new CadastroNaoRealizadoClienteException();
 
                 return retorno;
+            }
+            catch (CadastroNaoRealizadoClienteException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
@@ -149,6 +147,10 @@ namespace ms_crud_rest.DAO
                 if (qtdUsuario == 0)
                     throw new UsuarioNaoAutenticadoException();
             }
+            catch (UsuarioNaoAutenticadoException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 logDAO.Adicionar(new Log { Mensagem = "Erro ao autenticar usuário", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
@@ -194,6 +196,10 @@ namespace ms_crud_rest.DAO
                 //verifica se o retorno foi positivo
                 if (qtdUsuario == 0)
                     throw new UsuarioNaoAutenticadoException();
+            }
+            catch (UsuarioNaoAutenticadoException)
+            {
+                throw;
             }
             catch (System.Exception ex)
             {

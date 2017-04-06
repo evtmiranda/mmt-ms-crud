@@ -38,4 +38,15 @@ namespace ms_crud_rest.Exceptions
             }
         }
     }
+
+    public class CardapioNaoEncontradoException : Exception
+    {
+        public override string Message
+        {
+            get
+            {
+                return "nenhum cardápio encontrado";
+            }
+        }
+    }
 }

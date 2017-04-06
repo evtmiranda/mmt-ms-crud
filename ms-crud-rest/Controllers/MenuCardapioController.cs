@@ -1,5 +1,6 @@
 ﻿using ClassesMarmitex;
 using ms_crud_rest.DAO;
+using ms_crud_rest.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -108,17 +109,23 @@ namespace ms_crud_rest.Controllers
 
         //retorna todos os cardápios existentes
         [HttpGet]
-        [Route("api/menucardapio/listar")]
-        public HttpResponseMessage ListarCardapios()
+        [Route("api/menucardapio/listar/{idParceiro}")]
+        public HttpResponseMessage ListarCardapios(int idParceiro)
         {
             try
             {
-                IList<MenuCardapio> usuarios = cardapioDAO.Listar();
-                return Request.CreateResponse(HttpStatusCode.OK, usuarios);
+                IList<MenuCardapio> cardapios = cardapioDAO.Listar(idParceiro);
+                return Request.CreateResponse(HttpStatusCode.OK, cardapios);
             }
-            catch (KeyNotFoundException)
+            catch (CardapioNaoEncontradoException cneEx)
             {
-                string mensagem = string.Format("nao foram encontrados cardápios");
+                string mensagem = cneEx.Message;
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+            }
+            catch (Exception)
+            {
+                string mensagem = string.Format("ocorreu um problema ao buscar o cardápio. por favor, tente atualizar a página ou acessar dentro de alguns minutos...");
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.NotFound, error);
             }

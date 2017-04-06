@@ -15,13 +15,13 @@
             this.rest = rest;
         }
 
-        public List<MenuCardapio> ListarMenuCardapio()
+        public List<MenuCardapio> ListarMenuCardapio(int idParceiro)
         {
             DadosRequisicaoRest retornoGet = new DadosRequisicaoRest();
 
             List<MenuCardapio> listaMenuCardapio;
 
-            retornoGet = rest.Get("/menucardapio/listar");
+            retornoGet = rest.Get("/menucardapio/listar/" + idParceiro);
 
             if (retornoGet.HttpStatusCode != HttpStatusCode.OK)
                 return null;

@@ -1,5 +1,6 @@
 ﻿namespace ClassesMarmitex
 {
+    using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations.Schema;
 
@@ -38,5 +39,10 @@
 
         [Column("bol_ativo")]
         public bool Ativo { get; set; }
+
+        public Produto ToProduto()
+        {
+            return new Produto { Id = this.Id, IdMenuCardapio = this.IdMenuCardapio, Nome = this.Nome, Descricao = this.Descricao, Valor = this.Valor, Imagem = this.Imagem, Ativo = this.Ativo };
+        }
     }
 }

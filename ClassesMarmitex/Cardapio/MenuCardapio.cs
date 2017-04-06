@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClassesMarmitex
 {
@@ -7,6 +8,7 @@ namespace ClassesMarmitex
         public int Id { get; set; }
         public int IdRede { get; set; }
         public string Nome { get; set; }
+        public List<Produto> Produtos { get; set; }
         public int OrdemExibicao { get; set; }
         public bool Ativo { get; set; }
     }
@@ -28,5 +30,10 @@ namespace ClassesMarmitex
 
         [Column("bol_ativo")]
         public bool Ativo { get; set; }
+
+        public MenuCardapio ToMenuCardapio()
+        {
+            return new MenuCardapio { Id = this.Id, IdRede = this.IdRede, Nome = this.Nome, OrdemExibicao = this.OrdemExibicao, Ativo = this.Ativo};
+        }
     }
 }

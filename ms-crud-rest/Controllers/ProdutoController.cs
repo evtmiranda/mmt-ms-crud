@@ -1,5 +1,6 @@
 ﻿using ClassesMarmitex;
 using ms_crud_rest.DAO;
+using ms_crud_rest.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -112,16 +113,16 @@ namespace ms_crud_rest.Controllers
         //retorna todos os produtos existentes
         [HttpGet]
         [Route("api/produto/listar")]
-        public HttpResponseMessage ListarCardapios()
+        public HttpResponseMessage ListarProdutos(int idMenuCardapio)
         {
             try
             {
-                IList<Produto> produtos = produtoDAO.Listar();
+                IList<Produto> produtos = produtoDAO.Listar(idMenuCardapio);
                 return Request.CreateResponse(HttpStatusCode.OK, produtos);
             }
-            catch (KeyNotFoundException)
+            catch (Exception)
             {
-                string mensagem = string.Format("nao foram encontrados produtos");
+                string mensagem = string.Format("ocorreu um problema ao buscar os produtos. por favor, tente atualizar a página ou acessar dentro de alguns minutos...");
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.NotFound, error);
             }

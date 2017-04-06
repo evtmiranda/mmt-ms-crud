@@ -1,4 +1,4 @@
-﻿namespace ClassesMarmitex.Utils
+﻿namespace ClassesMarmitex
 {
     using System;
     using System.Configuration;

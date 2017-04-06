@@ -59,8 +59,8 @@ namespace ms_crud_rest.App_Start
         /// <param name="kernel">The kernel</param>
         private static void RegisterServices(IKernel kernel)
         {
-            kernel.Bind<ClassesMarmitex.Utils.SqlServer>()
-                    .ToMethod(x => new ClassesMarmitex.Utils.SqlServer());
+            kernel.Bind<ClassesMarmitex.SqlServer>()
+                    .ToMethod(x => new ClassesMarmitex.SqlServer());
         }
     }
 }
