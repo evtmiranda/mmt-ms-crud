@@ -1,8 +1,8 @@
 ﻿using ClassesMarmitex;
+using ClassesMarmitex.Utils;
 using ms_crud_rest.Exceptions;
-using ms_crud_rest.HelperClasses;
 using System;
-using System.Data.SqlClient;
+using System.Collections.Generic;
 
 namespace ms_crud_rest.DAO
 {
@@ -10,13 +10,58 @@ namespace ms_crud_rest.DAO
     {
         //recebe uma conexão e atribui à sessão da classe
         //recebe também um logDAO
-        private SqlConnection sqlConn;
+        private SqlServer sqlConn;
         private LogDAO logDAO;
 
-        public UsuarioDAO(SqlConnection sqlConn, LogDAO logDAO)
+        public UsuarioDAO(SqlServer sqlConn, LogDAO logDAO)
         {
             this.sqlConn = sqlConn;
             this.logDAO = logDAO;
+        }
+
+        /// <summary>
+        /// Faz o cadastro de um usuário no banco de dados
+        /// </summary>
+        /// <param name="usuario">dados do usuário</param>
+        public int CadastrarUsuarioLoja(UsuarioLoja usuario)
+        {
+            try
+            {
+                int retorno = 0;
+
+                sqlConn.StartConnection();
+
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_usuario_loja(id_parceiro, nm_nome, nm_apelido, nm_email, nm_senha)
+                                                            VALUES(@id_parceiro, @nm_nome, @nm_apelido, @nm_email, @nm_senha); SELECT @@IDENTITY;");
+
+
+                //sqlCommand.Parameters.AddWithValue("@id_parceiro", usuario.IdParceiro);
+                sqlConn.Command.Parameters.AddWithValue("@nm_nome", usuario.Nome);
+                sqlConn.Command.Parameters.AddWithValue("@nm_apelido", usuario.Apelido);
+                sqlConn.Command.Parameters.AddWithValue("@nm_email", usuario.Email);
+                sqlConn.Command.Parameters.AddWithValue("@nm_senha", usuario.Senha);
+
+                var varRetorno = sqlConn.Command.ExecuteScalar();
+
+                retorno = Convert.ToInt32(varRetorno);
+
+                //verifica se o retorno foi positivo
+                if (retorno == 0)
+                    throw new CadastroNaoRealizadoClienteException();
+
+
+                return retorno;
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { Mensagem = "erro ao cadastrar usuário", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
         }
 
         /// <summary>
@@ -28,68 +73,58 @@ namespace ms_crud_rest.DAO
         {
             try
             {
-                using (sqlConn)
-                {
-                    if (string.IsNullOrEmpty(sqlConn.ConnectionString))
-                        sqlConn = SqlHelper.AbreConexao();
+                int retorno = 0;
 
-                    sqlConn.Open();
+                sqlConn.StartConnection();
 
-                    SqlCommand sqlCommand = new SqlCommand();
-
-                    sqlCommand.Connection = sqlConn;
-                    sqlCommand.CommandType = System.Data.CommandType.Text;
-                    sqlCommand.CommandText = string.Format(@"INSERT INTO tab_usuario_parceiro(id_parceiro, nm_nome, nm_apelido, nm_email, nm_senha)
-                                                            VALUES(@id_parceiro, @nm_nome, @nm_apelido, @nm_email, @nm_senha); SELECT @@IDENTITY;");
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_usuario_parceiro(id_parceiro, nm_nome, nm_apelido, nm_email, nm_celular, nm_senha)
+                                                            VALUES(@id_parceiro, @nm_nome, @nm_apelido, @nm_email, @nm_celular, @nm_senha); SELECT @@IDENTITY;");
 
 
-                    sqlCommand.Parameters.AddWithValue("@id_parceiro", usuario.IdParceiro);
-                    sqlCommand.Parameters.AddWithValue("@nm_nome", usuario.Nome);
-                    sqlCommand.Parameters.AddWithValue("@nm_apelido", usuario.Apelido);
-                    sqlCommand.Parameters.AddWithValue("@nm_email", usuario.Email);
-                    sqlCommand.Parameters.AddWithValue("@nm_senha", usuario.Senha);
+                sqlConn.Command.Parameters.AddWithValue("@id_parceiro", usuario.IdParceiro);
+                sqlConn.Command.Parameters.AddWithValue("@nm_nome", usuario.Nome);
+                sqlConn.Command.Parameters.AddWithValue("@nm_apelido", usuario.Apelido);
+                sqlConn.Command.Parameters.AddWithValue("@nm_email", usuario.Email);
+                sqlConn.Command.Parameters.AddWithValue("@nm_celular", usuario.NumeroCelular);
+                sqlConn.Command.Parameters.AddWithValue("@nm_senha", usuario.Senha);
 
-                    var varRetorno = sqlCommand.ExecuteScalar();
+                var varRetorno = sqlConn.Command.ExecuteScalar();
 
-                    int retorno = Convert.ToInt32(varRetorno);
+                retorno = Convert.ToInt32(varRetorno);
 
-                    //verifica se o retorno foi positivo
-                    if (retorno == 0)
-                        throw new CadastroNaoRealizadoClienteException();
+                //verifica se o retorno foi positivo
+                if (retorno == 0)
+                    throw new CadastroNaoRealizadoClienteException();
 
-                    return retorno;
-                }
+                return retorno;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 logDAO.Adicionar(new Log { Mensagem = "erro ao cadastrar usuário", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
                 throw ex;
             }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
         }
 
         /// <summary>
-        /// Autentica um usuário do tipo loja
+        /// Autentica um usuário do tipo parceiro
         /// </summary>
-        /// <param name="usuario">Dados do usuário para autenticacai</param>
+        /// <param name="usuario">Dados do usuário para autenticacao</param>
         /// <param name="dominioRede">Rede que o usuário pertence</param>
-        public void AutenticarUsuarioLoja(Usuario usuario, string dominioRede)
+        public void AutenticarUsuarioParceiro(Usuario usuario, string dominioRede)
         {
             try
             {
                 int qtdUsuario = 0;
 
-                using (sqlConn)
-                {
-                    if (string.IsNullOrEmpty(sqlConn.ConnectionString))
-                        sqlConn = SqlHelper.AbreConexao();
+                sqlConn.StartConnection();
 
-                    sqlConn.Open();
-
-                    SqlCommand sqlCommand = new SqlCommand();
-
-                    sqlCommand.Connection = sqlConn;
-                    sqlCommand.CommandType = System.Data.CommandType.Text;
-                    sqlCommand.CommandText = string.Format(@"SELECT
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+                sqlConn.Command.CommandText = string.Format(@"SELECT
 	                                                            COUNT(1) 
                                                             FROM tab_usuario_parceiro AS tup
                                                             INNER JOIN tab_parceiro AS tp
@@ -103,61 +138,58 @@ namespace ms_crud_rest.DAO
                                                             AND tr.nm_dominio_rede = @dominio_rede
                                                             AND tup.bol_ativo = 1");
 
-                    sqlCommand.Parameters.AddWithValue("@email", usuario.Email);
-                    sqlCommand.Parameters.AddWithValue("@senha", usuario.Senha);
-                    sqlCommand.Parameters.AddWithValue("@dominio_rede", dominioRede.Replace("'", ""));
+                sqlConn.Command.Parameters.AddWithValue("@email", usuario.Email);
+                sqlConn.Command.Parameters.AddWithValue("@senha", usuario.Senha);
+                sqlConn.Command.Parameters.AddWithValue("@dominio_rede", dominioRede.Replace("'", ""));
 
-                    qtdUsuario = (int)sqlCommand.ExecuteScalar();
-                }
+                qtdUsuario = Convert.ToInt32(sqlConn.Command.ExecuteScalar());
+
 
                 //verifica se o retorno foi positivo
                 if (qtdUsuario == 0)
                     throw new UsuarioNaoAutenticadoException();
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 logDAO.Adicionar(new Log { Mensagem = "Erro ao autenticar usuário", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
                 throw ex;
             }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
         }
 
         /// <summary>
-        /// Autentica um usuário do tipo parceiro
+        /// Autentica um usuário do tipo loja
         /// </summary>
-        /// <param name="usuario">Dados do usuário para autenticacai</param>
+        /// <param name="usuario">Dados do usuário para autenticacao</param>
         /// <param name="dominioRede">Rede que o usuário pertence</param>
-        public void AutenticarUsuarioParceiro(Usuario usuario, string dominioRede)
+        public void AutenticarUsuarioLoja(Usuario usuario, string dominioRede)
         {
             try
             {
                 int qtdUsuario = 0;
 
-                using (sqlConn)
-                {
-                    if (string.IsNullOrEmpty(sqlConn.ConnectionString))
-                        sqlConn = SqlHelper.AbreConexao();
+                sqlConn.StartConnection();
 
-                    sqlConn.Open();
-
-                    SqlCommand sqlCommand = new SqlCommand();
-
-                    sqlCommand.Connection = sqlConn;
-                    sqlCommand.CommandType = System.Data.CommandType.Text;
-                    sqlCommand.CommandText = string.Format(@"SELECT 
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+                sqlConn.Command.CommandText = string.Format(@"SELECT 
                                                                 COUNT(1) 
                                                              FROM tab_usuario_loja 
                                                              INNER JOIN tab_rede
                                                              ON tab_rede.id_rede = tab_usuario_loja.id_rede
                                                              WHERE nm_email = @email 
                                                              AND nm_senha = @senha 
-                                                             AND nm_dominio_rede = @dominio_rede");
+                                                             AND nm_dominio_rede = @dominio_rede
+                                                             AND bol_ativo = 1");
 
-                    sqlCommand.Parameters.AddWithValue("@email", usuario.Email);
-                    sqlCommand.Parameters.AddWithValue("@senha", usuario.Senha);
-                    sqlCommand.Parameters.AddWithValue("@dominio_rede", dominioRede.Replace("'", ""));
+                sqlConn.Command.Parameters.AddWithValue("@email", usuario.Email);
+                sqlConn.Command.Parameters.AddWithValue("@senha", usuario.Senha);
+                sqlConn.Command.Parameters.AddWithValue("@dominio_rede", dominioRede.Replace("'", ""));
 
-                    qtdUsuario = (int)sqlCommand.ExecuteScalar();
-                }
+                qtdUsuario = Convert.ToInt32(sqlConn.Command.ExecuteScalar());
+
 
                 //verifica se o retorno foi positivo
                 if (qtdUsuario == 0)
@@ -168,32 +200,28 @@ namespace ms_crud_rest.DAO
                 logDAO.Adicionar(new Log { Mensagem = "Erro ao autenticar usuário", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
                 throw ex;
             }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
         }
 
         /// <summary>
         /// Faz a busca de um usuário de loja através do e-mail
         /// </summary>
-        /// <param name="usuario">Dados do usuario para consulta</param>
-        /// <returns></returns>
-        public UsuarioLoja BuscarUsuarioLojaPorEmail(Usuario usuario)
+        /// <param name="email">email do usuário</param>
+        /// <returns>UsuarioLoja</returns>
+        public UsuarioLoja BuscarUsuarioLojaPorEmail(string email)
         {
             UsuarioLoja usuarioLoja;
-            UsuarioLojaEntidade usuarioLojaEntidade;
+            List<UsuarioLojaEntidade> listaUsuarioLojaEntidade;
 
             try
             {
-                using (sqlConn)
-                {
-                    if (string.IsNullOrEmpty(sqlConn.ConnectionString))
-                        sqlConn = SqlHelper.AbreConexao();
+                sqlConn.StartConnection();
 
-                    sqlConn.Open();
-
-                    SqlCommand sqlCommand = new SqlCommand();
-
-                    sqlCommand.Connection = sqlConn;
-                    sqlCommand.CommandType = System.Data.CommandType.Text;
-                    sqlCommand.CommandText = string.Format(@"SELECT
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+                sqlConn.Command.CommandText = string.Format(@"SELECT
                                                                 id_usuario_loja,	
                                                                 id_loja,
                                                                 id_rede,	
@@ -206,83 +234,75 @@ namespace ms_crud_rest.DAO
                                                             FROM tab_usuario_loja
                                                             WHERE nm_email = @email");
 
-                    sqlCommand.Parameters.AddWithValue("@email", usuario.Email);
+                sqlConn.Command.Parameters.AddWithValue("@email", email);
 
-                    SqlDataReader reader;
-                    reader = sqlCommand.ExecuteReader();
+                sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
-                    usuarioLojaEntidade = new ModuloClasse().PreencheClassePorDataReader<UsuarioLojaEntidade>(reader)[0];
+                listaUsuarioLojaEntidade = new ModuloClasse().PreencheClassePorDataReader<UsuarioLojaEntidade>(sqlConn.Reader);
 
-                    usuarioLoja = usuarioLojaEntidade.ToUsuarioLoja();
+                usuarioLoja = listaUsuarioLojaEntidade[0].ToUsuarioLoja();
 
-                    //fecha o reader
-                    if (!reader.IsClosed)
-                        reader.Close();
-
-                    return usuarioLoja;
-                }
+                return usuarioLoja;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 logDAO.Adicionar(new Log { Mensagem = "Erro ao buscar os dados do usuário", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
                 throw ex;
             }
+            finally
+            {
+                sqlConn.CloseConnection();
+                sqlConn.Reader.Close();
+            }
         }
 
         /// <summary>
-        /// Faz a busca de um usuário de loja através do e-mail
+        /// faz a busca de um usuário de parceiros através do e-mail
         /// </summary>
-        /// <param name="usuario">Dados do usuario para consulta</param>
-        /// <returns></returns>
-        public UsuarioParceiro BuscarUsuarioParceiroPorEmail(Usuario usuario)
+        /// <param name="email">email do usuário</param>
+        /// <returns>UsuarioParceiro</returns>
+        public UsuarioParceiro BuscarUsuarioParceiroPorEmail(string email)
         {
-            UsuarioParceiro usuarioParceiro;
-            UsuarioParceiroEntidade usuarioParceiroEntidade;
+            UsuarioParceiro usuarioParceiro = new UsuarioParceiro();
+            List<UsuarioParceiroEntidade> listaUsuarioParceiroEntidade;
 
             try
             {
-                using (sqlConn)
-                {
-                    if (string.IsNullOrEmpty(sqlConn.ConnectionString))
-                        sqlConn = SqlHelper.AbreConexao();
+                sqlConn.StartConnection();
 
-                    sqlConn.Open();
-
-                    SqlCommand sqlCommand = new SqlCommand();
-
-                    sqlCommand.Connection = sqlConn;
-                    sqlCommand.CommandType = System.Data.CommandType.Text;
-                    sqlCommand.CommandText = string.Format(@"SELECT
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+                sqlConn.Command.CommandText = string.Format(@"SELECT
                                                                 id_usuario_parceiro,	
                                                                 id_parceiro,
                                                                 nm_nome,	
                                                                 nm_apelido,
                                                                 nm_email,
+                                                                nm_celular,
                                                                 nm_senha,
                                                                 bol_ativo  
                                                             FROM tab_usuario_parceiro 
                                                             WHERE nm_email = @email");
 
-                    sqlCommand.Parameters.AddWithValue("@email", usuario.Email);
+                sqlConn.Command.Parameters.AddWithValue("@email", email);
 
-                    SqlDataReader reader;
-                    reader = sqlCommand.ExecuteReader();
+                sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
-                    usuarioParceiroEntidade = new ModuloClasse().PreencheClassePorDataReader<UsuarioParceiroEntidade>(reader)[0];
+                listaUsuarioParceiroEntidade = new ModuloClasse().PreencheClassePorDataReader<UsuarioParceiroEntidade>(sqlConn.Reader);
 
-                    usuarioParceiro = usuarioParceiroEntidade.ToUsuarioParceiro();
+                if (listaUsuarioParceiroEntidade.Count > 0)
+                    usuarioParceiro = listaUsuarioParceiroEntidade[0].ToUsuarioParceiro();
 
-                    //fecha o reader
-                    if (!reader.IsClosed)
-                        reader.Close();
-
-                    return usuarioParceiro;
-                }
+                return usuarioParceiro;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 logDAO.Adicionar(new Log { Mensagem = "Erro ao buscar os dados do usuário", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
                 throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+                sqlConn.Reader.Close();
             }
         }
 
@@ -290,37 +310,30 @@ namespace ms_crud_rest.DAO
         {
             try
             {
-                using (sqlConn)
-                {
-                    if (string.IsNullOrEmpty(sqlConn.ConnectionString))
-                        sqlConn = SqlHelper.AbreConexao();
+                int retorno = 0;
 
-                    sqlConn.Open();
+                sqlConn.StartConnection();
 
-                    SqlCommand sqlCommand = new SqlCommand();
-
-                    sqlCommand.Connection = sqlConn;
-                    sqlCommand.CommandType = System.Data.CommandType.Text;
-                    sqlCommand.CommandText = string.Format(@"SELECT id_parceiro FROM tab_parceiro
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+                sqlConn.Command.CommandText = string.Format(@"SELECT id_parceiro FROM tab_parceiro
                                                             WHERE nm_codigo = @codigoParceiro");
 
 
-                    sqlCommand.Parameters.AddWithValue("@codigoParceiro", sCodigoParceiro);
+                sqlConn.Command.Parameters.AddWithValue("@codigoParceiro", sCodigoParceiro);
 
-                    int retorno = Convert.ToInt32(sqlCommand.ExecuteScalar());
+                retorno = Convert.ToInt32(sqlConn.Command.ExecuteScalar());
 
-                    //se não encontrar uma empresa com o código digitado
-                    if (retorno == 0)
-                        throw new EmpresaNaoEncontradaException();
+                //se não encontrar uma empresa com o código digitado
+                if (retorno == 0)
+                    throw new EmpresaNaoEncontradaException();
 
-                    return retorno;
-                }
+                return retorno;
             }
             catch (EmpresaNaoEncontradaException)
             {
                 throw;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 logDAO.Adicionar(new Log
                 {
@@ -328,7 +341,12 @@ namespace ms_crud_rest.DAO
                     Descricao = ex.Message,
                     StackTrace = ex.StackTrace == null ? "" : ex.StackTrace
                 });
+
                 throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
             }
 
         }

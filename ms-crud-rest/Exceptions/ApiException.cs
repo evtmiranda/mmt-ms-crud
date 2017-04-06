@@ -27,4 +27,15 @@ namespace ms_crud_rest.Exceptions
             }
         }
     }
+
+    public class UsuarioJaExisteException : Exception
+    {
+        public override string Message
+        {
+            get
+            {
+                return "já existe um usuário com este e-mail. clique no link abaixo para fazer login";
+            }
+        }
+    }
 }

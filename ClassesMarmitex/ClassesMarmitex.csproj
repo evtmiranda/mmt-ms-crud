@@ -36,6 +36,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -67,6 +68,7 @@
     <Compile Include="Utils\ModuloClasse.cs" />
     <Compile Include="Utils\Requisicoes.cs" />
     <Compile Include="Utils\RequisicoesREST.cs" />
+    <Compile Include="Utils\SqlServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

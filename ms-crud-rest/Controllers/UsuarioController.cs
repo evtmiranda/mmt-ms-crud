@@ -48,13 +48,27 @@
         {
             try
             {
-                usuarioDAO.Adicionar(usuario);
+                UsuarioLoja usuarioLoja = new UsuarioLoja();
+                //verifica se já existe algum usuário com este e-mail
+                usuarioLoja = usuarioDAO.BuscarUsuarioLojaPorEmail(usuario.Email);
+
+                if (usuarioLoja != null)
+                    throw new UsuarioJaExisteException();
+
+                int idUsuarioCadastrado = usuarioDAO.CadastrarUsuarioLoja(usuario);
 
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created);
-                string location = Url.Link("DefaultApi", new { controller = "usuario", id = usuario.Id });
+
+                string location = Url.Link("DefaultApi", new { controller = "Usuario", id = idUsuarioCadastrado });
                 response.Headers.Location = new Uri(location);
 
                 return response;
+            }
+            catch (UsuarioJaExisteException eneEx)
+            {
+                string mensagem = eneEx.Message;
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, error);
             }
             catch (Exception ex)
             {
@@ -70,6 +84,13 @@
         {
             try
             {
+                UsuarioParceiro usuarioParceiro = new UsuarioParceiro();
+                //verifica se já existe algum usuário com este e-mail
+                usuarioParceiro = usuarioDAO.BuscarUsuarioParceiroPorEmail(usuario.Email);
+
+                if (usuarioParceiro.Id != 0)
+                    throw new UsuarioJaExisteException();
+
                 //busca o parceiro
                 int idParceiro = usuarioDAO.BuscarIdParceiro(usuario.CodigoParceiro);
 
@@ -89,6 +110,12 @@
                 string mensagem = eneEx.Message;
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.NotFound, error);
+            }
+            catch (UsuarioJaExisteException eneEx)
+            {
+                string mensagem = eneEx.Message;
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, error);
             }
             catch (Exception ex)
             {
@@ -209,7 +236,7 @@
                 {
                     UsuarioLoja usuarioLoja;
 
-                    usuarioLoja = usuarioDAO.BuscarUsuarioLojaPorEmail(usuario);
+                    usuarioLoja = usuarioDAO.BuscarUsuarioLojaPorEmail(usuario.Email);
 
                     return Request.CreateResponse(HttpStatusCode.OK, usuarioLoja);
                 }
@@ -217,7 +244,7 @@
                 {
                     UsuarioParceiro usuarioParceiro;
 
-                    usuarioParceiro = usuarioDAO.BuscarUsuarioParceiroPorEmail(usuario);
+                    usuarioParceiro = usuarioDAO.BuscarUsuarioParceiroPorEmail(usuario.Email);
 
                     return Request.CreateResponse(HttpStatusCode.OK, usuarioParceiro);
                 }

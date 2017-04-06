@@ -5,14 +5,9 @@ namespace ms_crud_rest.App_Start
 {
     using System;
     using System.Web;
-
     using Microsoft.Web.Infrastructure.DynamicModuleHelper;
-
     using Ninject;
     using Ninject.Web.Common;
-    using HelperClasses;
-    using NHibernate;
-    using System.Data.SqlClient;
 
     public static class NinjectWebCommon
     {
@@ -59,13 +54,13 @@ namespace ms_crud_rest.App_Start
         }
 
         /// <summary>
-        /// Cria a sessão do NHibernate para o escopo/classe/DAO atual
+        /// Cria a sessão do SqlServer
         /// </summary>
         /// <param name="kernel">The kernel</param>
         private static void RegisterServices(IKernel kernel)
         {
-            kernel.Bind<SqlConnection>()
-                    .ToMethod(x => SqlHelper.AbreConexao());
+            kernel.Bind<ClassesMarmitex.Utils.SqlServer>()
+                    .ToMethod(x => new ClassesMarmitex.Utils.SqlServer());
         }
     }
 }
