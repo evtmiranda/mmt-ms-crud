@@ -24,7 +24,7 @@ namespace ms_crud_rest.Controllers
         //retorna todos os cardápios existentes
         [HttpGet]
         [Route("api/formaPagamento/listar/{idParceiro}")]
-        public HttpResponseMessage ListarCardapios(int idParceiro)
+        public HttpResponseMessage ListarFormasPagamento(int idParceiro)
         {
             try
             {
@@ -43,6 +43,11 @@ namespace ms_crud_rest.Controllers
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.NotFound, error);
             }
+        }
+
+        public FormaDePagamento BuscarFormaPagamento(string nomeFormaPagamento, int idParceiro)
+        {
+            return formaPagamentoDAO.BuscarPorNome(nomeFormaPagamento, idParceiro);
         }
     }
 }

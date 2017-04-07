@@ -71,4 +71,15 @@ namespace ms_crud_rest.Exceptions
             }
         }
     }
+
+    public class PedidoNaoCadastradoClienteException : Exception
+    {
+        public override string Message
+        {
+            get
+            {
+                return "o pedido não pôde ser finalizado. por favor, realize o pedido novamente";
+            }
+        }
+    }
 }

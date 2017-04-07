@@ -157,10 +157,10 @@
   <ItemGroup>
     <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Controllers\CarrinhoController.cs" />
     <Compile Include="Controllers\FormaPagamentoController.cs" />
     <Compile Include="Controllers\HorarioEntregaController.cs" />
     <Compile Include="Controllers\MenuCardapioController.cs" />
+    <Compile Include="Controllers\PedidoController.cs" />
     <Compile Include="Controllers\ProdutoController.cs" />
     <Compile Include="Controllers\UsuarioController.cs" />
     <Compile Include="DAO\FormaPagamentoDAO.cs" />
@@ -168,6 +168,7 @@
     <Compile Include="DAO\HorarioEntregaDAO.cs" />
     <Compile Include="DAO\LogDAO.cs" />
     <Compile Include="DAO\MenuCardapioDAO.cs" />
+    <Compile Include="DAO\PedidoDAO.cs" />
     <Compile Include="DAO\ProdutoDAO.cs" />
     <Compile Include="DAO\UsuarioDAO.cs" />
     <Compile Include="Exceptions\ApiException.cs" />

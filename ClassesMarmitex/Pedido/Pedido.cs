@@ -11,7 +11,7 @@
         public List<ProdutoPedido> ListaProdutos { get; set; }
         public string HorarioEntrega { get; set; }
         public List<FormaDePagamento> ListaFormaPagamento { get; set; }
-        public decimal Troco { get; set; }
+        public string Troco { get; set; }
         public string Observacao { get; set; }
     }
 
@@ -31,6 +31,14 @@
         public decimal Troco { get; set; }
 
         [Column("nm_observacao")]
+        public string Observacao { get; set; }
+    }
+
+    public class DetalhePedido
+    {
+        public string HorarioEntrega { get; set; }
+        public List<string> FormaPagamento { get; set; }
+        public string Troco { get; set; }
         public string Observacao { get; set; }
     }
 }
