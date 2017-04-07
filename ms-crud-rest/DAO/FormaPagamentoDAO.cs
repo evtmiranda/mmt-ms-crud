@@ -120,6 +120,7 @@ namespace ms_crud_rest.DAO
             {
                 sqlConn.CloseConnection();
                 sqlConn.Reader.Close();
+                sqlConn.Command.Parameters.Clear();
             }
         }
     }

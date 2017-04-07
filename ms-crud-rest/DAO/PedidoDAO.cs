@@ -54,8 +54,8 @@ namespace ms_crud_rest.DAO
                     produto.ValorTotal = produto.Quantidade * produto.Produto.Valor;
 
                     sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_produto_pedido(id_produto, id_pedido, nr_qtd_produto, vlr_total_produto)
-                                                            VALUES({0}, {1}, {2}, {3});",
-                                                            produto.Id, idPedido, produto.Quantidade, produto.ValorTotal);
+                                                            VALUES({0}, {1}, {2}, '{3}');",
+                                                            produto.Produto.Id, idPedido, produto.Quantidade, produto.ValorTotal.ToString().Replace(",","."));
                     sqlConn.Command.ExecuteNonQuery();
                 }
 
@@ -64,7 +64,7 @@ namespace ms_crud_rest.DAO
                 {
 
                     sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_forma_pagamento_pedido(id_forma_pagamento, id_pedido)
-                                                                  VALUES({0}, {1}, {2});",
+                                                                  VALUES({0}, {1});",
                                                             formaPagamento.Id, idPedido);
                     sqlConn.Command.ExecuteNonQuery();
                 }

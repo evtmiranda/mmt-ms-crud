@@ -33,12 +33,17 @@ namespace ms_crud_rest.Controllers
                 //preenchee a forma de pagamento
                 for (int i = 0; i < pedido.ListaFormaPagamento.Count; i++)
                 {
+                    if (pedido.ListaFormaPagamento[i].Nome == null)
+                        continue;
+
                     pedido.ListaFormaPagamento[i] = pagamentoDAO.BuscarPorNome(pedido.ListaFormaPagamento[i].Nome, pedido.Cliente.IdParceiro);
                 }
 
+                pedido.ListaFormaPagamento.RemoveAll(p => p.Id == 0);
+
                 pedidoDAO.Adicionar(pedido);
 
-                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created);
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created, pedido);
 
                 return response;
             }

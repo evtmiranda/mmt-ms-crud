@@ -8,6 +8,7 @@
     {
         public int Id { get; set; }
         public UsuarioParceiro Cliente { get; set; }
+        public DateTime DataPedido { get; set; }
         public List<ProdutoPedido> ListaProdutos { get; set; }
         public string HorarioEntrega { get; set; }
         public List<FormaDePagamento> ListaFormaPagamento { get; set; }
@@ -23,6 +24,9 @@
 
         [Column("id_usuario_parceiro")]
         public int IdCliente { get; set; }
+
+        [Column("dt_pedido")]
+        public DateTime DataPedido { get; set; }
 
         [Column("hr_entrega")]
         public string HorarioEntrega { get; set; }
