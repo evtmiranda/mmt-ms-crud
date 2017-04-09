@@ -19,7 +19,7 @@ namespace ms_crud_rest
                 TokenEndpointPath = new PathString("/Token"),
                 Provider = new ApplicationOAuthProvider(),
                 AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
-                AllowInsecureHttp = true
+                AllowInsecureHttp = false
             });
         }
     }
