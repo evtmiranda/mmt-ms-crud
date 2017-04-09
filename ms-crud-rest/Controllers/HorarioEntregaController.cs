@@ -1,6 +1,5 @@
 ﻿using ClassesMarmitex;
 using ms_crud_rest.DAO;
-using ms_crud_rest.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -21,7 +20,9 @@ namespace ms_crud_rest.Controllers
             this.logDAO = logDAO;
         }
 
-        //retorna todos os cardápios existentes
+        //retorna todos os horários de entrega
+        // A tag Authorize obriga estar autenticado para acessar o mesmo
+        [Authorize]
         [HttpGet]
         [Route("api/HorarioEntrega/listar/{idParceiro}")]
         public HttpResponseMessage ListarHorarios(int idParceiro)

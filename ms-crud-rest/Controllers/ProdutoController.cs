@@ -1,9 +1,7 @@
 ﻿using ClassesMarmitex;
 using ms_crud_rest.DAO;
-using ms_crud_rest.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -23,6 +21,8 @@ namespace ms_crud_rest.Controllers
             this.logDAO = logDAO;
         }
 
+        // A tag Authorize obriga estar autenticado para acessar o mesmo
+        [Authorize]
         public HttpResponseMessage Get(int id)
         {
             try
@@ -41,6 +41,8 @@ namespace ms_crud_rest.Controllers
             }
         }
 
+        // A tag Authorize obriga estar autenticado para acessar o mesmo
+        [Authorize]
         public HttpResponseMessage Post([FromBody] Produto produto)
         {
             try
@@ -61,6 +63,8 @@ namespace ms_crud_rest.Controllers
             }
         }
 
+        // A tag Authorize obriga estar autenticado para acessar o mesmo
+        [Authorize]
         public HttpResponseMessage Delete([FromUri] int id)
         {
             try
@@ -83,6 +87,8 @@ namespace ms_crud_rest.Controllers
             }
         }
 
+        // A tag Authorize obriga estar autenticado para acessar o mesmo
+        [Authorize]
         public HttpResponseMessage Patch([FromBody] Produto produto, [FromUri] int id)
         {
             try
@@ -111,6 +117,8 @@ namespace ms_crud_rest.Controllers
         }
 
         //retorna todos os produtos existentes
+        // A tag Authorize obriga estar autenticado para acessar o mesmo
+        [Authorize]
         [HttpGet]
         [Route("api/produto/listar")]
         public HttpResponseMessage ListarProdutos(int idMenuCardapio)

@@ -2,8 +2,6 @@
 using ms_crud_rest.DAO;
 using ms_crud_rest.Exceptions;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -24,6 +22,8 @@ namespace ms_crud_rest.Controllers
             this.pagamentoDAO = pagamentoDAO;
         }
 
+        // A tag Authorize obriga estar autenticado para acessar o mesmo
+        [Authorize]
         [HttpPost]
         [Route("api/pedido/cadastrar")]
         public HttpResponseMessage CadastrarPedido([FromBody] Pedido pedido)

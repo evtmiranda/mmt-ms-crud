@@ -23,6 +23,8 @@ namespace ms_crud_rest.Controllers
             this.logDAO = logDAO;
         }
 
+        // A tag Authorize obriga estar autenticado para acessar o mesmo
+        [Authorize]
         public HttpResponseMessage Get(int id)
         {
             try
@@ -41,6 +43,8 @@ namespace ms_crud_rest.Controllers
             }
         }
 
+        // A tag Authorize obriga estar autenticado para acessar o mesmo
+        [Authorize]
         public HttpResponseMessage Post([FromBody] MenuCardapio cardapio)
         {
             try
@@ -61,6 +65,8 @@ namespace ms_crud_rest.Controllers
             }
         }
 
+        // A tag Authorize obriga estar autenticado para acessar o mesmo
+        [Authorize]
         public HttpResponseMessage Delete([FromUri] int id)
         {
             try
@@ -83,6 +89,8 @@ namespace ms_crud_rest.Controllers
             }
         }
 
+        // A tag Authorize obriga estar autenticado para acessar o mesmo
+        [Authorize]
         public HttpResponseMessage Patch([FromBody] MenuCardapio cardapio, [FromUri] int id)
         {
             try
@@ -108,6 +116,8 @@ namespace ms_crud_rest.Controllers
         }
 
         //retorna todos os cardápios existentes
+        // A tag Authorize obriga estar autenticado para acessar o mesmo
+        [Authorize]
         [HttpGet]
         [Route("api/menucardapio/listar/{idParceiro}")]
         public HttpResponseMessage ListarCardapios(int idParceiro)
@@ -127,7 +137,7 @@ namespace ms_crud_rest.Controllers
             {
                 string mensagem = string.Format("ocorreu um problema ao buscar o cardápio. por favor, tente atualizar a página ou acessar dentro de alguns minutos...");
                 HttpError error = new HttpError(mensagem);
-                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
 

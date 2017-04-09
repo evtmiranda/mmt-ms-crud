@@ -8,6 +8,9 @@ namespace ms_crud_rest
     {
         public static void Register(HttpConfiguration config)
         {
+            //passa a aceitar somente json
+            config.Formatters.Remove(config.Formatters.XmlFormatter);
+
             // Web API routes
             config.MapHttpAttributeRoutes();
 
