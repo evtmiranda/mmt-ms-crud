@@ -42,9 +42,15 @@
             }
         }
 
+        /// <summary>
+        /// Cadastro de um usuário do tipo loja
+        /// </summary>
+        /// <param name="usuario">objeto com todos os dados do usuário</param>
+        /// <param name="dominioLoja">dominio da loja ao qual o usuário pertence</param>
+        /// <returns></returns>
         [HttpPost]
-        [Route("api/usuario/cadastrar/usuarioLoja/{dominioRede}")]
-        public HttpResponseMessage CadastrarUsuarioLoja([FromBody] UsuarioLoja usuario, [FromUri] string dominioRede)
+        [Route("api/Usuario/Cadastrar/UsuarioLoja/{dominioLoja}")]
+        public HttpResponseMessage CadastrarUsuarioLoja([FromBody] UsuarioLoja usuario, [FromUri] string dominioLoja)
         {
             try
             {
@@ -79,8 +85,8 @@
         }
 
         [HttpPost]
-        [Route("api/usuario/cadastrar/usuarioParceiro/{dominioRede}")]
-        public HttpResponseMessage CadastrarUsuarioParceiro([FromBody] UsuarioParceiro usuario, [FromUri] string dominioRede)
+        [Route("api/Usuario/Cadastrar/UsuarioParceiro/{dominioLoja}")]
+        public HttpResponseMessage CadastrarUsuarioParceiro([FromBody] UsuarioParceiro usuario, [FromUri] string dominioLoja)
         {
             try
             {
@@ -185,8 +191,8 @@
 
         //método para autenticação de usuário
         [HttpPost]
-        [Route("api/usuario/autenticar/{tipoUsuario}/{dominioRede}")]
-        public HttpResponseMessage AutenticarUsuario([FromBody] Usuario usuario, [FromUri] TipoUsuario tipoUsuario, [FromUri] string dominioRede)
+        [Route("api/Usuario/Autenticar/{tipoUsuario}/{dominioLoja}")]
+        public HttpResponseMessage AutenticarUsuario([FromBody] Usuario usuario, [FromUri] TipoUsuario tipoUsuario, [FromUri] string dominioLoja)
         {
             //bloco de tratamento de erros
             try
@@ -194,9 +200,9 @@
                 //faz a autenticação do usuário
                 //se for usuario loja
                 if (tipoUsuario == TipoUsuario.Loja)
-                    usuarioDAO.AutenticarUsuarioLoja(usuario, dominioRede);
+                    usuarioDAO.AutenticarUsuarioLoja(usuario, dominioLoja);
                 else
-                    usuarioDAO.AutenticarUsuarioParceiro(usuario, dominioRede);
+                    usuarioDAO.AutenticarUsuarioParceiro(usuario, dominioLoja);
 
                 //se for autenticado, retorna mensagem de aceito
                 return Request.CreateResponse(HttpStatusCode.Accepted);

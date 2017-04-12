@@ -9,7 +9,7 @@ namespace ms_crud_rest.DAO
     {
         public FormaPagamentoDAO(SqlServer sqlConn, LogDAO logDAO) : base(sqlConn, logDAO) { }
 
-        public override List<FormaDePagamento> Listar(int idParceiro)
+        public override List<FormaDePagamento> Listar(int idLoja)
         {
             List<FormaDePagamentoEntidade> listaPagamentoEntidade = new List<FormaDePagamentoEntidade>();
             List<FormaDePagamento> listaPagamento = new List<FormaDePagamento>();
@@ -20,19 +20,17 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
                 sqlConn.Command.CommandText = string.Format(@"SELECT
-	                                                            tfp.id_forma_pagamento,
-	                                                            tfp.id_loja,
-	                                                            tfp.nm_forma_pagamento,
-	                                                            tfp.bol_ativo
-                                                            FROM tab_forma_pagamento AS tfp
-                                                            INNER JOIN tab_parceiro AS tp
-                                                            ON tp.id_loja = tfp.id_loja
-                                                            WHERE tp.id_parceiro = @id_parceiro
-                                                            AND tfp.bol_ativo = 1;");
+	                                                            id_forma_pagamento,
+	                                                            id_loja,
+	                                                            nm_forma_pagamento,
+	                                                            bol_ativo
+                                                            FROM tab_forma_pagamento
+                                                            WHERE id_loja = @id_loja
+                                                            AND bol_ativo = 1;");
 
 
 
-                sqlConn.Command.Parameters.AddWithValue("@id_parceiro", idParceiro);
+                sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
@@ -55,7 +53,7 @@ namespace ms_crud_rest.DAO
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "erro ao buscar os cardápios", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+                logDAO.Adicionar(new Log { Mensagem = "erro ao buscar as formas de pagamento", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
 
                 throw ex;
             }

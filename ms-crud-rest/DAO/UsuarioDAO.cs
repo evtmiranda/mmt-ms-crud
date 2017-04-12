@@ -319,7 +319,9 @@ namespace ms_crud_rest.DAO
                 sqlConn.StartConnection();
 
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
-                sqlConn.Command.CommandText = string.Format(@"SELECT id_parceiro FROM tab_parceiro
+                sqlConn.Command.CommandText = string.Format(@"SELECT 
+                                                                id_parceiro 
+                                                            FROM tab_parceiro
                                                             WHERE nm_codigo = @codigoParceiro");
 
 

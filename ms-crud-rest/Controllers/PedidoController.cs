@@ -22,8 +22,13 @@ namespace ms_crud_rest.Controllers
             this.pagamentoDAO = pagamentoDAO;
         }
 
+        /// <summary>
+        /// Faz o cadastro de um pedido
+        /// </summary>
+        /// <param name="pedido">objeto com todos os dados do pedido</param>
+        /// <returns></returns>
         [HttpPost]
-        [Route("api/pedido/cadastrar")]
+        [Route("api/Pedido/Cadastrar")]
         public HttpResponseMessage CadastrarPedido([FromBody] Pedido pedido)
         {
             try
@@ -37,8 +42,10 @@ namespace ms_crud_rest.Controllers
                     pedido.ListaFormaPagamento[i] = pagamentoDAO.BuscarPorNome(pedido.ListaFormaPagamento[i].Nome, pedido.Cliente.IdParceiro);
                 }
 
+                //remove as formas de pagamento com id = 0
                 pedido.ListaFormaPagamento.RemoveAll(p => p.Id == 0);
 
+                //adiciona o pedido
                 pedidoDAO.Adicionar(pedido);
 
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created, pedido);

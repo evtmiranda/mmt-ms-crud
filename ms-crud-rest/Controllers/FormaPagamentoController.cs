@@ -21,19 +21,23 @@ namespace ms_crud_rest.Controllers
             this.logDAO = logDAO;
         }
 
-        //retorna todos os cardápios existentes
+        /// <summary>
+        /// Retorna uma lista de forma de pagamento para a loja enviada como parâmetro
+        /// </summary>
+        /// <param name="idLoja">Id da loja para a qual se quer as formas de pagamento</param>
+        /// <returns></returns>
         [HttpGet]
-        [Route("api/formaPagamento/listar/{idParceiro}")]
-        public HttpResponseMessage ListarFormasPagamento(int idParceiro)
+        [Route("api/FormaPagamento/Listar/{idLoja}")]
+        public HttpResponseMessage ListarFormasPagamento(int idLoja)
         {
             try
             {
-                IList<FormaDePagamento> formasPagamento = formaPagamentoDAO.Listar(idParceiro);
+                IList<FormaDePagamento> formasPagamento = formaPagamentoDAO.Listar(idLoja);
                 return Request.CreateResponse(HttpStatusCode.OK, formasPagamento);
             }
-            catch (CardapioNaoEncontradoException cneEx)
+            catch (PagamentoNaoEncontradoException pneEx)
             {
-                string mensagem = cneEx.Message;
+                string mensagem = pneEx.Message;
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.NotFound, error);
             }
@@ -41,13 +45,13 @@ namespace ms_crud_rest.Controllers
             {
                 string mensagem = string.Format("ocorreu um problema ao buscar as formas de pagamento. por favor, tente atualizar a página ou acessar dentro de alguns minutos...");
                 HttpError error = new HttpError(mensagem);
-                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
 
-        public FormaDePagamento BuscarFormaPagamento(string nomeFormaPagamento, int idParceiro)
-        {
-            return formaPagamentoDAO.BuscarPorNome(nomeFormaPagamento, idParceiro);
-        }
+        //public FormaDePagamento BuscarFormaPagamento(string nomeFormaPagamento, int idParceiro)
+        //{
+        //    return formaPagamentoDAO.BuscarPorNome(nomeFormaPagamento, idParceiro);
+        //}
     }
 }

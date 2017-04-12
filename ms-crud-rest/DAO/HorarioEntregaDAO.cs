@@ -9,7 +9,7 @@ namespace ms_crud_rest.DAO
     {
         public HorarioEntregaDAO(SqlServer sqlConn, LogDAO logDAO) : base(sqlConn, logDAO) { }
 
-        public override List<HorarioEntrega> Listar(int idParceiro)
+        public override List<HorarioEntrega> Listar(int idLoja)
         {
             List<HorarioEntregaEntidade> listaHorariosEntidade = new List<HorarioEntregaEntidade>();
             List<HorarioEntrega> listaHorarios = new List<HorarioEntrega>();
@@ -20,17 +20,15 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
                 sqlConn.Command.CommandText = string.Format(@"SELECT
-	                                                            the.id_horario_entrega,
-	                                                            the.id_loja,
-	                                                            the.nm_horario,
-	                                                            the.bol_ativo
-                                                            FROM tab_horario_entrega AS the
-                                                            INNER JOIN tab_parceiro AS tp
-                                                            ON tp.id_loja = the.id_loja
-                                                            WHERE tp.id_parceiro = @id_parceiro
-                                                            AND the.bol_ativo = 1;");
+	                                                            id_horario_entrega,
+	                                                            id_loja,
+	                                                            nm_horario,
+	                                                            bol_ativo
+                                                            FROM tab_horario_entrega
+                                                            WHERE id_loja = @id_loja
+                                                            AND bol_ativo = 1;");
 
-                sqlConn.Command.Parameters.AddWithValue("@id_parceiro", idParceiro);
+                sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
@@ -51,11 +49,9 @@ namespace ms_crud_rest.DAO
                 //habilita ou não um horário de entrega de acordo com o tempo mínimo de atecedência definido
                 sqlConn.Command.CommandText = string.Format(@"SELECT
 	                                                            nr_minutos_antecedencia
-                                                            FROM tab_horario_entrega_tempo_anteced_pedido AS ttap
-                                                            INNER JOIN tab_parceiro AS tp
-                                                            ON tp.id_loja = ttap.id_loja
-                                                            WHERE tp.id_parceiro = @id_parceiro
-                                                            AND ttap.bol_ativo = 1;");
+                                                            FROM tab_horario_entrega_tempo_anteced_pedido
+                                                            WHERE id_loja = @id_loja
+                                                            AND bol_ativo = 1;");
 
                 string tempoAntecedencia = sqlConn.Command.ExecuteScalar().ToString();
 

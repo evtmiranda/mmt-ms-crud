@@ -107,7 +107,11 @@ namespace ms_crud_rest.Controllers
             }
         }
 
-        //retorna todos os cardápios existentes de uma determinada loja
+        /// <summary>
+        /// Retorna todos os cardápios existentes de uma determinada loja
+        /// </summary>
+        /// <param name="idLoja"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("api/menucardapio/listar/{idLoja}")]
         public HttpResponseMessage ListarCardapios(int idLoja)

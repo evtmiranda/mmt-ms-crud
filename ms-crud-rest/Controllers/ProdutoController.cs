@@ -108,9 +108,13 @@ namespace ms_crud_rest.Controllers
             }
         }
 
-        //retorna todos os produtos existentes
+        /// <summary>
+        /// Retorna todos os produtos existentes dentro do cardápio enviado como parâmetro
+        /// </summary>
+        /// <param name="idMenuCardapio">Id do cardápio ao qual os produtos pertencem</param>
+        /// <returns></returns>
         [HttpGet]
-        [Route("api/produto/listar")]
+        [Route("api/Produto/Listar")]
         public HttpResponseMessage ListarProdutos(int idMenuCardapio)
         {
             try
