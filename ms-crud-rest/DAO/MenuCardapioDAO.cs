@@ -9,7 +9,7 @@ namespace ms_crud_rest.DAO
     {
         public MenuCardapioDAO(SqlServer sqlConn, LogDAO logDAO) : base(sqlConn, logDAO) { }
 
-        public override List<MenuCardapio> Listar(int idParceiro)
+        public override List<MenuCardapio> Listar(int idLoja)
         {
             List<MenuCardapioEntidade> listaMenuCardapioEntidade = new List<MenuCardapioEntidade>();
             List<MenuCardapio> listaMenuCardapio = new List<MenuCardapio>();
@@ -23,19 +23,17 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
                 sqlConn.Command.CommandText = string.Format(@"SELECT 
 	                                                            id_menu_cardapio,
-	                                                            tmc.id_loja,
+	                                                            id_loja,
 	                                                            nm_cardapio,
 	                                                            nr_ordem_exibicao,
-	                                                            tmc.bol_ativo
-                                                            FROM tab_menu_cardapio as tmc
-                                                            INNER JOIN tab_parceiro AS tp
-                                                            ON tp.id_loja = tmc.id_loja
-                                                            WHERE tp.id_parceiro = @id_parceiro
-                                                            AND tmc.bol_ativo = 1;");
+	                                                            bol_ativo
+                                                            FROM tab_menu_cardapio
+                                                            WHERE id_loja = @id_loja
+                                                            AND bol_ativo = 1;");
                         
                                                                 
 
-                sqlConn.Command.Parameters.AddWithValue("@id_parceiro", idParceiro);
+                sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 

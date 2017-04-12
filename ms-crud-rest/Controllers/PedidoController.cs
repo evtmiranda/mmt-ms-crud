@@ -22,8 +22,6 @@ namespace ms_crud_rest.Controllers
             this.pagamentoDAO = pagamentoDAO;
         }
 
-        // A tag Authorize obriga estar autenticado para acessar o mesmo
-        [Authorize]
         [HttpPost]
         [Route("api/pedido/cadastrar")]
         public HttpResponseMessage CadastrarPedido([FromBody] Pedido pedido)

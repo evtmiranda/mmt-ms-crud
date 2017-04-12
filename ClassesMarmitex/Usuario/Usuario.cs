@@ -48,7 +48,7 @@ namespace ClassesMarmitex
         [Column("id_loja")]
         public int IdLoja { get; set; }
 
-        [Column("nm_nome")]
+        [Column("nm_usuario")]
         public string Nome { get; set; }
 
         [Column("nm_apelido")]
@@ -94,7 +94,7 @@ namespace ClassesMarmitex
         [Column("id_parceiro")]
         public int IdParceiro { get; set; }
 
-        [Column("nm_nome")]
+        [Column("nm_usuario")]
         public string Nome { get; set; }
 
         [Column("nm_apelido")]

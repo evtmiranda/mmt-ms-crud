@@ -17,8 +17,7 @@
     <AssemblyName>ms-crud-rest</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>
-    </IISExpressSSLPort>
+    <IISExpressSSLPort>44313</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -199,6 +198,7 @@
     <Compile Include="Controllers\FormaPagamentoController.cs" />
     <Compile Include="Controllers\HorarioEntregaController.cs" />
     <Compile Include="Controllers\MenuCardapioController.cs" />
+    <Compile Include="Controllers\LojaController.cs" />
     <Compile Include="Controllers\PedidoController.cs" />
     <Compile Include="Controllers\ProdutoController.cs" />
     <Compile Include="Controllers\UsuarioController.cs" />
@@ -206,6 +206,7 @@
     <Compile Include="DAO\GenericDAO.cs" />
     <Compile Include="DAO\HorarioEntregaDAO.cs" />
     <Compile Include="DAO\LogDAO.cs" />
+    <Compile Include="DAO\LojaDAO.cs" />
     <Compile Include="DAO\MenuCardapioDAO.cs" />
     <Compile Include="DAO\PedidoDAO.cs" />
     <Compile Include="DAO\ProdutoDAO.cs" />

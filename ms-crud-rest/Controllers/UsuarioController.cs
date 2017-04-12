@@ -22,8 +22,6 @@
             this.logDAO = logDAO;
         }
 
-        // A tag Authorize obriga estar autenticado para acessar o mesmo
-        [Authorize]
         [HttpGet]
         public HttpResponseMessage BuscarUsuario(int id)
         {
@@ -44,8 +42,6 @@
             }
         }
 
-        // A tag Authorize obriga estar autenticado para acessar o mesmo
-        [Authorize]
         [HttpPost]
         [Route("api/usuario/cadastrar/usuarioLoja/{dominioRede}")]
         public HttpResponseMessage CadastrarUsuarioLoja([FromBody] UsuarioLoja usuario, [FromUri] string dominioRede)
@@ -82,8 +78,6 @@
             }
         }
 
-        // A tag Authorize obriga estar autenticado para acessar o mesmo
-        [Authorize]
         [HttpPost]
         [Route("api/usuario/cadastrar/usuarioParceiro/{dominioRede}")]
         public HttpResponseMessage CadastrarUsuarioParceiro([FromBody] UsuarioParceiro usuario, [FromUri] string dominioRede)
@@ -131,8 +125,6 @@
             }
         }
 
-        // A tag Authorize obriga estar autenticado para acessar o mesmo
-        [Authorize]
         [HttpDelete]
         public HttpResponseMessage ExcluirUsuario([FromUri] int id)
         {
@@ -150,8 +142,6 @@
             }
         }
 
-        // A tag Authorize obriga estar autenticado para acessar o mesmo
-        [Authorize]
         [HttpPatch]
         public HttpResponseMessage AtualizarUsuario([FromBody] Usuario usuario, [FromUri] int id)
         {
@@ -176,8 +166,6 @@
         }
 
         //retorna todos os usuários existentes
-        // A tag Authorize obriga estar autenticado para acessar o mesmo
-        [Authorize]
         [HttpGet]
         [Route("api/usuario/listar")]
         public HttpResponseMessage ListarUsuarios(TipoUsuario tipoUsuario)
@@ -196,8 +184,6 @@
         }
 
         //método para autenticação de usuário
-        // A tag Authorize obriga estar autenticado para acessar o mesmo
-        [Authorize]
         [HttpPost]
         [Route("api/usuario/autenticar/{tipoUsuario}/{dominioRede}")]
         public HttpResponseMessage AutenticarUsuario([FromBody] Usuario usuario, [FromUri] TipoUsuario tipoUsuario, [FromUri] string dominioRede)
@@ -240,8 +226,6 @@
         /// <param name="usuario">Dados do usuário</param>
         /// <param name="tipoUsuario">Define se é usuario de loja ou de parceiro</param>
         /// <returns></returns>
-        // A tag Authorize obriga estar autenticado para acessar o mesmo
-        [Authorize]
         [HttpPost]
         [Route("api/usuario/buscarPorEmail/{tipoUsuario}")]
         public HttpResponseMessage BuscarUsuarioPorEmail([FromBody] Usuario usuario, [FromUri] TipoUsuario tipoUsuario)

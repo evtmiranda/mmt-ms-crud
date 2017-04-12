@@ -82,4 +82,15 @@ namespace ms_crud_rest.Exceptions
             }
         }
     }
+
+    public class LojaNaoEncontradaException : Exception
+    {
+        public override string Message
+        {
+            get
+            {
+                return "nenhuma loja encontrada";
+            }
+        }
+    }
 }

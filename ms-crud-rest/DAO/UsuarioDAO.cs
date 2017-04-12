@@ -72,12 +72,12 @@ namespace ms_crud_rest.DAO
                 sqlConn.StartConnection();
 
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
-                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_usuario_parceiro(id_parceiro, nm_nome, nm_apelido, nm_email, nm_celular, nm_senha)
-                                                            VALUES(@id_parceiro, @nm_nome, @nm_apelido, @nm_email, @nm_celular, @nm_senha); SELECT @@IDENTITY;");
+                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_usuario_parceiro(id_parceiro, nm_usuario, nm_apelido, nm_email, nm_celular, nm_senha)
+                                                            VALUES(@id_parceiro, @nm_usuario, @nm_apelido, @nm_email, @nm_celular, @nm_senha); SELECT @@IDENTITY;");
 
 
                 sqlConn.Command.Parameters.AddWithValue("@id_parceiro", usuario.IdParceiro);
-                sqlConn.Command.Parameters.AddWithValue("@nm_nome", usuario.Nome);
+                sqlConn.Command.Parameters.AddWithValue("@nm_usuario", usuario.Nome);
                 sqlConn.Command.Parameters.AddWithValue("@nm_apelido", usuario.Apelido);
                 sqlConn.Command.Parameters.AddWithValue("@nm_email", usuario.Email);
                 sqlConn.Command.Parameters.AddWithValue("@nm_celular", usuario.NumeroCelular);
@@ -112,8 +112,8 @@ namespace ms_crud_rest.DAO
         /// Autentica um usuário do tipo parceiro
         /// </summary>
         /// <param name="usuario">Dados do usuário para autenticacao</param>
-        /// <param name="dominioRede">Rede que o usuário pertence</param>
-        public void AutenticarUsuarioParceiro(Usuario usuario, string dominioRede)
+        /// <param name="dominio">Dominio da loja que o usuário pertence</param>
+        public void AutenticarUsuarioParceiro(Usuario usuario, string dominio)
         {
             try
             {
@@ -129,16 +129,14 @@ namespace ms_crud_rest.DAO
                                                                 ON tup.id_parceiro = tp.id_parceiro
                                                             INNER JOIN tab_loja AS tl
                                                                 ON tl.id_loja = tp.id_loja
-                                                            INNER JOIN tab_rede AS tr
-                                                                ON tr.id_rede = tl.id_rede
                                                             WHERE tup.nm_email = @email 
                                                             AND tup.nm_senha = @senha 
-                                                            AND tr.nm_dominio_rede = @dominio_rede
+                                                            AND tl.nm_dominio_loja = @nm_dominio_loja
                                                             AND tup.bol_ativo = 1");
 
                 sqlConn.Command.Parameters.AddWithValue("@email", usuario.Email);
                 sqlConn.Command.Parameters.AddWithValue("@senha", usuario.Senha);
-                sqlConn.Command.Parameters.AddWithValue("@dominio_rede", dominioRede.Replace("'", ""));
+                sqlConn.Command.Parameters.AddWithValue("@nm_dominio_loja", dominio.Replace("'", ""));
 
                 qtdUsuario = Convert.ToInt32(sqlConn.Command.ExecuteScalar());
 
@@ -280,7 +278,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.CommandText = string.Format(@"SELECT
                                                                 id_usuario_parceiro,	
                                                                 id_parceiro,
-                                                                nm_nome,	
+                                                                nm_usuario,	
                                                                 nm_apelido,
                                                                 nm_email,
                                                                 nm_celular,

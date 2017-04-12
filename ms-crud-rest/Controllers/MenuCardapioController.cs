@@ -23,8 +23,6 @@ namespace ms_crud_rest.Controllers
             this.logDAO = logDAO;
         }
 
-        // A tag Authorize obriga estar autenticado para acessar o mesmo
-        [Authorize]
         public HttpResponseMessage Get(int id)
         {
             try
@@ -43,8 +41,6 @@ namespace ms_crud_rest.Controllers
             }
         }
 
-        // A tag Authorize obriga estar autenticado para acessar o mesmo
-        [Authorize]
         public HttpResponseMessage Post([FromBody] MenuCardapio cardapio)
         {
             try
@@ -65,8 +61,6 @@ namespace ms_crud_rest.Controllers
             }
         }
 
-        // A tag Authorize obriga estar autenticado para acessar o mesmo
-        [Authorize]
         public HttpResponseMessage Delete([FromUri] int id)
         {
             try
@@ -89,8 +83,6 @@ namespace ms_crud_rest.Controllers
             }
         }
 
-        // A tag Authorize obriga estar autenticado para acessar o mesmo
-        [Authorize]
         public HttpResponseMessage Patch([FromBody] MenuCardapio cardapio, [FromUri] int id)
         {
             try
@@ -115,16 +107,14 @@ namespace ms_crud_rest.Controllers
             }
         }
 
-        //retorna todos os cardápios existentes
-        // A tag Authorize obriga estar autenticado para acessar o mesmo
-        [Authorize]
+        //retorna todos os cardápios existentes de uma determinada loja
         [HttpGet]
-        [Route("api/menucardapio/listar/{idParceiro}")]
-        public HttpResponseMessage ListarCardapios(int idParceiro)
+        [Route("api/menucardapio/listar/{idLoja}")]
+        public HttpResponseMessage ListarCardapios(int idLoja)
         {
             try
             {
-                IList<MenuCardapio> cardapios = cardapioDAO.Listar(idParceiro);
+                IList<MenuCardapio> cardapios = cardapioDAO.Listar(idLoja);
                 return Request.CreateResponse(HttpStatusCode.OK, cardapios);
             }
             catch (CardapioNaoEncontradoException cneEx)

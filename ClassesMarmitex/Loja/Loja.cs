@@ -22,7 +22,7 @@ namespace ClassesMarmitex
         [Column("id_rede")]
         public int IdRede { get; set; }
 
-        [Column("nm_nome_loja")]
+        [Column("nm_loja")]
         public string Nome { get; set; }
 
         [Column("id_endereco")]
@@ -30,5 +30,7 @@ namespace ClassesMarmitex
 
         [Column("bol_ativo")]
         public bool Ativo { get; set; }
+
+        public Loja ToLoja() { return new Loja { Id = this.Id, Nome = this.Nome, Ativo = this.Ativo}; }
     }
 }

@@ -21,8 +21,6 @@ namespace ms_crud_rest.Controllers
         }
 
         //retorna todos os horários de entrega
-        // A tag Authorize obriga estar autenticado para acessar o mesmo
-        [Authorize]
         [HttpGet]
         [Route("api/HorarioEntrega/listar/{idParceiro}")]
         public HttpResponseMessage ListarHorarios(int idParceiro)
