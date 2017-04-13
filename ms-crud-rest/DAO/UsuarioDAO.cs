@@ -164,8 +164,8 @@ namespace ms_crud_rest.DAO
         /// Autentica um usuário do tipo loja
         /// </summary>
         /// <param name="usuario">Dados do usuário para autenticacao</param>
-        /// <param name="dominioRede">Rede que o usuário pertence</param>
-        public void AutenticarUsuarioLoja(Usuario usuario, string dominioRede)
+        /// <param name="dominioLoja">Loja que o usuário pertence</param>
+        public void AutenticarUsuarioLoja(Usuario usuario, string dominioLoja)
         {
             try
             {
@@ -176,17 +176,17 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
                 sqlConn.Command.CommandText = string.Format(@"SELECT 
                                                                 COUNT(1) 
-                                                             FROM tab_usuario_loja 
-                                                             INNER JOIN tab_rede
-                                                             ON tab_rede.id_rede = tab_usuario_loja.id_rede
+                                                             FROM tab_usuario_loja AS tul
+                                                             INNER JOIN tab_loja AS tl
+                                                                ON tul.id_loja = tl.id_loja
                                                              WHERE nm_email = @email 
                                                              AND nm_senha = @senha 
-                                                             AND nm_dominio_rede = @dominio_rede
-                                                             AND bol_ativo = 1");
+                                                             AND tl.nm_dominio_loja = @nm_dominio_loja
+                                                             AND tul.bol_ativo = 1");
 
                 sqlConn.Command.Parameters.AddWithValue("@email", usuario.Email);
                 sqlConn.Command.Parameters.AddWithValue("@senha", usuario.Senha);
-                sqlConn.Command.Parameters.AddWithValue("@dominio_rede", dominioRede.Replace("'", ""));
+                sqlConn.Command.Parameters.AddWithValue("@nm_dominio_loja", dominioLoja.Replace("'", ""));
 
                 qtdUsuario = Convert.ToInt32(sqlConn.Command.ExecuteScalar());
 
