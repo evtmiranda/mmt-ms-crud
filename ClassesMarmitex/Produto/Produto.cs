@@ -12,7 +12,7 @@
         public string Descricao { get; set; }
         public decimal Valor { get; set; }
         public byte[] Imagem { get; set; }
-        public List<DadosAdicionaisProduto> DadosAdicionaisProdutos { get; set; }
+        public List<DadosProdutoAdicional> DadosAdicionaisProdutos { get; set; }
         public bool Ativo { get; set; }
     }
 
