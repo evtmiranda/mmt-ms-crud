@@ -42,7 +42,8 @@ namespace ClassesMarmitex
 
         public DadosProdutoAdicional ToProdutoAdicional()
         {
-            throw new NotImplementedException();
+            return new DadosProdutoAdicional { Id = this.Id, Nome = this.Nome, Descricao = this.Descricao,
+                QtdMin = this.QtdMin, QtdMax = this.QtdMax, OrdemExibicao = this.OrdemExibicao, Ativo = this.Ativo };
         }
     }
 
@@ -79,7 +80,7 @@ namespace ClassesMarmitex
 
         public DadosProdutoAdicionalItem ToProdutoAdicionalItem()
         {
-            throw new NotImplementedException();
+            return new DadosProdutoAdicionalItem { Id = this.Id, Nome = this.Nome, Descricao = this.Descricao, Valor = this.Valor, IdProdutoAdicional = this.IdProdutoAdicional, Ativo = this.Ativo };
         }
     }
 
@@ -104,7 +105,7 @@ namespace ClassesMarmitex
 
         public DadosProdutoAdicionalProduto ToProdutoAdicionalProduto()
         {
-            throw new NotImplementedException();
+            return new DadosProdutoAdicionalProduto { Id = this.Id, IdProduto = this.IdProduto, IdProdutoAdicional = this.IdProdutoAdicional };
         }
     }
 

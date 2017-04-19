@@ -124,6 +124,31 @@ namespace ms_crud_rest.DAO
 
                 #endregion
 
+                #region Relação de adicionais para um produto
+                //monta a relação de adicionais por produto
+                sqlConn.Command.CommandText = @"SELECT
+	                                                id_produto_adicional_produto,
+	                                                id_produto,
+	                                                id_produto_adicional
+                                                FROM tab_produto_adicional_produto;";
+
+                sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                //transforma a entidade em objeto
+                listaProdutoAdicionalProdutoEntidade = new ModuloClasse().PreencheClassePorDataReader<DadosProdutoAdicionalProdutoEntidade>(sqlConn.Reader);
+
+                foreach (var prodAdicionalProduto in listaProdutoAdicionalProdutoEntidade)
+                {
+                    listaProdutoAdicionalProduto.Add(prodAdicionalProduto.ToProdutoAdicionalProduto());
+                }
+
+                //limpa os dados da execução anterior
+                sqlConn.Command.CommandText = "";
+                if (sqlConn.Reader != null)
+                    sqlConn.Reader.Close();
+
+                #endregion
+
                 //Adiciona os itens adicionais aos produtos adicionais
                 for (int i = 0; i < listaProdutoAdicional.Count; i++)
                 {
@@ -142,7 +167,9 @@ namespace ms_crud_rest.DAO
                     List<DadosProdutoAdicional> listaProdutoAdicionalFiltrada = new List<DadosProdutoAdicional>();
                     foreach (var produtoAdicional in listaIdProdutosAdicionais)
                     {
-                        listaProdutoAdicionalFiltrada.Add((DadosProdutoAdicional)listaProdutoAdicional.Where(p=>p.Id == produtoAdicional.IdProdutoAdicional));
+
+                        var produtoAdicionalFiltrado = listaProdutoAdicional.Where(p => p.Id == produtoAdicional.IdProdutoAdicional);
+                        listaProdutoAdicionalFiltrada.Add((DadosProdutoAdicional)produtoAdicionalFiltrado);
                     }
 
                     //adiciona os produtos adicionais ao produto
