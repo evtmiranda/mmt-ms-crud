@@ -76,6 +76,11 @@ namespace ClassesMarmitex
 
         [Column("bol_ativo")]
         public bool Ativo { get; set; }
+
+        public DadosProdutoAdicionalItem ToProdutoAdicionalItem()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class DadosProdutoAdicionalProduto
@@ -96,6 +101,11 @@ namespace ClassesMarmitex
 
         [Column("id_produto_adicional")]
         public int IdProdutoAdicional { get; set; }
+
+        public DadosProdutoAdicionalProduto ToProdutoAdicionalProduto()
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }

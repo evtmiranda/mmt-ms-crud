@@ -1,6 +1,7 @@
 ﻿using ClassesMarmitex;
 using ms_crud_rest.Exceptions;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace ms_crud_rest.DAO
@@ -17,10 +18,18 @@ namespace ms_crud_rest.DAO
             List<DadosProdutoAdicionalEntidade> listaProdutoAdicionalEntidade = new List<DadosProdutoAdicionalEntidade>();
             List<DadosProdutoAdicional> listaProdutoAdicional = new List<DadosProdutoAdicional>();
 
+            List<DadosProdutoAdicionalItemEntidade> listaProdutoAdicionalItemEntidade = new List<DadosProdutoAdicionalItemEntidade>();
+            List<DadosProdutoAdicionalItem> listaProdutoAdicionalItem = new List<DadosProdutoAdicionalItem>();
+
+            List<DadosProdutoAdicionalProdutoEntidade> listaProdutoAdicionalProdutoEntidade = new List<DadosProdutoAdicionalProdutoEntidade>();
+            List<DadosProdutoAdicionalProduto> listaProdutoAdicionalProduto = new List<DadosProdutoAdicionalProduto>();
+
             try
             {
                 sqlConn.StartConnection();
-                
+
+
+                #region Produtos
                 //busca os produtos
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
                 sqlConn.Command.CommandText = string.Format(@"SELECT
@@ -38,7 +47,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.AddWithValue("@id_menu_cardapio", idMenuCardapio);
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
-                //transforma os produtos entidades em produtos
+                //transforma a entidade em objeto
                 listaProdutoEntidade = new ModuloClasse().PreencheClassePorDataReader<ProdutoEntidade>(sqlConn.Reader);
                 foreach (var produtoEntidade in listaProdutoEntidade)
                 {
@@ -50,16 +59,9 @@ namespace ms_crud_rest.DAO
                 if (sqlConn.Reader != null)
                     sqlConn.Reader.Close();
 
+                #endregion
 
-                //lista quais produtos adicionais o produto possui
-                sqlConn.Command.CommandText = @"SELECT
-	                                                id_produto_adicional_produto,
-	                                                id_produto,
-	                                                id_produto_adicional
-                                                FROM tab_produto_adicional_produto AS tpap;";
-
-
-
+                #region Adicionais Produtos
                 //busca os dados adicionais dos produtos
                 sqlConn.Command.CommandText = string.Format(@"SELECT
 	                                                            tpa.id_produto_adicional,
@@ -79,7 +81,7 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
-                //transforma os produtos adicionais entidades em produtos adicionais
+                //transforma a entidade em objeto
                 listaProdutoAdicionalEntidade = new ModuloClasse().PreencheClassePorDataReader<DadosProdutoAdicionalEntidade>(sqlConn.Reader);
 
                 foreach (var produtoAdicionalEntidade in listaProdutoAdicionalEntidade)
@@ -87,14 +89,64 @@ namespace ms_crud_rest.DAO
                     listaProdutoAdicional.Add(produtoAdicionalEntidade.ToProdutoAdicional());
                 }
 
+                //limpa os dados da execução anterior
+                sqlConn.Command.CommandText = "";
+                if (sqlConn.Reader != null)
+                    sqlConn.Reader.Close();
 
-                //adiciona os produtos adicionais aos produtos
+                #endregion
+
+                #region Itens Adicionais Produtos
+                //lista quais itens os produtos adicionais possui
+                sqlConn.Command.CommandText = @"SELECT
+	                                                id_produto_adicional_item,
+	                                                id_produto_adicional,
+	                                                nm_adicional_item,
+	                                                nm_descricao_item,
+	                                                vlr_adicional_item,
+	                                                bol_ativo
+                                                FROM tab_produto_adicional_item;";
+
+                sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                //transforma a entidade em objeto
+                listaProdutoAdicionalItemEntidade = new ModuloClasse().PreencheClassePorDataReader<DadosProdutoAdicionalItemEntidade>(sqlConn.Reader);
+
+                foreach (var itemAdicional in listaProdutoAdicionalItemEntidade)
+                {
+                    listaProdutoAdicionalItem.Add(itemAdicional.ToProdutoAdicionalItem());
+                }
+
+                //limpa os dados da execução anterior
+                sqlConn.Command.CommandText = "";
+                if (sqlConn.Reader != null)
+                    sqlConn.Reader.Close();
+
+                #endregion
+
+                //Adiciona os itens adicionais aos produtos adicionais
+                for (int i = 0; i < listaProdutoAdicional.Count; i++)
+                {
+                    listaProdutoAdicional[i].ItensAdicionais =
+                        listaProdutoAdicionalItem.Where(p => p.IdProdutoAdicional == listaProdutoAdicional[i].Id).ToList();
+                }
+
+                //Adiciona os produtos adicionais aos produtos
                 for (int i = 0; i < listaProduto.Count; i++)
                 {
-                    for (int j = 0; j < listaProdutoAdicional.Count; j++)
+                    //busca a relação de produtos adicionais para este produto
+                    List<DadosProdutoAdicionalProduto> listaIdProdutosAdicionais = new List<DadosProdutoAdicionalProduto>();
+                    listaIdProdutosAdicionais = listaProdutoAdicionalProduto.Where(p => p.IdProduto == listaProduto[i].Id).ToList();
+
+                    //monta uma lista somente com os produtos adicionais deste produto
+                    List<DadosProdutoAdicional> listaProdutoAdicionalFiltrada = new List<DadosProdutoAdicional>();
+                    foreach (var produtoAdicional in listaIdProdutosAdicionais)
                     {
-                        if(listaProduto[i].Id == listaProdutoAdicional[j].)
+                        listaProdutoAdicionalFiltrada.Add((DadosProdutoAdicional)listaProdutoAdicional.Where(p=>p.Id == produtoAdicional.IdProdutoAdicional));
                     }
+
+                    //adiciona os produtos adicionais ao produto
+                    listaProduto[i].DadosAdicionaisProdutos = listaProdutoAdicionalFiltrada;
                 }
 
                 return listaProduto;
