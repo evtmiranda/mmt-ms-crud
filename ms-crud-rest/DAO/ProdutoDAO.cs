@@ -168,8 +168,8 @@ namespace ms_crud_rest.DAO
                     foreach (var produtoAdicional in listaIdProdutosAdicionais)
                     {
 
-                        var produtoAdicionalFiltrado = listaProdutoAdicional.Where(p => p.Id == produtoAdicional.IdProdutoAdicional);
-                        listaProdutoAdicionalFiltrada.Add((DadosProdutoAdicional)produtoAdicionalFiltrado);
+                        var produtoAdicionalFiltrado = listaProdutoAdicional.Where(p => p.Id == produtoAdicional.IdProdutoAdicional).ToList();
+                        listaProdutoAdicionalFiltrada.Add((DadosProdutoAdicional)produtoAdicionalFiltrado.FirstOrDefault());
                     }
 
                     //adiciona os produtos adicionais ao produto
