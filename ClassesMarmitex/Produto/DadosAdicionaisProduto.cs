@@ -54,6 +54,7 @@ namespace ClassesMarmitex
         public string Nome { get; set; }
         public string Descricao { get; set; }
         public decimal Valor { get; set; }
+        public int Qtd { get; set; }
         public bool Ativo { get; set; }
     }
 
@@ -109,4 +110,16 @@ namespace ClassesMarmitex
         }
     }
 
+    public class DadosAtualizarProdutoAdicional
+    {
+        public int Id { get; set; }
+        public int IdProduto { get; set; }
+        public List<DadosAtualizarProdutoAdicionalItem> ListaProdutosAdicionais { get; set; }
+    }
+
+    public class DadosAtualizarProdutoAdicionalItem
+    {
+        public int Id { get; set; }
+        public int Qtd { get; set; }
+    }
 }
