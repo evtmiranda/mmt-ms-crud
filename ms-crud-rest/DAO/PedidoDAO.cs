@@ -51,7 +51,7 @@ namespace ms_crud_rest.DAO
                 foreach (var produto in pedido.ListaProdutos)
                 {
                     //valor total do produto
-                    produto.ValorTotal = produto.Quantidade * produto.Produto.Valor;
+                    //produto.ValorTotal = produto.Quantidade * produto.Produto.Valor;
 
                     sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_produto_pedido(id_produto, id_pedido, nr_qtd_produto, vlr_total_produto)
                                                             VALUES({0}, {1}, {2}, '{3}');",
