@@ -16,7 +16,7 @@ namespace ms_crud_rest.DAO
         /// </summary>
         /// <param name="pedido">objeto com as informações do pedido</param>
         /// <returns>id do pedido cadastrado</returns>
-        public override void Adicionar(Pedido pedido)
+        public int Adicionar(Pedido pedido)
         {
             try
             {
@@ -70,7 +70,7 @@ namespace ms_crud_rest.DAO
                 }
 
                 //retorna o id do pedido
-                //return idPedido;
+                return idPedido;
             }
             catch (PedidoNaoCadastradoClienteException)
             {

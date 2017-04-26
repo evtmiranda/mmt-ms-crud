@@ -46,7 +46,7 @@ namespace ms_crud_rest.Controllers
                 pedido.ListaFormaPagamento.RemoveAll(p => p.Id == 0);
 
                 //adiciona o pedido
-                pedidoDAO.Adicionar(pedido);
+                pedido.Id = pedidoDAO.Adicionar(pedido);
 
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created, pedido);
 
