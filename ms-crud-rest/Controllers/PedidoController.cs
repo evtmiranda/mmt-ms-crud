@@ -72,18 +72,18 @@ namespace ms_crud_rest.Controllers
         /// <summary>
         /// Busca todos os pedidos de um determinado cliente
         /// </summary>
-        /// <param name="idCliente">id do cliente para consultar os pedidos</param>
+        /// <param name="idUsuarioParceiro">id do cliente para consultar os pedidos</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("api/Pedido/Buscar")]
-        public HttpResponseMessage BuscarPedidos([FromUri] int idCliente)
+        [Route("api/Pedido/BuscarHistorico")]
+        public HttpResponseMessage BuscarHistoricoPedidos([FromUri] int idUsuarioParceiro)
         {
             List<PedidoCliente> listaPedidosCliente = new List<PedidoCliente>();
-
+            
             try
             {
                 //busca os pedidos
-                listaPedidosCliente = pedidoClienteDAO.Listar(idCliente);
+                listaPedidosCliente = pedidoClienteDAO.Listar(idUsuarioParceiro);
 
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, listaPedidosCliente);
 
