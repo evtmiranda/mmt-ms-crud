@@ -83,6 +83,18 @@ namespace ms_crud_rest.Exceptions
         }
     }
 
+    public class ClienteNuncaFezPedidosException : Exception
+    {
+        public override string Message
+        {
+            get
+            {
+                return "você ainda não realizou pedidos =/";
+            }
+        }
+    }
+
+
     public class LojaNaoEncontradaException : Exception
     {
         public override string Message

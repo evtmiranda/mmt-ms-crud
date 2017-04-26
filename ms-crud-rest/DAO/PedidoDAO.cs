@@ -1,6 +1,7 @@
 ﻿using ClassesMarmitex;
 using ms_crud_rest.Exceptions;
 using System;
+using System.Collections.Generic;
 
 namespace ms_crud_rest.DAO
 {
@@ -16,7 +17,7 @@ namespace ms_crud_rest.DAO
         /// </summary>
         /// <param name="pedido">objeto com as informações do pedido</param>
         /// <returns>id do pedido cadastrado</returns>
-        public int Adicionar(Pedido pedido)
+        public override int AdicionarPedido(Pedido pedido)
         {
             try
             {

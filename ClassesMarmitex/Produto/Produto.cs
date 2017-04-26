@@ -45,4 +45,29 @@
             return new Produto { Id = this.Id, IdMenuCardapio = this.IdMenuCardapio, Nome = this.Nome, Descricao = this.Descricao, Valor = this.Valor, Imagem = this.Imagem, Ativo = this.Ativo };
         }
     }
+
+    //classe apenas para armazenar dados para exibição
+    public class ProdutoCliente
+    {
+        public int IdPedido { get; set; }
+        public string NomeProduto { get; set; }
+        public int QtdProduto { get; set; }
+    }
+
+    public class ProdutoClienteEntidade
+    {
+        [Column("id_pedido")]
+        public int IdPedido { get; set; }
+
+        [Column("nm_produto")]
+        public string NomeProduto { get; set; }
+
+        [Column("nr_qtd_produto")]
+        public int QtdProduto { get; set; }
+
+        public ProdutoCliente ToProdutoCliente()
+        {
+            return new ProdutoCliente { NomeProduto = this.NomeProduto, QtdProduto = this.QtdProduto, IdPedido = this.IdPedido };
+        }
+    }
 }

@@ -208,6 +208,7 @@
     <Compile Include="DAO\LogDAO.cs" />
     <Compile Include="DAO\LojaDAO.cs" />
     <Compile Include="DAO\MenuCardapioDAO.cs" />
+    <Compile Include="DAO\PedidoClienteDAO.cs" />
     <Compile Include="DAO\PedidoDAO.cs" />
     <Compile Include="DAO\ProdutoDAO.cs" />
     <Compile Include="DAO\UsuarioDAO.cs" />
