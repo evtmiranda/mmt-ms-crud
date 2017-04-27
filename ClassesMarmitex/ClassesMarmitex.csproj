@@ -69,6 +69,8 @@
     <Compile Include="Utils\HttpRequestMarmitex.cs" />
     <Compile Include="Utils\ModuloClasse.cs" />
     <Compile Include="Utils\OAuth.cs" />
+    <Compile Include="Utils\Requisicoes.cs" />
+    <Compile Include="Utils\RequisicoesREST.cs" />
     <Compile Include="Utils\SqlServer.cs" />
     <Compile Include="Utils\Token.cs" />
   </ItemGroup>
