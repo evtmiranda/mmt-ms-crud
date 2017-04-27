@@ -11,7 +11,7 @@
         public string Nome { get; set; }
         public string Descricao { get; set; }
         public decimal Valor { get; set; }
-        public byte[] Imagem { get; set; }
+        public string Imagem { get; set; }
         public List<DadosProdutoAdicional> DadosAdicionaisProdutos { get; set; }
         public bool Ativo { get; set; }
     }
@@ -34,8 +34,8 @@
         [Column("vlr_produto")]
         public decimal Valor { get; set; }
 
-        [Column("img_imagem")]
-        public byte[] Imagem { get; set; }
+        [Column("url_imagem")]
+        public string Imagem { get; set; }
 
         [Column("bol_ativo")]
         public bool Ativo { get; set; }
