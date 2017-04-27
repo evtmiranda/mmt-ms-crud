@@ -75,8 +75,8 @@ namespace ms_crud_rest.Controllers
         /// <param name="idUsuarioParceiro">id do cliente para consultar os pedidos</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("api/Pedido/BuscarHistorico")]
-        public HttpResponseMessage BuscarHistoricoPedidos([FromUri] int idUsuarioParceiro)
+        [Route("api/Pedido/BuscarHistorico/{idUsuarioParceiro}")]
+        public HttpResponseMessage BuscarHistoricoPedidos(int idUsuarioParceiro)
         {
             List<PedidoCliente> listaPedidosCliente = new List<PedidoCliente>();
             
@@ -102,5 +102,6 @@ namespace ms_crud_rest.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
+
     }
 }

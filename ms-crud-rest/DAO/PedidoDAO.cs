@@ -22,6 +22,7 @@ namespace ms_crud_rest.DAO
             try
             {
                 int idPedido = 0;
+                int idProdutoPedido = 0;
 
                 sqlConn.StartConnection();
 
@@ -55,9 +56,33 @@ namespace ms_crud_rest.DAO
                     //produto.ValorTotal = produto.Quantidade * produto.Produto.Valor;
 
                     sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_produto_pedido(id_produto, id_pedido, nr_qtd_produto, vlr_total_produto)
-                                                            VALUES({0}, {1}, {2}, '{3}');",
-                                                            produto.Produto.Id, idPedido, produto.Quantidade, produto.ValorTotal.ToString().Replace(",","."));
-                    sqlConn.Command.ExecuteNonQuery();
+                                                            VALUES({0}, {1}, {2}, '{3}'); SELECT @@IDENTITY",
+                                                            produto.Produto.Id, idPedido, produto.Quantidade, produto.ValorTotal.ToString().Replace(",", "."));
+                    var varRetornoProdutoPedido = sqlConn.Command.ExecuteScalar();
+                    idProdutoPedido = Convert.ToInt32(varRetornoProdutoPedido);
+
+                    //verifica se o retorno foi positivo
+                    if (idProdutoPedido == 0)
+                        throw new PedidoNaoCadastradoClienteException();
+
+                    //insere os itens adicionais dos produtos do pedido
+                    foreach (var listaProdutos in pedido.ListaProdutos)
+                    {
+                        foreach (var adicionaisProduto in listaProdutos.Produto.DadosAdicionaisProdutos)
+                        {
+                            sqlConn.Command.CommandText = "";
+
+                            foreach (var itemAdicional in adicionaisProduto.ItensAdicionais)
+                            {
+                                if (itemAdicional.Qtd > 0)
+                                    sqlConn.Command.CommandText += string.Format(@"INSERT INTO tab_produto_adicional_pedido(id_pedido, id_produto_pedido, id_produto_adicional_item, qtd_item_adicional)
+                                                            VALUES({0}, {1}, {2}, {3});",
+                                                                idPedido, idProdutoPedido, itemAdicional.Id, itemAdicional.Qtd);
+                            }
+
+                            sqlConn.Command.ExecuteNonQuery();
+                        }
+                    }
                 }
 
                 //3 - insere as formas de pagamento do pedido

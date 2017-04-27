@@ -24,7 +24,7 @@ namespace ms_crud_rest.DAO
 
                 //1 - busca o cabeçalho do pedido
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
-                sqlConn.Command.CommandText = string.Format(@"SELECT
+                sqlConn.Command.CommandText = string.Format(@"SELECT DISTINCT
 	                                                            tp.id_pedido,
 	                                                            tp.dt_pedido
                                                             FROM tab_pedido AS tp
