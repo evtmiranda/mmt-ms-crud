@@ -38,7 +38,7 @@ namespace ms_crud_rest.DAO
 	                                                            nm_produto,
 	                                                            nm_descricao,
 	                                                            vlr_produto,
-	                                                            img_imagem,
+	                                                            url_imagem,
 	                                                            bol_ativo
                                                             FROM tab_produto
                                                             WHERE id_menu_cardapio = @id_menu_cardapio
