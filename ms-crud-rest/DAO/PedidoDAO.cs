@@ -130,30 +130,27 @@ namespace ms_crud_rest.DAO
                 List<Pedido> listaPedidos = new List<Pedido>();
                 List<PedidoEntidade> listaPedidosEntidade = new List<PedidoEntidade>();
 
-                List<ProdutoCliente> listaProdutos = new List<ProdutoCliente>();
-                List<ProdutoClienteEntidade> listaProdutosEntidade = new List<ProdutoClienteEntidade>();
-
                 sqlConn.StartConnection();
 
-                //1 - busca o cabeçalho do pedido
+                //1 - monta o pedido
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
-                sqlConn.Command.CommandText = string.Format(@"SELECT DISTINCT
-	                                                            tp.id_pedido,
-	                                                            tp.dt_pedido
-                                                            FROM tab_pedido AS tp
-                                                            INNER JOIN tab_forma_pagamento_pedido AS tfp
-                                                            ON tfp.id_pedido = tp.id_pedido
-                                                            INNER JOIN tab_produto_pedido AS tpp
-                                                            ON tpp.id_pedido = tp.id_pedido
-                                                            INNER JOIN tab_produto AS tprod
-                                                            ON tprod.id_produto = tpp.id_produto
-                                                            WHERE tp.id_usuario_parceiro = @id_usuario_parceiro;");
+                sqlConn.Command.CommandText = string.Format(@"SELECT
+	                                                            id_pedido,
+	                                                            id_usuario_parceiro,
+	                                                            dt_pedido,
+	                                                            dt_entrega,
+	                                                            vlr_troco,
+	                                                            nm_observacao,
+	                                                            id_status_pedido,
+	                                                            dt_pedido_entregue,
+	                                                            bol_pedido_entregue
+                                                            FROM tab_pedido
+                                                            WHERE id_usuario_parceiro = @id_usuario_parceiro");
 
                 //parametros do pedido
                 sqlConn.Command.Parameters.AddWithValue("@id_usuario_parceiro", idUsuarioParceiro);
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
-
                 listaPedidosEntidade = new ModuloClasse().PreencheClassePorDataReader<PedidoEntidade>(sqlConn.Reader);
 
                 //fecha o reader
@@ -165,41 +162,12 @@ namespace ms_crud_rest.DAO
 
                 foreach (var pedidoEnt in listaPedidosEntidade)
                 {
-                    //listaPedidos.Add(pedidoEnt());
+                    listaPedidos.Add(pedidoEnt.ToPedido());
                 }
 
                 //2 - busca os produtos do pedido
-                sqlConn.Command.CommandType = System.Data.CommandType.Text;
-                sqlConn.Command.CommandText = string.Format(@"SELECT
-                                                                tp.id_pedido,
-	                                                            tprod.nm_produto,
-	                                                            tpp.nr_qtd_produto
-                                                            FROM tab_pedido AS tp
-                                                            INNER JOIN tab_forma_pagamento_pedido AS tfp
-                                                            ON tfp.id_pedido = tp.id_pedido
-                                                            INNER JOIN tab_produto_pedido AS tpp
-                                                            ON tpp.id_pedido = tp.id_pedido
-                                                            INNER JOIN tab_produto AS tprod
-                                                            ON tprod.id_produto = tpp.id_produto
-                                                            WHERE tp.id_usuario_parceiro = @id_usuario_parceiro;");
-
-                sqlConn.Reader = sqlConn.Command.ExecuteReader();
-
-                listaProdutosEntidade = new ModuloClasse().PreencheClassePorDataReader<ProdutoClienteEntidade>(sqlConn.Reader);
-
-                //fecha o reader
-                sqlConn.Reader.Close();
-
-                foreach (var produtoEnt in listaProdutosEntidade)
-                {
-                    listaProdutos.Add(produtoEnt.ToProdutoCliente());
-                }
-
-                //adiciona os produtos aos pedidos
-                foreach (var pedido in listaPedidos)
-                {
-                    //pedido.Produtos = listaProdutos.Where(p => p.IdPedido == pedido.IdPedido).ToList();
-                }
+                
+                //3 - busca as formas de pagamento do pedido
 
                 //retorna a lista de pedidos
                 return listaPedidos;

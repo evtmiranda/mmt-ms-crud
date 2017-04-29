@@ -10,7 +10,7 @@
         public UsuarioParceiro Cliente { get; set; }
         public DateTime DataPedido { get; set; }
         public List<ProdutoPedido> ListaProdutos { get; set; }
-        public string HorarioEntrega { get; set; }
+        public DateTime DataEntrega { get; set; }
         public List<FormaDePagamento> ListaFormaPagamento { get; set; }
         public string Troco { get; set; }
         public string Observacao { get; set; }
@@ -31,8 +31,8 @@
         [Column("dt_pedido")]
         public DateTime DataPedido { get; set; }
 
-        [Column("hr_entrega")]
-        public string HorarioEntrega { get; set; }
+        [Column("dt_entrega")]
+        public DateTime DataEntrega { get; set; }
 
         [Column("vlr_troco")]
         public decimal Troco { get; set; }
@@ -48,6 +48,24 @@
 
         [Column("bol_pedido_entregue")]
         public bool PedidoEntregue { get; set; }
+
+        public Pedido ToPedido()
+        {
+            Pedido pedido = new Pedido()
+            {
+                Id = Id,
+                Cliente = new UsuarioParceiro { Id = IdCliente},
+                DataPedido = DataPedido,
+                DataEntrega = DataEntrega,
+                Troco = Troco.ToString(),
+                Observacao = Observacao,
+                IdStatusPedido = IdStatusPedido,
+                DataPedidoEntregue = DataPedidoEntregue,
+                PedidoEntregue = PedidoEntregue
+            };
+
+            return pedido;
+        }
     }
 
     public class DetalhePedido
