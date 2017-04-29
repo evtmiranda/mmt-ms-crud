@@ -14,15 +14,13 @@ namespace ms_crud_rest.Controllers
         public PedidoDAO pedidoDAO;
         public LogDAO logDAO;
         public FormaPagamentoDAO pagamentoDAO;
-        public PedidoClienteDAO pedidoClienteDAO;
 
         //O Ninject é o responsável por cuidar da criação de todos esses objetos
-        public PedidoController(PedidoDAO pedidoDAO, LogDAO logDAO, FormaPagamentoDAO pagamentoDAO, PedidoClienteDAO pedidoClienteDAO)
+        public PedidoController(PedidoDAO pedidoDAO, LogDAO logDAO, FormaPagamentoDAO pagamentoDAO)
         {
             this.pedidoDAO = pedidoDAO;
             this.logDAO = logDAO;
             this.pagamentoDAO = pagamentoDAO;
-            this.pedidoClienteDAO = pedidoClienteDAO;
         }
 
         /// <summary>
@@ -70,6 +68,43 @@ namespace ms_crud_rest.Controllers
         }
 
         /// <summary>
+        /// Busca todos os pedidos de uma determinada loja
+        /// </summary>
+        /// <param name="idLoja">Id da loja</param>
+        /// <param name="ehPedidoFila">Diz se quer buscar os pedidos que estão na fila de entrega</param>
+        /// <param name="ehPedidoAndamento">Diz se quer buscar os pedidos que estão em andamento</param>
+        /// <param name="ehPedidoEntregue">Diz se quer buscar os pedidos que já foram entregues</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("api/Pedido/BuscarPedidos/{idLoja}/{ehPedidoFila},{ehPedidoAndamento},{ehPedidoEntregue}")]
+        public HttpResponseMessage BuscarPedidos(int idLoja, bool ehPedidoFila, bool ehPedidoAndamento, bool ehPedidoEntregue)
+        {
+            List<PedidoCliente> listaPedidosCliente = new List<PedidoCliente>();
+
+            try
+            {
+                //busca os pedidos
+                listaPedidosCliente = pedidoDAO.ConsultarPedidosLoja(idLoja, ehPedidoFila, ehPedidoAndamento, ehPedidoEntregue);
+
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, listaPedidosCliente);
+
+                return response;
+            }
+            catch (ClienteNuncaFezPedidosException cnpEx)
+            {
+                string mensagem = cnpEx.Message;
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.NotModified, error);
+            }
+            catch (Exception ex)
+            {
+                string mensagem = string.Format("nao foi possivel consultar os pedidos. erro: {0}", ex);
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        /// <summary>
         /// Busca todos os pedidos de um determinado cliente
         /// </summary>
         /// <param name="idUsuarioParceiro">id do cliente para consultar os pedidos</param>
@@ -79,11 +114,12 @@ namespace ms_crud_rest.Controllers
         public HttpResponseMessage BuscarHistoricoPedidos(int idUsuarioParceiro)
         {
             List<PedidoCliente> listaPedidosCliente = new List<PedidoCliente>();
+            //List<Pedido> listaPedidos = new List<Pedido>();
             
             try
             {
                 //busca os pedidos
-                listaPedidosCliente = pedidoClienteDAO.Listar(idUsuarioParceiro);
+                //listaPedidosCliente = pedidoClienteDAO.Listar(idUsuarioParceiro);
 
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, listaPedidosCliente);
 

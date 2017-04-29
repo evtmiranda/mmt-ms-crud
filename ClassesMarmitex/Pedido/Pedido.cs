@@ -14,6 +14,9 @@
         public List<FormaDePagamento> ListaFormaPagamento { get; set; }
         public string Troco { get; set; }
         public string Observacao { get; set; }
+        public int IdStatusPedido { get; set; }
+        public DateTime DataPedidoEntregue { get; set; }
+        public bool PedidoEntregue { get; set; }
     }
 
     [Table("tab_pedido")]
@@ -36,6 +39,15 @@
 
         [Column("nm_observacao")]
         public string Observacao { get; set; }
+
+        [Column("id_status_pedido")]
+        public int IdStatusPedido { get; set; }
+
+        [Column("dt_pedido_entregue")]
+        public DateTime DataPedidoEntregue { get; set; }
+
+        [Column("bol_pedido_entregue")]
+        public bool PedidoEntregue { get; set; }
     }
 
     public class DetalhePedido
@@ -46,7 +58,9 @@
         public string Observacao { get; set; }
     }
 
-    //classe apenas para armazenar dados para exibição
+    /// <summary>
+    /// Classe para utilizacao da tela de histórico de pedidos do usuário
+    /// </summary>
     public class PedidoCliente
     {
         public int IdPedido { get; set; }

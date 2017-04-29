@@ -46,7 +46,9 @@
         }
     }
 
-    //classe apenas para armazenar dados para exibição
+    /// <summary>
+    /// Classe para utilizacao da tela de histórico de pedidos do usuário
+    /// </summary>
     public class ProdutoCliente
     {
         public int IdPedido { get; set; }

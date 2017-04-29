@@ -228,7 +228,6 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.CommandText = string.Format(@"SELECT
                                                                 id_usuario_loja,	
                                                                 id_loja,
-                                                                id_rede,	
                                                                 nm_usuario,
                                                                 nm_apelido,
                                                                 nm_email,

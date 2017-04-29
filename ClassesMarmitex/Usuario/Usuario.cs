@@ -37,6 +37,7 @@ namespace ClassesMarmitex
     {
         public int IdLoja { get; set; }
         public int NivelPermissao { get; set; }
+        public string UrlLoja { get; set; }
     }
 
     [Table("tab_usuario_loja")]
