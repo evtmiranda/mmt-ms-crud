@@ -357,6 +357,7 @@ namespace ms_crud_rest.DAO
                     listaProdutoPedidoEntidade = new ModuloClasse().PreencheClassePorDataReader<ProdutoPedidoEntidade>(sqlConn.Reader);
 
                     //preenche a lista de produto pedido
+                    listaProdutoPedido = new List<ProdutoPedido>();
                     foreach (var produtoPedidoEntidade in listaProdutoPedidoEntidade)
                     {
                         listaProdutoPedido.Add(produtoPedidoEntidade.ToProdutoPedido());
@@ -392,6 +393,12 @@ namespace ms_crud_rest.DAO
                             produto = produtoEntidade.ToProduto();
                         }
 
+                        //adiciona o produto ao produto pedido
+                        produtoPedido.Produto = produto;
+
+                        //fecha o reader
+                        sqlConn.Reader.Close();
+
                         #region 1.2.2 - preenche os produtos adicionais dos produtos
 
                         sqlConn.Command.Parameters.Clear();
@@ -419,7 +426,11 @@ namespace ms_crud_rest.DAO
                             listaProdutosAdicionaisEntidade = new ModuloClasse().PreencheClassePorDataReader<DadosProdutoAdicionalEntidade>(sqlConn.Reader);
                         }
 
+                        //fecha o reader
+                        sqlConn.Reader.Close();
+
                         //transforma a entidade em objeto
+                        listaProdutosAdicionais = new List<DadosProdutoAdicional>();
                         foreach (var produtoAdicionalEntidade in listaProdutosAdicionaisEntidade)
                         {
                             listaProdutosAdicionais.Add(produtoAdicionalEntidade.ToProdutoAdicional());
@@ -451,7 +462,11 @@ namespace ms_crud_rest.DAO
                                 listaItensProdutosAdicionaisEntidade = new ModuloClasse().PreencheClassePorDataReader<DadosProdutoAdicionalItemEntidade>(sqlConn.Reader);
                             }
 
+                            //fecha o reader
+                            sqlConn.Reader.Close();
+
                             //transforma a entidade em objeto
+                            listaItensProdutosAdicionais = new List<DadosProdutoAdicionalItem>();
                             foreach (var itemProdutoAdicionalEntidade in listaItensProdutosAdicionaisEntidade)
                             {
                                 listaItensProdutosAdicionais.Add(itemProdutoAdicionalEntidade.ToProdutoAdicionalItem());
@@ -483,7 +498,11 @@ namespace ms_crud_rest.DAO
                                 listaDadosProdutosAdicionaisPedidoEntidade = new ModuloClasse().PreencheClassePorDataReader<DadosProdutoAdicionalPedidoEntidade>(sqlConn.Reader);
                             }
 
+                            //fecha o reader
+                            sqlConn.Reader.Close();
+
                             //transforma a entidade em objeto
+                            listaDadosProdutosAdicionaisPedido = new List<DadosProdutoAdicionalPedido>();
                             foreach (var dadosProdutosAdicionaisPedidoEntidade in listaDadosProdutosAdicionaisPedidoEntidade)
                             {
                                 listaDadosProdutosAdicionaisPedido.Add(dadosProdutosAdicionaisPedidoEntidade.ToProdutoAdicionalPedido());
@@ -492,7 +511,10 @@ namespace ms_crud_rest.DAO
                             //atualiza a quantidade de itens adicionais
                             foreach (var itemProdutoAdicional in listaItensProdutosAdicionais)
                             {
-                                itemProdutoAdicional.Qtd = listaDadosProdutosAdicionaisPedido.Where(p => p.IdProdutoAdicionalItem == itemProdutoAdicional.Id).
+                                if (listaDadosProdutosAdicionaisPedido.Where(p => p.IdProdutoAdicionalItem == itemProdutoAdicional.Id && p.IdProdutoPedido == produtoPedido.Id).Count() == 0)
+                                    continue;
+
+                                itemProdutoAdicional.Qtd = listaDadosProdutosAdicionaisPedido.Where(p => p.IdProdutoAdicionalItem == itemProdutoAdicional.Id && p.IdProdutoPedido == produtoPedido.Id).
                                     SingleOrDefault().QtdItemAdicional;
                             }
 
