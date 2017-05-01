@@ -89,7 +89,18 @@ namespace ms_crud_rest.Exceptions
         {
             get
             {
-                return "você ainda não realizou pedidos =/";
+                return "nenhum pedido encontrado =/";
+            }
+        }
+    }
+
+    public class LojaNaoPossuiPedidosException : Exception
+    {
+        public override string Message
+        {
+            get
+            {
+                return "nenhum pedido encontrado =/";
             }
         }
     }

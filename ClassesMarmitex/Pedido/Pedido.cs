@@ -11,6 +11,7 @@
         public DateTime DataPedido { get; set; }
         public List<ProdutoPedido> ListaProdutos { get; set; }
         public DateTime DataEntrega { get; set; }
+        public string HorarioEntrega { get; set; }
         public List<FormaDePagamento> ListaFormaPagamento { get; set; }
         public string Troco { get; set; }
         public string Observacao { get; set; }
@@ -79,24 +80,24 @@
     /// <summary>
     /// Classe para utilizacao da tela de histórico de pedidos do usuário
     /// </summary>
-    public class PedidoCliente
-    {
-        public int IdPedido { get; set; }
-        public DateTime DataPedido { get; set; }
-        public List<ProdutoCliente> Produtos { get; set; }
-    }
+    //public class PedidoCliente
+    //{
+    //    public int IdPedido { get; set; }
+    //    public DateTime DataPedido { get; set; }
+    //    public List<ProdutoCliente> Produtos { get; set; }
+    //}
 
-    public class PedidoClienteEntidade
-    {
-        [Column("id_pedido")]
-        public int IdPedido { get; set; }
+    //public class PedidoClienteEntidade
+    //{
+    //    [Column("id_pedido")]
+    //    public int IdPedido { get; set; }
 
-        [Column("dt_pedido")]
-        public DateTime DataPedido { get; set; }
+    //    [Column("dt_pedido")]
+    //    public DateTime DataPedido { get; set; }
 
-        public PedidoCliente ToPedidoCliente()
-        {
-            return new PedidoCliente { IdPedido = this.IdPedido, DataPedido = this.DataPedido };
-        }
-    }
+    //    public PedidoCliente ToPedidoCliente()
+    //    {
+    //        return new PedidoCliente { IdPedido = this.IdPedido, DataPedido = this.DataPedido };
+    //    }
+    //}
 }

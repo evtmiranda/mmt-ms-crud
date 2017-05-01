@@ -76,10 +76,10 @@ namespace ms_crud_rest.Controllers
         /// <param name="ehPedidoEntregue">Diz se quer buscar os pedidos que já foram entregues</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("api/Pedido/BuscarPedidos/{idLoja}/{ehPedidoFila},{ehPedidoAndamento},{ehPedidoEntregue}")]
-        public HttpResponseMessage BuscarPedidos(int idLoja, bool ehPedidoFila, bool ehPedidoAndamento, bool ehPedidoEntregue)
+        [Route("api/Pedido/BuscarPedidos/{idLoja}/{ehPedidoFila}/{ehPedidoAndamento}/{ehPedidoEntregue}")]
+        public HttpResponseMessage BuscarPedidos(int idLoja, bool ehPedidoFila = false, bool ehPedidoAndamento = false, bool ehPedidoEntregue = false)
         {
-            List<PedidoCliente> listaPedidosCliente = new List<PedidoCliente>();
+            List<Pedido> listaPedidosCliente = new List<Pedido>();
 
             try
             {
@@ -90,7 +90,7 @@ namespace ms_crud_rest.Controllers
 
                 return response;
             }
-            catch (ClienteNuncaFezPedidosException cnpEx)
+            catch (LojaNaoPossuiPedidosException cnpEx)
             {
                 string mensagem = cnpEx.Message;
                 HttpError error = new HttpError(mensagem);
@@ -113,13 +113,12 @@ namespace ms_crud_rest.Controllers
         [Route("api/Pedido/BuscarHistorico/{idUsuarioParceiro}")]
         public HttpResponseMessage BuscarHistoricoPedidos(int idUsuarioParceiro)
         {
-            List<PedidoCliente> listaPedidosCliente = new List<PedidoCliente>();
-            //List<Pedido> listaPedidos = new List<Pedido>();
+            List<Pedido> listaPedidosCliente = new List<Pedido>();
             
             try
             {
                 //busca os pedidos
-                //listaPedidosCliente = pedidoClienteDAO.Listar(idUsuarioParceiro);
+                listaPedidosCliente = pedidoDAO.ConsultarPedidosCliente(idUsuarioParceiro);
 
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, listaPedidosCliente);
 

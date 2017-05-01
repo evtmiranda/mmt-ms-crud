@@ -110,6 +110,48 @@ namespace ClassesMarmitex
         }
     }
 
+    public class DadosProdutoAdicionalPedido
+    {
+        public int Id { get; set; }
+        public int IdPedido { get; set; }
+        public int IdProdutoPedido { get; set; }
+        public int IdProdutoAdicionalItem{ get; set; }
+        public int QtdItemAdicional { get; set; }
+    }
+
+    [Table("tab_produto_adicional_pedido")]
+    public class DadosProdutoAdicionalPedidoEntidade
+    {
+        [Column("id")]
+        public int Id { get; set; }
+
+        [Column("id_pedido")]
+        public int IdPedido { get; set; }
+
+        [Column("id_produto_pedido")]
+        public int IdProdutoPedido { get; set; }
+
+        [Column("id_produto_adicional_item")]
+        public int IdProdutoAdicionalItem { get; set; }
+
+        [Column("qtd_item_adicional")]
+        public int QtdItemAdicional { get; set; }
+
+        public DadosProdutoAdicionalPedido ToProdutoAdicionalPedido()
+        {
+            DadosProdutoAdicionalPedido dadosProdutoAdicionalPedido = new DadosProdutoAdicionalPedido()
+            {
+                Id = Id,
+                IdPedido = IdPedido,
+                IdProdutoPedido = IdProdutoPedido,
+                IdProdutoAdicionalItem = IdProdutoAdicionalItem,
+                QtdItemAdicional = QtdItemAdicional
+            };
+
+            return dadosProdutoAdicionalPedido;
+        }
+    }
+
     public class DadosAtualizarProdutoAdicional
     {
         public int Id { get; set; }

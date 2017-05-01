@@ -27,5 +27,19 @@ namespace ClassesMarmitex
 
         [Column("vlr_total_produto")]
         public decimal ValorTotal { get; set; }
+
+        public ProdutoPedido ToProdutoPedido()
+        {
+            ProdutoPedido produtoPedido = new ProdutoPedido
+            {
+                Id = Id,
+                Produto = new Produto { Id = IdProduto },
+                Quantidade = Quantidade,
+                ValorTotal = ValorTotal
+            };
+
+            return produtoPedido;
+        }
+
     }
 }

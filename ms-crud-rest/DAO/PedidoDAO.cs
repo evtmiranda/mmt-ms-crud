@@ -2,6 +2,7 @@
 using ms_crud_rest.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ms_crud_rest.DAO
 {
@@ -118,23 +119,130 @@ namespace ms_crud_rest.DAO
             }
         }
 
+
         /// <summary>
-        /// Monta uma lista com todos os pedidos de um determinado cliente
+        /// Busca todos os pedidos de um determinado cliente
         /// </summary>
-        /// <param name="idUsuarioParceiro">id do cliente</param>
+        /// <param name="idUsuarioParceiro"></param>
         /// <returns></returns>
         public List<Pedido> ConsultarPedidosCliente(int idUsuarioParceiro)
         {
+            List<Pedido> listaPedidos = new List<Pedido>();
+
             try
             {
-                List<Pedido> listaPedidos = new List<Pedido>();
-                List<PedidoEntidade> listaPedidosEntidade = new List<PedidoEntidade>();
+                listaPedidos = ConsultarPedidos(idUsuarioParceiro);
+            }
+            catch (ClienteNuncaFezPedidosException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
 
-                sqlConn.StartConnection();
+            return listaPedidos;
+        }
 
-                //1 - monta o pedido
+        /// <summary>
+        /// Busca todos os pedidos de uma determinada loja
+        /// </summary>
+        /// <param name="idLoja">Id da loja</param>
+        /// <param name="ehPedidoFila">Diz se quer buscar os pedidos que estão na fila de entrega</param>
+        /// <param name="ehPedidoAndamento">Diz se quer buscar os pedidos que estão em andamento</param>
+        /// <param name="ehPedidoEntregue">Diz se quer buscar os pedidos que já foram entregues</param>
+        /// <returns></returns>
+        public List<Pedido> ConsultarPedidosLoja(int idLoja, bool ehPedidoFila = false, bool ehPedidoAndamento = false, bool ehPedidoEntregue = false)
+        {
+            //valida o tipo de pedido
+            if ((ehPedidoFila && ehPedidoAndamento) || (ehPedidoFila && ehPedidoEntregue) || (ehPedidoAndamento && ehPedidoEntregue))
+                throw new Exception("apenas uma tipo de pedido pode ser consultado por vez");
+
+            if(idLoja == 0)
+                throw new Exception("insira o id da loja para a qual quer consultar os pedidos");
+
+            List<Pedido> listaPedidos = new List<Pedido>();
+
+            try
+            {
+                //busca todos os pedidos da loja
+                listaPedidos = ConsultarPedidos(0, idLoja);
+
+                if (ehPedidoFila)
+                    listaPedidos = listaPedidos.FindAll(p => p.IdStatusPedido == 0);
+
+                if(ehPedidoAndamento)
+                    listaPedidos = listaPedidos.FindAll(p => p.IdStatusPedido == 1);
+
+                if (ehPedidoEntregue)
+                    listaPedidos = listaPedidos.FindAll(p => p.IdStatusPedido == 2);
+            }
+            catch (LojaNaoPossuiPedidosException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return listaPedidos;
+        }
+
+
+        /// <summary>
+        /// Monta uma lista com todos os pedidos de um determinado cliente ou loja
+        /// É necessário informar ou o id do parceiro ou o id da loja..
+        /// </summary>
+        /// <param name="idUsuarioParceiro">Id do usuário parceiro (cliente)</param>
+        /// <param name="idLoja">id da loja</param>
+        /// <returns></returns>
+        private List<Pedido> ConsultarPedidos(int idUsuarioParceiro = 0, int idLoja = 0)
+        {
+            if (idUsuarioParceiro == 0 && idLoja == 0)
+                throw new Exception("É necessário informar o idUsuarioParceiro ou o idLoja");
+
+            if (idUsuarioParceiro > 0 && idLoja > 0)
+                throw new Exception("Informe apenas o idUsuarioParceiro ou o idLoja. Não é permitido informar os 2");
+
+
+            List<Pedido> listaPedidos = new List<Pedido>();
+            List<PedidoEntidade> listaPedidosEntidade = new List<PedidoEntidade>();
+
+            UsuarioParceiro usuarioParceiro = new UsuarioParceiro();
+            UsuarioParceiroEntidade usuarioParceiroEnt = new UsuarioParceiroEntidade();
+
+            List<ProdutoPedido> listaProdutoPedido = new List<ProdutoPedido>();
+            List<ProdutoPedidoEntidade> listaProdutoPedidoEntidade = new List<ProdutoPedidoEntidade>();
+
+            Produto produto = new Produto();
+            ProdutoEntidade produtoEntidade = new ProdutoEntidade();
+
+            List<DadosProdutoAdicional> listaProdutosAdicionais = new List<DadosProdutoAdicional>();
+            List<DadosProdutoAdicionalEntidade> listaProdutosAdicionaisEntidade = new List<DadosProdutoAdicionalEntidade>();
+
+            List<DadosProdutoAdicionalItem> listaItensProdutosAdicionais = new List<DadosProdutoAdicionalItem>();
+            List<DadosProdutoAdicionalItemEntidade> listaItensProdutosAdicionaisEntidade = new List<DadosProdutoAdicionalItemEntidade>();
+
+            List<DadosProdutoAdicionalPedido> listaDadosProdutosAdicionaisPedido = new List<DadosProdutoAdicionalPedido>();
+            List<DadosProdutoAdicionalPedidoEntidade> listaDadosProdutosAdicionaisPedidoEntidade = new List<DadosProdutoAdicionalPedidoEntidade>();
+
+            List<FormaDePagamento> listaFormaPagamento = new List<FormaDePagamento>();
+            List<FormaDePagamentoEntidade> listaFormaPagamentoEntidade = new List<FormaDePagamentoEntidade>();
+
+
+            sqlConn.StartConnection();
+
+            try
+            {
+                #region 1 - monta o pedido
+
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
-                sqlConn.Command.CommandText = string.Format(@"SELECT
+
+                if (idUsuarioParceiro > 0)
+                {
+                    sqlConn.Command.CommandText = string.Format(@"SELECT
 	                                                            id_pedido,
 	                                                            id_usuario_parceiro,
 	                                                            dt_pedido,
@@ -147,8 +255,31 @@ namespace ms_crud_rest.DAO
                                                             FROM tab_pedido
                                                             WHERE id_usuario_parceiro = @id_usuario_parceiro");
 
-                //parametros do pedido
-                sqlConn.Command.Parameters.AddWithValue("@id_usuario_parceiro", idUsuarioParceiro);
+                    //parametros do pedido
+                    sqlConn.Command.Parameters.AddWithValue("@id_usuario_parceiro", idUsuarioParceiro);
+                }
+                else
+                {
+                    sqlConn.Command.CommandText = string.Format(@"SELECT
+	                                                                tp.id_pedido,
+	                                                                tp.id_usuario_parceiro,
+	                                                                tp.dt_pedido,
+	                                                                tp.dt_entrega,
+	                                                                tp.vlr_troco,
+	                                                                tp.nm_observacao,
+	                                                                tp.id_status_pedido,
+	                                                                tp.dt_pedido_entregue,
+	                                                                tp.bol_pedido_entregue
+                                                                FROM tab_pedido AS tp
+                                                                INNER JOIN tab_usuario_parceiro AS tup
+                                                                ON tp.id_usuario_parceiro = tup.id_usuario_parceiro
+                                                                INNER JOIN tab_parceiro AS tparc
+                                                                ON tparc.id_parceiro = tup.id_parceiro
+                                                                WHERE tparc.id_loja = @id_loja;");
+
+                    //parametros do pedido
+                    sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
+                }
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
                 listaPedidosEntidade = new ModuloClasse().PreencheClassePorDataReader<PedidoEntidade>(sqlConn.Reader);
@@ -158,130 +289,284 @@ namespace ms_crud_rest.DAO
 
                 //verifica se o retorno foi positivo
                 if (listaPedidosEntidade.Count == 0)
-                    throw new ClienteNuncaFezPedidosException();
+                    if (idUsuarioParceiro > 0)
+                        throw new ClienteNuncaFezPedidosException();
+                    else
+                        throw new LojaNaoPossuiPedidosException();
 
                 foreach (var pedidoEnt in listaPedidosEntidade)
                 {
                     listaPedidos.Add(pedidoEnt.ToPedido());
                 }
 
-                //2 - busca os produtos do pedido
-                
-                //3 - busca as formas de pagamento do pedido
-
-                //retorna a lista de pedidos
-                return listaPedidos;
-            }
-            catch (ClienteNuncaFezPedidosException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                logDAO.Adicionar(new Log { Mensagem = "erro ao consultar os pedidos", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-                throw ex;
-            }
-            finally
-            {
-                sqlConn.CloseConnection();
-            }
-        }
-
-        /// <summary>
-        /// Busca todos os pedidos de uma determinada loja
-        /// </summary>
-        /// <param name="idLoja">Id da loja</param>
-        /// <param name="ehPedidoFila">Diz se quer buscar os pedidos que estão na fila de entrega</param>
-        /// <param name="ehPedidoAndamento">Diz se quer buscar os pedidos que estão em andamento</param>
-        /// <param name="ehPedidoEntregue">Diz se quer buscar os pedidos que já foram entregues</param>
-        /// <returns></returns>
-        public List<PedidoCliente> ConsultarPedidosLoja(int idLoja, bool ehPedidoFila, bool ehPedidoAndamento, bool ehPedidoEntregue)
-        {
-            try
-            {
-                List<PedidoCliente> listaPedidos = new List<PedidoCliente>();
-                List<PedidoClienteEntidade> listaPedidosEntidade = new List<PedidoClienteEntidade>();
-
-                List<ProdutoCliente> listaProdutos = new List<ProdutoCliente>();
-                List<ProdutoClienteEntidade> listaProdutosEntidade = new List<ProdutoClienteEntidade>();
-
-                sqlConn.StartConnection();
-
-                //1 - busca os dados do pedido
-                //os dados adicionais, como produto, formas de pagamento e etc serão preenchidos posteriormente
-                sqlConn.Command.CommandType = System.Data.CommandType.Text;
-                sqlConn.Command.CommandText = string.Format(@"SELECT DISTINCT
-	                                                            tp.id_pedido,
-	                                                            tp.dt_pedido
-                                                            FROM tab_pedido AS tp
-                                                            INNER JOIN tab_usuario_parceiro as tup
-                                                            ON tp.id_usuario_parceiro = tup.id_usuario_parceiro
-                                                            INNER JOIN tab_parceiro as tpedido
-                                                            ON tup.id_parceiro = tpedido.id_parceiro
-                                                            INNER JOIN tab_forma_pagamento_pedido AS tfp
-                                                            ON tfp.id_pedido = tp.id_pedido
-                                                            INNER JOIN tab_produto_pedido AS tpp
-                                                            ON tpp.id_pedido = tp.id_pedido
-                                                            INNER JOIN tab_produto AS tprod
-                                                            ON tprod.id_produto = tpp.id_produto
-                                                            WHERE tpedido.id_loja = @id_loja;");
-
-                //parametros do pedido
-                sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
-
-                sqlConn.Reader = sqlConn.Command.ExecuteReader();
-
-                listaPedidosEntidade = new ModuloClasse().PreencheClassePorDataReader<PedidoClienteEntidade>(sqlConn.Reader);
-
-                //fecha o reader
-                sqlConn.Reader.Close();
-
-                //verifica se o retorno foi positivo
-                if (listaPedidosEntidade.Count == 0)
-                    throw new ClienteNuncaFezPedidosException();
-
-                foreach (var pedidoEnt in listaPedidosEntidade)
-                {
-                    listaPedidos.Add(pedidoEnt.ToPedidoCliente());
-                }
-
-                //2 - busca os produtos do pedido
-                sqlConn.Command.CommandType = System.Data.CommandType.Text;
-                sqlConn.Command.CommandText = string.Format(@"SELECT
-                                                                tp.id_pedido,
-	                                                            tprod.nm_produto,
-	                                                            tpp.nr_qtd_produto
-                                                            FROM tab_pedido AS tp
-                                                            INNER JOIN tab_forma_pagamento_pedido AS tfp
-                                                            ON tfp.id_pedido = tp.id_pedido
-                                                            INNER JOIN tab_produto_pedido AS tpp
-                                                            ON tpp.id_pedido = tp.id_pedido
-                                                            INNER JOIN tab_produto AS tprod
-                                                            ON tprod.id_produto = tpp.id_produto
-                                                            WHERE tp.id_usuario_parceiro = @id_usuario_parceiro;");
-
-                sqlConn.Reader = sqlConn.Command.ExecuteReader();
-
-                listaProdutosEntidade = new ModuloClasse().PreencheClassePorDataReader<ProdutoClienteEntidade>(sqlConn.Reader);
-
-                //fecha o reader
-                sqlConn.Reader.Close();
-
-                foreach (var produtoEnt in listaProdutosEntidade)
-                {
-                    listaProdutos.Add(produtoEnt.ToProdutoCliente());
-                }
-
-                //adiciona os produtos aos pedidos
+                //percorre pedido a pedido para preencher os objetos
                 foreach (var pedido in listaPedidos)
                 {
-                    //pedido.Produtos = listaProdutos.Where(p => p.IdPedido == pedido.IdPedido).ToList();
+                    #region 1.1 - preenche o "UsuarioParceiro" do pedido
+
+                    sqlConn.Command.Parameters.Clear();
+                    sqlConn.Command.CommandText = "";
+
+                    sqlConn.Command.CommandText = @"SELECT
+	                                                    id_usuario_parceiro,
+	                                                    id_parceiro,
+	                                                    nm_usuario,
+	                                                    nm_apelido,
+	                                                    nm_email,
+	                                                    nm_celular,
+	                                                    nm_senha,
+	                                                    bol_ativo
+                                                    FROM tab_usuario_parceiro
+                                                    WHERE id_usuario_parceiro = @id_usuario_parceiro;";
+
+                    sqlConn.Command.Parameters.AddWithValue("@id_usuario_parceiro", pedido.Cliente.Id);
+
+                    sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                    if (sqlConn.Reader.HasRows)
+                    {
+                        usuarioParceiroEnt = new ModuloClasse().PreencheClassePorDataReader<UsuarioParceiroEntidade>(sqlConn.Reader).FirstOrDefault();
+                        usuarioParceiro = usuarioParceiroEnt.ToUsuarioParceiro();
+                    }
+
+                    //fecha o reader
+                    sqlConn.Reader.Close();
+
+                    //adiciona o usuário parceiro(cliente) ao pedido
+                    pedido.Cliente = usuarioParceiro;
+
+                    #endregion
+
+                    #region 1.2 - preenche a lista de "ProdutoPedido"
+
+                    sqlConn.Command.Parameters.Clear();
+                    sqlConn.Command.CommandText = "";
+
+                    sqlConn.Command.CommandText = @"SELECT
+	                                                    id_produto_pedido,
+	                                                    id_produto,
+	                                                    id_pedido,
+	                                                    nr_qtd_produto,
+	                                                    vlr_total_produto
+                                                    FROM tab_produto_pedido
+                                                    WHERE id_pedido = @id_pedido;";
+
+                    sqlConn.Command.Parameters.AddWithValue("@id_pedido", pedido.Id);
+
+                    sqlConn.Reader = sqlConn.Command.ExecuteReader();
+                    listaProdutoPedidoEntidade = new ModuloClasse().PreencheClassePorDataReader<ProdutoPedidoEntidade>(sqlConn.Reader);
+
+                    //preenche a lista de produto pedido
+                    foreach (var produtoPedidoEntidade in listaProdutoPedidoEntidade)
+                    {
+                        listaProdutoPedido.Add(produtoPedidoEntidade.ToProdutoPedido());
+                    }
+
+                    //fecha o reader
+                    sqlConn.Reader.Close();
+
+                    #region 1.2.1 - preenche os produtos dos "ProdutosPedido"
+                    foreach (var produtoPedido in listaProdutoPedido)
+                    {
+                        sqlConn.Command.Parameters.Clear();
+                        sqlConn.Command.CommandText = "";
+
+                        sqlConn.Command.CommandText = @"SELECT
+	                                                    id_produto,
+	                                                    id_menu_cardapio,
+	                                                    nm_produto,
+	                                                    nm_descricao,
+	                                                    vlr_produto,
+	                                                    url_imagem,
+	                                                    bol_ativo
+                                                    FROM tab_produto
+                                                    WHERE id_produto = @id_produto;";
+
+                        sqlConn.Command.Parameters.AddWithValue("@id_produto", produtoPedido.Produto.Id);
+
+                        sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                        if (sqlConn.Reader.HasRows)
+                        {
+                            produtoEntidade = new ModuloClasse().PreencheClassePorDataReader<ProdutoEntidade>(sqlConn.Reader).FirstOrDefault();
+                            produto = produtoEntidade.ToProduto();
+                        }
+
+                        #region 1.2.2 - preenche os produtos adicionais dos produtos
+
+                        sqlConn.Command.Parameters.Clear();
+                        sqlConn.Command.CommandText = "";
+
+                        sqlConn.Command.CommandText = @"SELECT
+	                                                        tpa.id_produto_adicional,
+	                                                        tpa.nm_adicional,
+	                                                        tpa.nm_descricao,
+	                                                        tpa.nr_qtd_min,
+	                                                        tpa.nr_qtd_max,
+	                                                        tpa.nr_ordem_exibicao,
+	                                                        tpa.bol_ativo
+                                                        FROM tab_produto_adicional AS tpa
+                                                        INNER JOIN tab_produto_adicional_produto AS tpap
+                                                        ON tpa.id_produto_adicional = tpap.id_produto_adicional
+                                                        WHERE tpap.id_produto = @id_produto;";
+
+                        sqlConn.Command.Parameters.AddWithValue("@id_produto", produtoPedido.Produto.Id);
+
+                        sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                        if (sqlConn.Reader.HasRows)
+                        {
+                            listaProdutosAdicionaisEntidade = new ModuloClasse().PreencheClassePorDataReader<DadosProdutoAdicionalEntidade>(sqlConn.Reader);
+                        }
+
+                        //transforma a entidade em objeto
+                        foreach (var produtoAdicionalEntidade in listaProdutosAdicionaisEntidade)
+                        {
+                            listaProdutosAdicionais.Add(produtoAdicionalEntidade.ToProdutoAdicional());
+                        }
+
+                        #region 3.1.2 - preenche os itens dos produtos adicionais do produto
+
+                        foreach (var produtoAdicional in listaProdutosAdicionais)
+                        {
+                            sqlConn.Command.Parameters.Clear();
+                            sqlConn.Command.CommandText = "";
+
+                            sqlConn.Command.CommandText = @"SELECT
+	                                                            id_produto_adicional_item,
+	                                                            id_produto_adicional,
+	                                                            nm_adicional_item,
+	                                                            nm_descricao_item,
+	                                                            vlr_adicional_item,
+	                                                            bol_ativo
+                                                            FROM tab_produto_adicional_item
+                                                            WHERE id_produto_adicional = @id_produto_adicional;";
+
+                            sqlConn.Command.Parameters.AddWithValue("@id_produto_adicional", produtoAdicional.Id);
+
+                            sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                            if (sqlConn.Reader.HasRows)
+                            {
+                                listaItensProdutosAdicionaisEntidade = new ModuloClasse().PreencheClassePorDataReader<DadosProdutoAdicionalItemEntidade>(sqlConn.Reader);
+                            }
+
+                            //transforma a entidade em objeto
+                            foreach (var itemProdutoAdicionalEntidade in listaItensProdutosAdicionaisEntidade)
+                            {
+                                listaItensProdutosAdicionais.Add(itemProdutoAdicionalEntidade.ToProdutoAdicionalItem());
+                            }
+
+                            #region 3.1.3 - atualiza a quantidade dos itens adicionais
+                            //busca todos os itens dos produtos adicionais do pedido
+
+                            sqlConn.Command.Parameters.Clear();
+                            sqlConn.Command.CommandText = "";
+
+                            sqlConn.Command.CommandText = @"SELECT
+	                                                            id,
+	                                                            id_pedido,
+	                                                            id_produto_pedido,
+	                                                            id_produto_adicional_item,
+	                                                            qtd_item_adicional
+                                                            FROM tab_produto_adicional_pedido
+                                                            WHERE id_pedido = @id_pedido
+                                                            AND id_produto_pedido = @id_produto_pedido";
+
+                            sqlConn.Command.Parameters.AddWithValue("@id_pedido", pedido.Id);
+                            sqlConn.Command.Parameters.AddWithValue("@id_produto_pedido", produtoPedido.Id);
+
+                            sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                            if (sqlConn.Reader.HasRows)
+                            {
+                                listaDadosProdutosAdicionaisPedidoEntidade = new ModuloClasse().PreencheClassePorDataReader<DadosProdutoAdicionalPedidoEntidade>(sqlConn.Reader);
+                            }
+
+                            //transforma a entidade em objeto
+                            foreach (var dadosProdutosAdicionaisPedidoEntidade in listaDadosProdutosAdicionaisPedidoEntidade)
+                            {
+                                listaDadosProdutosAdicionaisPedido.Add(dadosProdutosAdicionaisPedidoEntidade.ToProdutoAdicionalPedido());
+                            }
+
+                            //atualiza a quantidade de itens adicionais
+                            foreach (var itemProdutoAdicional in listaItensProdutosAdicionais)
+                            {
+                                itemProdutoAdicional.Qtd = listaDadosProdutosAdicionaisPedido.Where(p => p.IdProdutoAdicionalItem == itemProdutoAdicional.Id).
+                                    SingleOrDefault().QtdItemAdicional;
+                            }
+
+                            //adiciona os produtos adicionais ao produto
+                            produtoAdicional.ItensAdicionais = listaItensProdutosAdicionais;
+
+                            #endregion
+
+                        }
+
+                        #endregion
+
+                        #endregion
+
+                        //atualiza os dados adicionais do produto
+                        produto.DadosAdicionaisProdutos = listaProdutosAdicionais;
+
+                    }
+
+                    #endregion
+
+                    //adiciona a lista de produtoPedido ao pedido
+                    pedido.ListaProdutos = listaProdutoPedido;
+
+                    #endregion
+
+                    #region 1.3 - preenche a lista de "Forma de pagamento"
+
+                    sqlConn.Command.Parameters.Clear();
+                    sqlConn.Command.CommandText = "";
+
+                    sqlConn.Command.CommandText = @"SELECT
+	                                                    tfp.id_forma_pagamento,
+	                                                    tfp.id_loja,
+	                                                    tfp.nm_forma_pagamento,
+	                                                    tfp.bol_ativo
+                                                    FROM tab_forma_pagamento AS tfp
+                                                    INNER JOIN tab_forma_pagamento_pedido AS tfpp
+                                                    ON tfp.id_forma_pagamento = tfpp.id_forma_pagamento
+                                                    WHERE tfpp.id_pedido = @id_pedido;";
+
+                    sqlConn.Command.Parameters.AddWithValue("@id_pedido", pedido.Id);
+
+                    sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                    if (sqlConn.Reader.HasRows)
+                    {
+                        listaFormaPagamentoEntidade = new ModuloClasse().PreencheClassePorDataReader<FormaDePagamentoEntidade>(sqlConn.Reader);
+                    }
+
+                    foreach (var formaPagamentoEntidade in listaFormaPagamentoEntidade)
+                    {
+                        listaFormaPagamento.Add(formaPagamentoEntidade.ToFormaPagamento());
+                    }
+
+                    //fecha o reader
+                    sqlConn.Reader.Close();
+
+                    //adiciona as formas de pagamento ao pedido
+                    pedido.ListaFormaPagamento = listaFormaPagamento;
+
+                    #endregion
                 }
+
+                #endregion
 
                 //retorna a lista de pedidos
                 return listaPedidos;
             }
             catch (ClienteNuncaFezPedidosException)
+            {
+                throw;
+            }
+            catch (LojaNaoPossuiPedidosException)
             {
                 throw;
             }
@@ -295,5 +580,6 @@ namespace ms_crud_rest.DAO
                 sqlConn.CloseConnection();
             }
         }
+
     }
 }
