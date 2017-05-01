@@ -46,6 +46,10 @@ namespace ms_crud_rest.Controllers
                 //remove as formas de pagamento com id = 0
                 pedido.ListaFormaPagamento.RemoveAll(p => p.Id == 0);
 
+                //formata o campo troco para decimal
+                if (string.IsNullOrEmpty(pedido.Troco))
+                    pedido.Troco = "0.00";
+
                 //adiciona o pedido
                 pedido.Id = pedidoDAO.AdicionarPedido(pedido);
 
@@ -55,9 +59,13 @@ namespace ms_crud_rest.Controllers
             }
             catch (PedidoNaoCadastradoClienteException pncEx)
             {
-                string mensagem = pncEx.Message;
+                //string mensagem = pncEx.Message;
+                //HttpError error = new HttpError(mensagem);
+                //return Request.CreateResponse(HttpStatusCode.NotModified, error);
+
+                string mensagem = string.Format("nao foi possivel cadastrar o pedido. erro: {0}", pncEx);
                 HttpError error = new HttpError(mensagem);
-                return Request.CreateResponse(HttpStatusCode.NotModified, error);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
             catch (Exception ex)
             {
@@ -90,11 +98,11 @@ namespace ms_crud_rest.Controllers
 
                 return response;
             }
-            catch (LojaNaoPossuiPedidosException cnpEx)
+            catch (LojaNaoPossuiPedidosException)
             {
-                string mensagem = cnpEx.Message;
-                HttpError error = new HttpError(mensagem);
-                return Request.CreateResponse(HttpStatusCode.NotModified, error);
+                //string mensagem = cnpEx.Message;
+                //HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.NoContent);
             }
             catch (Exception ex)
             {
@@ -124,11 +132,11 @@ namespace ms_crud_rest.Controllers
 
                 return response;
             }
-            catch (ClienteNuncaFezPedidosException cnpEx)
+            catch (ClienteNuncaFezPedidosException)
             {
-                string mensagem = cnpEx.Message;
-                HttpError error = new HttpError(mensagem);
-                return Request.CreateResponse(HttpStatusCode.NotModified, error);
+                //string mensagem = cnpEx.Message;
+                //HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.NoContent);
             }
             catch (Exception ex)
             {

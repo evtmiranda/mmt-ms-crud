@@ -35,10 +35,12 @@
             }
             catch (KeyNotFoundException)
             {
-                string mensagem = string.Format("O usuario {0} não foi encontrado", id);
-                HttpError error = new HttpError(mensagem);
+                //string mensagem = string.Format("O usuario {0} não foi encontrado", id);
+                //HttpError error = new HttpError(mensagem);
 
-                return Request.CreateResponse(HttpStatusCode.NoContent, error);
+                //return Request.CreateResponse(HttpStatusCode.NoContent, error);
+
+                return Request.CreateResponse(HttpStatusCode.NoContent);
             }
         }
 

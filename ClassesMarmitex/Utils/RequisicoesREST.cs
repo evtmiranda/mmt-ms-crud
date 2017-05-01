@@ -5,135 +5,156 @@ using System.Text;
 
 namespace ClassesMarmitex
 {
-    public class RequisicoesREST
-    {
-        public string urlBase = "http://localhost:29783/";
+    //public class RequisicoesREST
+    //{
+    //    public string urlBase = "http://localhost:29783/";
 
-        public DadosRequisicaoRest Post(string recurso, object objeto)
-        {
-            DadosRequisicaoRest retorno = new DadosRequisicaoRest();
-            string conteudo = "";
+    //    public DadosRequisicaoRest Post(string recurso, object objeto)
+    //    {
+    //        DadosRequisicaoRest retorno = new DadosRequisicaoRest();
+    //        string conteudo = "";
 
-            //faz o post de um objeto em um determinado recurso
-            try
-            {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlBase + "/api/" + recurso);
-                request.Method = "POST";
-                request.Accept = "application/json";
+    //        //faz o post de um objeto em um determinado recurso
+    //        try
+    //        {
+    //            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlBase + "/api/" + recurso);
+    //            request.Method = "POST";
+    //            request.Accept = "application/json";
 
-                string json = JsonConvert.SerializeObject(objeto);
+    //            string json = JsonConvert.SerializeObject(objeto);
 
-                byte[] jsonBytes = Encoding.UTF8.GetBytes(json);
-                request.GetRequestStream().Write(jsonBytes, 0, jsonBytes.Length);
+    //            byte[] jsonBytes = Encoding.UTF8.GetBytes(json);
+    //            request.GetRequestStream().Write(jsonBytes, 0, jsonBytes.Length);
 
-                request.ContentType = "application/json";
+    //            request.ContentType = "application/json";
 
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+    //            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
-                retorno.HttpStatusCode = response.StatusCode;
+    //            retorno.HttpStatusCode = response.StatusCode;
 
-                using (Stream responseStream = response.GetResponseStream())
-                {
-                    StreamReader reader = new StreamReader(responseStream, Encoding.UTF8);
-                    conteudo = reader.ReadToEnd();
-                }
+    //            using (Stream responseStream = response.GetResponseStream())
+    //            {
+    //                StreamReader reader = new StreamReader(responseStream, Encoding.UTF8);
+    //                conteudo = reader.ReadToEnd();
+    //            }
 
-                retorno.objeto = conteudo;
+    //            retorno.objeto = conteudo;
 
-                return retorno;
-            }
-            //se for algum erro do protocolo HTTP, captura o retorno HTTP para utilizar no retorno do método
-            catch (WebException wEx)
-            {
-                string mensagemErro = new StreamReader(wEx.Response.GetResponseStream()).ReadToEnd();
+    //            return retorno;
+    //        }
+    //        //se for algum erro do protocolo HTTP, captura o retorno HTTP para utilizar no retorno do método
+    //        catch (WebException wEx)
+    //        {
+    //            string mensagemErro = "";
 
-                //cria um webResponse
-                var webResponse = wEx.Response as System.Net.HttpWebResponse;
+    //            try
+    //            {
+    //                mensagemErro = new StreamReader(wEx.Response.GetResponseStream()).ReadToEnd();
+    //            }
+    //            catch
+    //            {
+    //                mensagemErro = "";
+    //            }
 
-                //verifica se não é erro do protocolo HTTP. Se não for, devolve um InternalServerError
-                if (wEx.Status != WebExceptionStatus.ProtocolError)
-                {
-                    retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
-                    retorno.objeto = mensagemErro;
+    //            //cria um webResponse
+    //            var webResponse = wEx.Response as HttpWebResponse;
 
-                    return retorno;
-                }
+    //            //verifica se não é erro do protocolo HTTP. Se não for, devolve um InternalServerError
+    //            if (wEx.Status != WebExceptionStatus.ProtocolError)
+    //            {
+    //                retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
+    //                retorno.objeto = mensagemErro;
 
-                //Retorna o status HTTP
-                retorno.HttpStatusCode = webResponse.StatusCode;
-                retorno.objeto = mensagemErro;
+    //                return retorno;
+    //            }
 
-                return retorno;
-            }
-            //Se ocorrer qualquer outra exceção retorna um InternalServerError
-            catch (System.Exception ex)
-            {
-                retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
-                retorno.objeto = ex.Message != null ? ex.Message : "";
+    //            //Retorna o status HTTP
+    //            retorno.HttpStatusCode = webResponse.StatusCode;
+    //            retorno.objeto = mensagemErro;
 
-                return retorno;
-            }
-        }
+    //            return retorno;
+    //        }
+    //        //Se ocorrer qualquer outra exceção retorna um InternalServerError
+    //        catch (System.Exception ex)
+    //        {
+    //            retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
+    //            retorno.objeto = ex.Message != null ? ex.Message : "";
 
-        public DadosRequisicaoRest Get(string recurso, int id = 0)
-        {
-            DadosRequisicaoRest retorno = new DadosRequisicaoRest();
-            string conteudo;
+    //            return retorno;
+    //        }
+    //    }
 
-            //faz o get de um objeto em um determinado recurso
-            try
-            {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlBase + "/api/" + recurso);
+    //    public DadosRequisicaoRest Get(string recurso, int id = 0)
+    //    {
+    //        DadosRequisicaoRest retorno = new DadosRequisicaoRest();
+    //        string conteudo;
 
-                if (id != 0)
-                    request.Headers.Add("id", id.ToString());
+    //        //faz o get de um objeto em um determinado recurso
+    //        try
+    //        {
+    //            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlBase + "/api/" + recurso);
 
-                request.Method = "GET";
-                request.Accept = "application/json";
+    //            if (id != 0)
+    //                request.Headers.Add("id", id.ToString());
 
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+    //            request.Method = "GET";
+    //            request.Accept = "application/json";
 
-                retorno.HttpStatusCode = response.StatusCode;
+    //            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
-                using (Stream responseStream = response.GetResponseStream())
-                {
-                    StreamReader reader = new StreamReader(responseStream, Encoding.UTF8);
-                    conteudo = reader.ReadToEnd();
-                }
+    //            retorno.HttpStatusCode = response.StatusCode;
 
-                retorno.objeto = conteudo;
+    //            using (Stream responseStream = response.GetResponseStream())
+    //            {
+    //                StreamReader reader = new StreamReader(responseStream, Encoding.UTF8);
+    //                conteudo = reader.ReadToEnd();
+    //            }
 
-                return retorno;
-            }
-            //se for algum erro do protocolo HTTP, captura o retorno HTTP para utilizar no retorno do método
-            catch (WebException wEx)
-            {
-                //cria um webResponse
-                var webResponse = wEx.Response as System.Net.HttpWebResponse;
+    //            retorno.objeto = conteudo;
 
-                //verifica se não é erro do protocolo HTTP. Se não for, devolve um InternalServerError
-                if (wEx.Status != WebExceptionStatus.ProtocolError)
-                {
-                    retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
-                    retorno.objeto = wEx.Message != null ? wEx.Message : "";
-                    return retorno;
-                }
+    //            return retorno;
+    //        }
+    //        //se for algum erro do protocolo HTTP, captura o retorno HTTP para utilizar no retorno do método
+    //        catch (WebException wEx)
+    //        {
+    //            string mensagemErro = "";
 
-                //Retorna o status HTTP
-                retorno.HttpStatusCode = webResponse.StatusCode;
-                retorno.objeto = wEx.Message != null ? wEx.Message : "";
+    //            try
+    //            {
+    //                mensagemErro = new StreamReader(wEx.Response.GetResponseStream()).ReadToEnd();
+    //            }
+    //            catch
+    //            {
+    //                mensagemErro = "";
+    //            }
 
-                return retorno;
-            }
-            //Se ocorrer qualquer outra exceção retorna um InternalServerError
-            catch (System.Exception ex)
-            {
-                retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
-                retorno.objeto = ex.Message != null ? ex.Message : "";
+    //            //cria um webResponse
+    //            var webResponse = wEx.Response as HttpWebResponse;
 
-                return retorno;
-            }
-        }
+    //            //verifica se não é erro do protocolo HTTP. Se não for, devolve um InternalServerError
+    //            if (wEx.Status != WebExceptionStatus.ProtocolError)
+    //            {
+    //                retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
+    //                retorno.objeto = mensagemErro;
 
-    }
+    //                return retorno;
+    //            }
+
+    //            //Retorna o status HTTP
+    //            retorno.HttpStatusCode = webResponse.StatusCode;
+    //            retorno.objeto = mensagemErro;
+
+    //            return retorno;
+    //        }
+    //        //Se ocorrer qualquer outra exceção retorna um InternalServerError
+    //        catch (System.Exception ex)
+    //        {
+    //            retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
+    //            retorno.objeto = ex.Message != null ? ex.Message : "";
+
+    //            return retorno;
+    //        }
+    //    }
+
+    //}
 }

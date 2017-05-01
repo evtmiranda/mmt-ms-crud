@@ -43,7 +43,7 @@ namespace ms_crud_rest.Controllers
                 string mensagem = string.Format("nenhuma loja encontrada para o dominio {0}", dominio);
                 HttpError error = new HttpError(mensagem);
 
-                return Request.CreateResponse(HttpStatusCode.NoContent, error);
+                return Request.CreateResponse(HttpStatusCode.NotFound, error);
             }
             catch(Exception ex)
             {
