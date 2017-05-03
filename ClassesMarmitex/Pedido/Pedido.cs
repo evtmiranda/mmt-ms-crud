@@ -8,6 +8,7 @@
     {
         public int Id { get; set; }
         public UsuarioParceiro Cliente { get; set; }
+        public Parceiro Parceiro { get; set; }
         public DateTime DataPedido { get; set; }
         public List<ProdutoPedido> ListaProdutos { get; set; }
         public DateTime DataEntrega { get; set; }

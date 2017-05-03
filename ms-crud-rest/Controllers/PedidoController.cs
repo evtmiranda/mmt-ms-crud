@@ -79,20 +79,21 @@ namespace ms_crud_rest.Controllers
         /// Busca todos os pedidos de uma determinada loja
         /// </summary>
         /// <param name="idLoja">Id da loja</param>
+        /// <param name="ehDoDia">Diz se quer buscar os pedidos do dia</param>
         /// <param name="ehPedidoFila">Diz se quer buscar os pedidos que estão na fila de entrega</param>
         /// <param name="ehPedidoAndamento">Diz se quer buscar os pedidos que estão em andamento</param>
         /// <param name="ehPedidoEntregue">Diz se quer buscar os pedidos que já foram entregues</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("api/Pedido/BuscarPedidos/{idLoja}/{ehPedidoFila}/{ehPedidoAndamento}/{ehPedidoEntregue}")]
-        public HttpResponseMessage BuscarPedidos(int idLoja, bool ehPedidoFila = false, bool ehPedidoAndamento = false, bool ehPedidoEntregue = false)
+        [Route("api/Pedido/BuscarPedidos/{idLoja}/{ehDoDia}/{ehPedidoFila}/{ehPedidoAndamento}/{ehPedidoEntregue}")]
+        public HttpResponseMessage BuscarPedidos(int idLoja, bool ehDoDia, bool ehPedidoFila = false, bool ehPedidoAndamento = false, bool ehPedidoEntregue = false)
         {
             List<Pedido> listaPedidosCliente = new List<Pedido>();
 
             try
             {
                 //busca os pedidos
-                listaPedidosCliente = pedidoDAO.ConsultarPedidosLoja(idLoja, ehPedidoFila, ehPedidoAndamento, ehPedidoEntregue);
+                listaPedidosCliente = pedidoDAO.ConsultarPedidosLoja(idLoja, ehDoDia, ehPedidoFila, ehPedidoAndamento, ehPedidoEntregue);
 
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, listaPedidosCliente);
 

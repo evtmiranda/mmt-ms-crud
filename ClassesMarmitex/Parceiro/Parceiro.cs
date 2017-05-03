@@ -24,7 +24,7 @@ namespace ClassesMarmitex
         [Column("id_loja")]
         public int IdLoja { get; set; }
 
-        [Column("nm_nome")]
+        [Column("nm_parceiro")]
         public string Nome { get; set; }
 
         [Column("nm_descricao")]
@@ -38,5 +38,21 @@ namespace ClassesMarmitex
 
         [Column("bol_ativo")]
         public bool Ativo { get; set; }
+
+        public Parceiro ToParceiro()
+        {
+            Parceiro parceiro = new Parceiro
+            {
+                Id = Id,
+                IdLoja = IdLoja,
+                Nome = Nome,
+                Descricao = Descricao,
+                Endereco = new Endereco { Id = IdEndereco },
+                Codigo = Codigo,
+                Ativo = Ativo
+            };
+
+            return parceiro;
+        }
     }
 }

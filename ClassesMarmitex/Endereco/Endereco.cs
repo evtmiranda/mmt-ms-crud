@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClassesMarmitex
 {
@@ -40,5 +41,22 @@ namespace ClassesMarmitex
 
         [Column("nm_complemento_endereco")]
         public string ComplementoEndereco { get; set; }
+
+        public Endereco ToEndereco()
+        {
+            Endereco endereco = new Endereco
+            {
+                Id = Id,
+                Cep = Cep,
+                UF = UF,
+                Cidade = Cidade,
+                Bairro = Bairro,
+                Logradouro = Logradouro,
+                NumeroEndereco = NumeroEndereco,
+                ComplementoEndereco = ComplementoEndereco
+            };
+
+            return endereco;
+        }
     }
 }
