@@ -62,6 +62,7 @@ namespace ms_crud_rest.DAO
                     sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_produto_pedido(id_produto, id_pedido, nr_qtd_produto, vlr_total_produto)
                                                             VALUES({0}, {1}, {2}, '{3}'); SELECT @@IDENTITY",
                                                             produto.Produto.Id, idPedido, produto.Quantidade, produto.ValorTotal.ToString().Replace(",", "."));
+
                     var varRetornoProdutoPedido = sqlConn.Command.ExecuteScalar();
                     idProdutoPedido = Convert.ToInt32(varRetornoProdutoPedido);
 
@@ -82,7 +83,9 @@ namespace ms_crud_rest.DAO
                                                             idPedido, idProdutoPedido, itemAdicional.Id, itemAdicional.Qtd);
                         }
 
-                        sqlConn.Command.ExecuteNonQuery();
+                        if(!string.IsNullOrEmpty(sqlConn.Command.CommandText))
+                            sqlConn.Command.ExecuteNonQuery();
+
                     }
                 }
 
