@@ -116,4 +116,26 @@ namespace ms_crud_rest.Exceptions
             }
         }
     }
+
+    public class ParceiroNaoEncontradoException : Exception
+    {
+        public override string Message
+        {
+            get
+            {
+                return "parceiro nãoa encontrado";
+            }
+        }
+    }
+
+    public class LojaNaoPossuiParceirosException : Exception
+    {
+        public override string Message
+        {
+            get
+            {
+                return "nenhum parceiro encontrado =/";
+            }
+        }
+    }
 }
