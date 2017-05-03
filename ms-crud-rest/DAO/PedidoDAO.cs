@@ -657,6 +657,7 @@ VALUES({0}, {1});",
                         listaFormaPagamentoEntidade = new ModuloClasse().PreencheClassePorDataReader<FormaDePagamentoEntidade>(sqlConn.Reader);
                     }
 
+                    listaFormaPagamento = new List<FormaDePagamento>();
                     foreach (var formaPagamentoEntidade in listaFormaPagamentoEntidade)
                     {
                         listaFormaPagamento.Add(formaPagamentoEntidade.ToFormaPagamento());
