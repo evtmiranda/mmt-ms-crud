@@ -115,7 +115,7 @@ namespace ClassesMarmitex
 
         public UsuarioParceiro ToUsuarioParceiro()
         {
-            return new UsuarioParceiro { Id = this.Id, IdParceiro = this.IdParceiro, Nome = this.Nome, Apelido = this.Apelido, Email = this.Email, Senha = this.Senha, Ativo = this.Ativo };
+            return new UsuarioParceiro { Id = this.Id, IdParceiro = this.IdParceiro, Nome = this.Nome, Apelido = this.Apelido, Email = this.Email, NumeroCelular = this.NumeroCelular, Senha = this.Senha, Ativo = this.Ativo };
         }
     }
 }

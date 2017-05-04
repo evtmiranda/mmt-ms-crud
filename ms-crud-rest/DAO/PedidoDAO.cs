@@ -270,6 +270,8 @@ VALUES({0}, {1});",
 
                     sqlConn.Command.CommandText += " AND id_usuario_parceiro = @id_usuario_parceiro";
 
+                    sqlConn.Command.CommandText += " ORDER BY dt_entrega ASC";
+
                     //parametros do pedido
                     sqlConn.Command.Parameters.AddWithValue("@id_usuario_parceiro", idUsuarioParceiro);
                 }
