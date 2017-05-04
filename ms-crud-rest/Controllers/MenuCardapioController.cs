@@ -41,6 +41,7 @@ namespace ms_crud_rest.Controllers
             }
         }
 
+        [Route("api/MenuCardapio/Cadastrar/{dominioLoja}")]
         public HttpResponseMessage Post([FromBody] MenuCardapio cardapio)
         {
             try
@@ -121,15 +122,13 @@ namespace ms_crud_rest.Controllers
                 IList<MenuCardapio> cardapios = cardapioDAO.Listar(idLoja);
                 return Request.CreateResponse(HttpStatusCode.OK, cardapios);
             }
-            catch (CardapioNaoEncontradoException cneEx)
+            catch (NenhumCardapioEncontradoException)
             {
-                string mensagem = cneEx.Message;
-                HttpError error = new HttpError(mensagem);
-                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+                return Request.CreateResponse(HttpStatusCode.NoContent);
             }
             catch (Exception)
             {
-                string mensagem = string.Format("ocorreu um problema ao buscar o cardápio. por favor, tente atualizar a página ou acessar dentro de alguns minutos...");
+                string mensagem = string.Format("ocorreu um problema ao buscar os cardápios. por favor, tente atualizar a página ou acessar dentro de alguns minutos...");
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }

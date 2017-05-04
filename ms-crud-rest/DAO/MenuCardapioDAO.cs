@@ -49,7 +49,7 @@ namespace ms_crud_rest.DAO
 
                 //verifica se o retorno foi positivo
                 if (listaMenuCardapio.Count == 0)
-                    throw new CardapioNaoEncontradoException();
+                    throw new NenhumCardapioEncontradoException();
 
                 //adiciona os produtos ao cardápio
                 foreach (var menuCardapio in listaMenuCardapio)
@@ -59,7 +59,7 @@ namespace ms_crud_rest.DAO
                 
                 return listaMenuCardapio;
             }
-            catch (CardapioNaoEncontradoException)
+            catch (NenhumCardapioEncontradoException)
             {
                 throw;
             }
