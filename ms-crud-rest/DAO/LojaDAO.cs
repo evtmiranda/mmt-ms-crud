@@ -39,6 +39,7 @@ namespace ms_crud_rest.DAO
                                                 WHERE nm_dominio_loja = @nm_dominio_loja
                                                 AND bol_ativo = 1";
 
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@nm_dominio_loja", dominio);
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();

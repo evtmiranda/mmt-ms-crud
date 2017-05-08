@@ -18,7 +18,7 @@ namespace ms_crud_rest.DAO
 
         public virtual void Adicionar(T t) { }
 
-        public virtual int AdicionarPedido(T t) { return 0; }
+        //public virtual int AdicionarPedido(T t) { return 0; }
 
         public virtual List<T> Listar() { return null; }
 

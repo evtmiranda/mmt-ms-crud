@@ -147,5 +147,34 @@ namespace ms_crud_rest.Controllers
             }
         }
 
+        [Route("api/Pedido/AtualizarStatusPedido")]
+        public HttpResponseMessage AtualizarStatusPedido([FromBody] DadosAtualizarStatusPedido dadosPedido)
+        {
+            Pedido pedido = new Pedido();
+            try
+            {
+                Pedido pedidoAtual = pedidoDAO.BuscarPorId(dadosPedido.IdPedido);
+
+                pedidoAtual.PedidoStatus = new PedidoStatus()
+                {
+                    IdStatus = dadosPedido.IdStatusPedido
+                };
+
+                pedidoDAO.AtualizarStatusPedido(pedidoAtual);
+
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch(PedidoNaoEncontradoException)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+            catch (Exception ex)
+            {
+                string mensagem = string.Format("nao foi possivel atualizar o pedido. erro: {0}", ex);
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
     }
 }

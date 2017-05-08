@@ -18,7 +18,7 @@ namespace ms_crud_rest.DAO
         /// </summary>
         /// <param name="pedido">objeto com as informações do pedido</param>
         /// <returns>id do pedido cadastrado</returns>
-        public override int AdicionarPedido(Pedido pedido)
+        public int AdicionarPedido(Pedido pedido)
         {
             try
             {
@@ -31,7 +31,7 @@ namespace ms_crud_rest.DAO
                 //1 - insere o pedido
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
                 sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_pedido(id_usuario_parceiro, dt_entrega, vlr_troco, nm_observacao)
-VALUES(@id_usuario_parceiro, @dt_entrega, @vlr_troco, @nm_observacao); SELECT @@IDENTITY;");
+                                                              VALUES(@id_usuario_parceiro, @dt_entrega, @vlr_troco, @nm_observacao); SELECT @@IDENTITY;");
 
                 pedido.DataPedido = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd " + pedido.HorarioEntrega));
 
@@ -49,6 +49,21 @@ VALUES(@id_usuario_parceiro, @dt_entrega, @vlr_troco, @nm_observacao); SELECT @@
                 if (idPedido == 0)
                     throw new PedidoNaoCadastradoClienteException();
 
+                //2 - insere o status do pedido
+                sqlConn.Command.Parameters.Clear();
+
+                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_pedido_status(id_pedido, id_status)
+                                                              VALUES(@id_pedido, @id_status);");
+
+                pedido.DataPedido = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd " + pedido.HorarioEntrega));
+
+                //parametros do pedido
+                sqlConn.Command.Parameters.AddWithValue("@id_pedido", idPedido);
+                //status "na fila"
+                sqlConn.Command.Parameters.AddWithValue("@id_status", 0);
+
+                sqlConn.Command.ExecuteNonQuery();
+
                 //2 - insere os produtos do pedido
                 //parâmetros dos produtos do pedido
                 sqlConn.Command.Parameters.Clear();
@@ -60,7 +75,7 @@ VALUES(@id_usuario_parceiro, @dt_entrega, @vlr_troco, @nm_observacao); SELECT @@
                     //produto.ValorTotal = produto.Quantidade * produto.Produto.Valor;
 
                     sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_produto_pedido(id_produto, id_pedido, nr_qtd_produto, vlr_total_produto)
-VALUES({0}, {1}, {2}, '{3}'); SELECT @@IDENTITY",
+                                                                  VALUES({0}, {1}, {2}, '{3}'); SELECT @@IDENTITY",
                     produto.Produto.Id, idPedido, produto.Quantidade, produto.ValorTotal.ToString().Replace(",", "."));
 
                     var varRetornoProdutoPedido = sqlConn.Command.ExecuteScalar();
@@ -79,7 +94,7 @@ VALUES({0}, {1}, {2}, '{3}'); SELECT @@IDENTITY",
                         {
                             if (itemAdicional.Qtd > 0)
                                 sqlConn.Command.CommandText += string.Format(@"INSERT INTO tab_produto_adicional_pedido(id_pedido, id_produto_pedido, id_produto_adicional_item, qtd_item_adicional)
-VALUES({0}, {1}, {2}, {3});",
+                                                                               VALUES({0}, {1}, {2}, {3});",
                                 idPedido, idProdutoPedido, itemAdicional.Id, itemAdicional.Qtd);
                         }
 
@@ -94,7 +109,7 @@ VALUES({0}, {1}, {2}, {3});",
                 {
 
                     sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_forma_pagamento_pedido(id_forma_pagamento, id_pedido)
-VALUES({0}, {1});",
+                                                                  VALUES({0}, {1});",
                     formaPagamento.Id, idPedido);
                     sqlConn.Command.ExecuteNonQuery();
                 }
@@ -174,13 +189,13 @@ VALUES({0}, {1});",
                 listaPedidos = ConsultarPedidos(0, idLoja, ehDoDia);
 
                 if (ehPedidoFila)
-                    listaPedidos = listaPedidos.FindAll(p => p.IdStatusPedido == 0);
+                    listaPedidos = listaPedidos.FindAll(p => p.PedidoStatus.IdStatus == 0);
 
                 if (ehPedidoAndamento)
-                    listaPedidos = listaPedidos.FindAll(p => p.IdStatusPedido == 1);
+                    listaPedidos = listaPedidos.FindAll(p => p.PedidoStatus.IdStatus == 1);
 
                 if (ehPedidoEntregue)
-                    listaPedidos = listaPedidos.FindAll(p => p.IdStatusPedido == 2);
+                    listaPedidos = listaPedidos.FindAll(p => p.PedidoStatus.IdStatus == 2);
             }
             catch (LojaNaoPossuiPedidosException)
             {
@@ -213,6 +228,9 @@ VALUES({0}, {1});",
 
             List<Pedido> listaPedidos = new List<Pedido>();
             List<PedidoEntidade> listaPedidosEntidade = new List<PedidoEntidade>();
+
+            List<PedidoStatus> listaPedidoStatus = new List<PedidoStatus>();
+            List<PedidoStatusEntidade> listaPedidoStatusEntidade = new List<PedidoStatusEntidade>();
 
             UsuarioParceiro usuarioParceiro = new UsuarioParceiro();
             UsuarioParceiroEntidade usuarioParceiroEnt = new UsuarioParceiroEntidade();
@@ -258,10 +276,7 @@ VALUES({0}, {1});",
                                                                     dt_pedido,
                                                                     dt_entrega,
                                                                     vlr_troco,
-                                                                    nm_observacao,
-                                                                    id_status_pedido,
-                                                                    dt_pedido_entregue,
-                                                                    bol_pedido_entregue
+                                                                    nm_observacao
                                                                 FROM tab_pedido
                                                                 WHERE 1 = 1");
 
@@ -283,10 +298,7 @@ VALUES({0}, {1});",
                                                                     tp.dt_pedido,
                                                                     tp.dt_entrega,
                                                                     tp.vlr_troco,
-                                                                    tp.nm_observacao,
-                                                                    tp.id_status_pedido,
-                                                                    tp.dt_pedido_entregue,
-                                                                    tp.bol_pedido_entregue
+                                                                    tp.nm_observacao
                                                                 FROM tab_pedido AS tp
                                                                 INNER JOIN tab_usuario_parceiro AS tup
                                                                 ON tp.id_usuario_parceiro = tup.id_usuario_parceiro
@@ -326,6 +338,41 @@ VALUES({0}, {1});",
                 //percorre pedido a pedido para preencher os objetos
                 foreach (var pedido in listaPedidos)
                 {
+                    #region 1.0 preenche o "PedidoStatus" do pedido
+
+                    sqlConn.Command.Parameters.Clear();
+                    sqlConn.Command.CommandText = "";
+
+                    sqlConn.Command.CommandText = @"SELECT
+	                                                    id_status_pedido,
+	                                                    id_pedido,
+	                                                    id_status,
+	                                                    dt_status,
+	                                                    bol_ativo
+                                                    FROM tab_pedido_status
+                                                    WHERE id_pedido = @id_pedido;";
+
+                    sqlConn.Command.Parameters.AddWithValue("@id_pedido", pedido.Id);
+
+                    sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                    if (sqlConn.Reader.HasRows)
+                        listaPedidoStatusEntidade = new ModuloClasse().PreencheClassePorDataReader<PedidoStatusEntidade>(sqlConn.Reader);
+
+                    foreach (var statusEntidade in listaPedidoStatusEntidade)
+                    {
+                        listaPedidoStatus.Add(statusEntidade.ToPedidoStatus());
+                    }
+
+                    //fecha o reader
+                    sqlConn.Reader.Close();
+
+                    //adiciona o usuário parceiro(cliente) ao pedido
+                    pedido.PedidoStatus = listaPedidoStatus.Where(p => p.Ativo == 1).FirstOrDefault();
+
+                    #endregion
+
+
                     #region 1.1 - preenche o "UsuarioParceiro" do pedido
 
                     sqlConn.Command.Parameters.Clear();
@@ -632,9 +679,9 @@ VALUES({0}, {1});",
 
                     //adiciona a lista de produtoPedido ao pedido
                     pedido.ListaProdutos = listaProdutoPedido;
-                    
+
                     #endregion
-                    
+
                     #region 1.5 - preenche a lista de "Forma de pagamento"
 
                     sqlConn.Command.Parameters.Clear();
@@ -693,6 +740,113 @@ VALUES({0}, {1});",
             finally
             {
                 sqlConn.CloseConnection();
+            }
+        }
+
+        public override Pedido BuscarPorId(int idPedido)
+        {
+            PedidoEntidade pedidoEntidade = new PedidoEntidade();
+            Pedido pedido = new Pedido();
+
+            try
+            {
+                sqlConn.StartConnection();
+
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                sqlConn.Command.CommandText = string.Format(@"SELECT
+                                                                    id_pedido,
+                                                                    id_usuario_parceiro,
+                                                                    dt_pedido,
+                                                                    dt_entrega,
+                                                                    vlr_troco,
+                                                                    nm_observacao
+                                                                FROM tab_pedido
+                                                                WHERE 1 = 1");
+
+                sqlConn.Command.CommandText += " AND id_pedido = @id_pedido";
+
+                //parametros do pedido
+                sqlConn.Command.Parameters.AddWithValue("@id_pedido", idPedido);
+
+                sqlConn.Reader = sqlConn.Command.ExecuteReader();
+                pedidoEntidade = new ModuloClasse().PreencheClassePorDataReader<PedidoEntidade>(sqlConn.Reader).FirstOrDefault();
+
+                pedido = pedidoEntidade.ToPedido();
+
+                //fecha o reader
+                sqlConn.Reader.Close();
+
+                if (pedido == null)
+                    throw new PedidoNaoEncontradoException();
+
+                return pedido;
+
+            }
+            catch (PedidoNaoEncontradoException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { Mensagem = "erro ao consultar o pedido", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// seta todos os status do pedido como inativo e insere o status atual
+        /// </summary>
+        /// <param name="p">Pedido</param>
+        public void AtualizarStatusPedido(Pedido p)
+        {
+            try
+            {
+                //abre o begin transaction
+                sqlConn.BeginTransaction();
+                sqlConn.StartConnection();
+
+                //monta os parâmetros que serão utilizados
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@id_pedido", p.Id);
+                sqlConn.Command.Parameters.AddWithValue("@id_status", p.PedidoStatus.IdStatus);
+
+                //seta o tipo do comando
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                #region seta todos os status do pedido como inativo
+                
+                //atualiza todos os status do pedido como inativo
+                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_pedido_status
+                                                                SET bol_ativo = 0
+                                                              WHERE id_pedido = @id_pedido");
+
+                //roda o update
+                sqlConn.Command.ExecuteNonQuery();
+
+                #endregion
+
+                #region insere o novo status do pedido
+
+                //monta o insert
+                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_pedido_status(id_pedido, id_status)
+                                                              VALUES(@id_pedido, @id_status);");
+
+
+                //roda o insert
+                sqlConn.Command.ExecuteNonQuery();
+
+                #endregion
+
+                //se correr tudo bem, roda o commit
+                sqlConn.Commit();
+            }
+            catch (Exception ex)
+            {
+                sqlConn.Rollback();
+
+                logDAO.Adicionar(new Log { Mensagem = "erro ao consultar o pedido", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+                throw ex;
             }
         }
 

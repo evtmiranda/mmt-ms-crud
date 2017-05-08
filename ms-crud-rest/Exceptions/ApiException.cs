@@ -72,6 +72,18 @@ namespace ms_crud_rest.Exceptions
         }
     }
 
+
+    public class PedidoNaoEncontradoException : Exception
+    {
+        public override string Message
+        {
+            get
+            {
+                return "pedido não encontrado";
+            }
+        }
+    }
+
     public class PedidoNaoCadastradoClienteException : Exception
     {
         public override string Message
@@ -124,6 +136,17 @@ namespace ms_crud_rest.Exceptions
             get
             {
                 return "parceiro nãoa encontrado";
+            }
+        }
+    }
+
+    public class ParceiroJaExisteException : Exception
+    {
+        public override string Message
+        {
+            get
+            {
+                return "já existe um parceiro com este nome";
             }
         }
     }

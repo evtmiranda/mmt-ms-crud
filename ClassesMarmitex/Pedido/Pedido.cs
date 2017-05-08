@@ -16,9 +16,7 @@
         public List<FormaDePagamento> ListaFormaPagamento { get; set; }
         public string Troco { get; set; }
         public string Observacao { get; set; }
-        public int IdStatusPedido { get; set; }
-        public DateTime DataPedidoEntregue { get; set; }
-        public bool PedidoEntregue { get; set; }
+        public PedidoStatus PedidoStatus { get; set; }
     }
 
     [Table("tab_pedido")]
@@ -42,15 +40,6 @@
         [Column("nm_observacao")]
         public string Observacao { get; set; }
 
-        [Column("id_status_pedido")]
-        public int IdStatusPedido { get; set; }
-
-        [Column("dt_pedido_entregue")]
-        public DateTime DataPedidoEntregue { get; set; }
-
-        [Column("bol_pedido_entregue")]
-        public bool PedidoEntregue { get; set; }
-
         public Pedido ToPedido()
         {
             Pedido pedido = new Pedido()
@@ -60,10 +49,7 @@
                 DataPedido = DataPedido,
                 DataEntrega = DataEntrega,
                 Troco = Troco.ToString(),
-                Observacao = Observacao,
-                IdStatusPedido = IdStatusPedido,
-                DataPedidoEntregue = DataPedidoEntregue,
-                PedidoEntregue = PedidoEntregue
+                Observacao = Observacao
             };
 
             return pedido;
@@ -79,26 +65,56 @@
     }
 
     /// <summary>
-    /// Classe para utilizacao da tela de histórico de pedidos do usuário
+    /// classe utilizada para trafegar dados na tela de pedido
     /// </summary>
-    //public class PedidoCliente
-    //{
-    //    public int IdPedido { get; set; }
-    //    public DateTime DataPedido { get; set; }
-    //    public List<ProdutoCliente> Produtos { get; set; }
-    //}
+    public class DadosAtualizarStatusPedido
+    {
+        public int IdPedido { get; set; }
+        /// <summary>
+        /// 0 = na fila, 1 = entregue, 2 = cancelado
+        /// </summary>
+        public int IdStatusPedido { get; set; }
+    }
 
-    //public class PedidoClienteEntidade
-    //{
-    //    [Column("id_pedido")]
-    //    public int IdPedido { get; set; }
+    public class PedidoStatus
+    {
+        public int Id { get; set; }
+        public int IdPedido { get; set; }
+        public int IdStatus { get; set; }
+        public DateTime DataStatus { get; set; }
+        public int Ativo { get; set; }
+    }
 
-    //    [Column("dt_pedido")]
-    //    public DateTime DataPedido { get; set; }
+    [Table("tab_pedido_status")]
+    public class PedidoStatusEntidade
+    {
+        [Column("id_status_pedido")]
+        public int Id { get; set; }
 
-    //    public PedidoCliente ToPedidoCliente()
-    //    {
-    //        return new PedidoCliente { IdPedido = this.IdPedido, DataPedido = this.DataPedido };
-    //    }
-    //}
+        [Column("id_pedido")]
+        public int IdPedido { get; set; }
+
+        [Column("id_status")]
+        public int IdStatus { get; set; }
+
+        [Column("dt_status")]
+        public DateTime DataStatus { get; set; }
+
+        [Column("bol_ativo")]
+        public int Ativo { get; set; }
+
+        public PedidoStatus ToPedidoStatus()
+        {
+            PedidoStatus pedidoStatus = new PedidoStatus
+            {
+                Id = this.Id,
+                IdPedido = this.IdPedido,
+                IdStatus = this.IdStatus,
+                DataStatus = this.DataStatus,
+                Ativo = this.Ativo
+            };
+
+            return pedidoStatus;
+        }
+    }
 }

@@ -21,6 +21,39 @@ namespace ms_crud_rest.Controllers
             this.logDAO = logDAO;
         }
 
+        [HttpPost]
+        [Route("api/Parceiro/Adicionar/{urlLoja}")]
+        public HttpResponseMessage AdicionarParceiro([FromUri] string urlLoja, [FromBody] Parceiro parceiro)
+        {
+            try
+            {
+                //verifica se já existe um parceiro com este nome
+                Parceiro parceiroExiste = new Parceiro();
+                parceiroExiste = parceiroDAO.BuscarParceiro(parceiro.Nome);
+
+                if (parceiroExiste.Id != 0)
+                    throw new ParceiroJaExisteException();
+
+                parceiroDAO.AdicionarParceiro(urlLoja, parceiro);
+
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created);
+
+                return response;
+            }
+            catch (ParceiroJaExisteException pjeEx)
+            {
+                string mensagem = pjeEx.Message;
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, error);
+            }
+            catch (Exception ex)
+            {
+                string mensagem = string.Format("nao foi possivel cadastrar o parceiro. erro: {0}", ex);
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
         /// <summary>
         /// Faz a busca de um parceiro pelo id parceiro
         /// </summary>
