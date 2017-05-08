@@ -51,6 +51,42 @@ namespace ms_crud_rest.DAO
 
                 parceiro = listaParceirosEntidade[0].ToParceiro();
 
+                //fecha o reader
+                sqlConn.Reader.Close();
+
+                #region busca o endereco
+
+                List<EnderecoEntidade> endEntidade = new List<EnderecoEntidade>();
+                Endereco endereco = new Endereco();
+
+                sqlConn.Command.CommandText = string.Format(@"SELECT
+	                                                            id_endereco,
+	                                                            nm_cep,
+	                                                            nm_uf,
+	                                                            nm_cidade,
+	                                                            nm_bairro,
+	                                                            nm_logradouro,
+	                                                            nm_numero_endereco,
+	                                                            nm_complemento_endereco
+                                                            FROM tab_endereco
+                                                            WHERE id_endereco = @id_endereco;");
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@id_endereco", parceiro.Endereco.Id);
+
+                sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                endEntidade = new ModuloClasse().PreencheClassePorDataReader<EnderecoEntidade>(sqlConn.Reader);
+
+                if (endEntidade.Count == 0)
+                    throw new Exception("Não foi possível consultar o endereço do parceiro: " + parceiro.Nome);
+
+                endereco = endEntidade.FirstOrDefault().ToEndereco();
+
+                #endregion
+
+                parceiro.Endereco = endereco;
+
                 return parceiro;
             }
             catch (Exception ex)
@@ -99,6 +135,8 @@ namespace ms_crud_rest.DAO
 
                 if (listaParceirosEntidade != null && listaParceirosEntidade.Count > 0)
                     parceiro = listaParceirosEntidade[0].ToParceiro();
+
+
 
                 return parceiro;
             }
@@ -153,7 +191,6 @@ namespace ms_crud_rest.DAO
                 foreach (var parceiro in listaParceirosEntidade)
                 {
 
-                    
                     try
                     {
                         #region busca o endereco
@@ -197,7 +234,7 @@ namespace ms_crud_rest.DAO
                     {
                         sqlConn.Reader.Close();
                     }
-                    
+
                 }
 
                 return listaParceiros;
@@ -253,11 +290,11 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.AddWithValue("@nm_bairro", parceiro.Endereco.Bairro);
                 sqlConn.Command.Parameters.AddWithValue("@nm_logradouro", parceiro.Endereco.Logradouro);
                 sqlConn.Command.Parameters.AddWithValue("@nm_numero_endereco", parceiro.Endereco.NumeroEndereco);
-                sqlConn.Command.Parameters.AddWithValue("@nm_complemento_endereco", parceiro.Endereco.ComplementoEndereco);
+                sqlConn.Command.Parameters.AddWithValue("@nm_complemento_endereco", parceiro.Endereco.ComplementoEndereco ?? "");
 
                 idEndereco = Convert.ToInt32(sqlConn.Command.ExecuteScalar());
 
-                if(idEndereco == 0)
+                if (idEndereco == 0)
                     throw new Exception("Não foi cadastrar o endereço");
 
                 #endregion
@@ -271,7 +308,7 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.Parameters.AddWithValue("@id_loja", loja.Id);
                 sqlConn.Command.Parameters.AddWithValue("@nm_parceiro", parceiro.Nome);
-                sqlConn.Command.Parameters.AddWithValue("@nm_descricao", parceiro.Descricao);
+                sqlConn.Command.Parameters.AddWithValue("@nm_descricao", parceiro.Descricao ?? "");
                 sqlConn.Command.Parameters.AddWithValue("@id_endereco", idEndereco);
                 sqlConn.Command.Parameters.AddWithValue("@nm_codigo", parceiro.Codigo);
 
@@ -292,6 +329,121 @@ namespace ms_crud_rest.DAO
             {
                 sqlConn.CloseConnection();
                 sqlConn.Reader.Close();
+            }
+        }
+
+
+        /// <summary>
+        /// Atualiza os dados de um parceiro
+        /// </summary>
+        /// <param name="parceiro">parceiro que será atualizado</param>
+        /// <returns></returns>
+        public override void Atualizar(Parceiro parceiro)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+                sqlConn.BeginTransaction();
+
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                #region atualiza os dados do parceiro
+
+                sqlConn.Command.Parameters.AddWithValue("@nm_parceiro", parceiro.Nome);
+                sqlConn.Command.Parameters.AddWithValue("@nm_descricao", parceiro.Descricao);
+                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", parceiro.Ativo);
+                sqlConn.Command.Parameters.AddWithValue("@id_parceiro", parceiro.Id);
+
+                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_parceiro
+	                                                            SET nm_parceiro = @nm_parceiro,
+		                                                            nm_descricao = @nm_descricao,
+		                                                            bol_ativo = @bol_ativo
+                                                            WHERE id_parceiro = @id_parceiro;");
+
+                sqlConn.Command.ExecuteNonQuery();
+
+                #endregion
+
+                #region atualiza o endereço do parceiro
+
+                sqlConn.Command.Parameters.Clear();
+
+                sqlConn.Command.Parameters.AddWithValue("@id_endereco", parceiro.Endereco.Id);
+                sqlConn.Command.Parameters.AddWithValue("@nm_cep", parceiro.Endereco.Cep);
+                sqlConn.Command.Parameters.AddWithValue("@nm_uf", parceiro.Endereco.UF);
+                sqlConn.Command.Parameters.AddWithValue("@nm_cidade", parceiro.Endereco.Cidade);
+                sqlConn.Command.Parameters.AddWithValue("@nm_bairro", parceiro.Endereco.Bairro);
+                sqlConn.Command.Parameters.AddWithValue("@nm_logradouro", parceiro.Endereco.Logradouro);
+                sqlConn.Command.Parameters.AddWithValue("@nm_numero_endereco", parceiro.Endereco.NumeroEndereco);
+                sqlConn.Command.Parameters.AddWithValue("@nm_complemento_endereco", parceiro.Endereco.ComplementoEndereco ?? "");
+
+                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_endereco
+	                                                            SET nm_cep = @nm_cep,
+		                                                            nm_uf = @nm_uf,
+		                                                            nm_cidade = @nm_cidade,
+		                                                            nm_bairro = @nm_bairro,
+		                                                            nm_logradouro = @nm_logradouro,
+		                                                            nm_numero_endereco = @nm_numero_endereco,
+		                                                            nm_complemento_endereco = @nm_complemento_endereco
+                                                            WHERE id_endereco = @id_endereco;");
+
+                sqlConn.Command.ExecuteNonQuery();
+
+                #endregion
+
+                sqlConn.Commit();
+
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { Mensagem = "Erro ao atualizar os dados do parceiro", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+
+                sqlConn.Rollback();
+
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
+        }
+
+        /// <summary>
+        /// Seta um parceiro como inativo
+        /// </summary>
+        /// <param name="parceiro">parceiro que será inativado</param>
+        /// <returns></returns>
+        public override void Excluir(Parceiro parceiro)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                #region atualiza os dados do parceiro
+
+                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", parceiro.Ativo);
+                sqlConn.Command.Parameters.AddWithValue("@id_parceiro", parceiro.Id);
+
+                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_parceiro
+	                                                            SET bol_ativo = @bol_ativo
+                                                            WHERE id_parceiro = @id_parceiro;");
+
+                sqlConn.Command.ExecuteNonQuery();
+
+                #endregion
+
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { Mensagem = "Erro ao atualizar os dados do parceiro", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
             }
         }
     }

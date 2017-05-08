@@ -79,6 +79,8 @@ namespace ClassesMarmitex
         [StringLength(200, ErrorMessage = "o tamanho máximo aceito para a descrição é 200 caracteres")]
         public string Descricao { get; set; }
 
+        public int IdEndereco { get; set; }
+
         [Required(ErrorMessage = "o preenchimento do cep é obrigatório")]
         [StringLength(200, ErrorMessage = "o tamanho máximo aceito para o cep é 10 caracteres")]
         public string Cep { get; set; }

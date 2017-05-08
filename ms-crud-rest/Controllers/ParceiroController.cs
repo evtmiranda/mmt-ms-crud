@@ -127,5 +127,54 @@ namespace ms_crud_rest.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
+
+        /// <summary>
+        /// Atualiza os dados de um parceiro
+        /// </summary>
+        /// <param name="parceiro">parceiro que será atualizado</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/Parceiro/Atualizar")]
+        public HttpResponseMessage AtualizarParceiro([FromBody] Parceiro parceiro)
+        {
+            try
+            {
+                parceiroDAO.Atualizar(parceiro);
+
+                return Request.CreateResponse(HttpStatusCode.OK, parceiro);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível atualizar o parceiro. Por favor, tente novamente ou entre em contato com o administrador do sistema";
+                HttpError error = new HttpError(mensagem);
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+
+        /// <summary>
+        /// Inativa um parceiro
+        /// </summary>
+        /// <param name="parceiro">parceiro que será atualizado</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/Parceiro/Excluir")]
+        public HttpResponseMessage ExcluirParceiro([FromBody] Parceiro parceiro)
+        {
+            try
+            {
+                parceiroDAO.Excluir(parceiro);
+
+                return Request.CreateResponse(HttpStatusCode.OK, parceiro);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível excluir o parceiro. Por favor, tente novamente ou entre em contato com o administrador do sistema";
+                HttpError error = new HttpError(mensagem);
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
     }
 }
