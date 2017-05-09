@@ -44,6 +44,7 @@ namespace ms_crud_rest.DAO
                                                             WHERE id_menu_cardapio = @id_menu_cardapio
                                                             AND bol_ativo = 1;");
 
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_menu_cardapio", idMenuCardapio);
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 

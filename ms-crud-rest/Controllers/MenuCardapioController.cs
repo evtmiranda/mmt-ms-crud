@@ -23,11 +23,13 @@ namespace ms_crud_rest.Controllers
             this.logDAO = logDAO;
         }
 
+        [Route("api/Cardapio/BuscarCardapio/{id}")]
         public HttpResponseMessage Get(int id)
         {
             try
             {
                 MenuCardapio menuCardapio = cardapioDAO.BuscarPorId(id);
+
                 if (menuCardapio == null)
                     throw new KeyNotFoundException();
 
@@ -41,14 +43,15 @@ namespace ms_crud_rest.Controllers
             }
         }
 
-        [Route("api/MenuCardapio/Cadastrar/{dominioLoja}")]
-        public HttpResponseMessage Post([FromBody] MenuCardapio cardapio)
+        [Route("api/MenuCardapio/Cadastrar/{urlLoja}")]
+        public HttpResponseMessage Post([FromUri] string urlLoja, [FromBody] MenuCardapio cardapio)
         {
             try
             {
-                cardapioDAO.Adicionar(cardapio);
+                cardapioDAO.AdicionarCardapio(urlLoja, cardapio);
 
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created);
+
                 string location = Url.Link("DefaultApi", new { controller = "MenuCardapio", id = cardapio.Id });
                 response.Headers.Location = new Uri(location);
 
@@ -62,48 +65,51 @@ namespace ms_crud_rest.Controllers
             }
         }
 
-        public HttpResponseMessage Delete([FromUri] int id)
+        /// <summary>
+        /// Atualiza os dados de um cardápio
+        /// </summary>
+        /// <param name="cardapio">cardápio que será atualizado</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/MenuCardapio/Atualizar")]
+        public HttpResponseMessage AtualizarCardapio([FromBody] MenuCardapio cardapio)
         {
             try
             {
-                //verifica se o id existe antes de excluir
-                HttpResponseMessage retornoGet = Get(id);
+                cardapioDAO.Atualizar(cardapio);
 
-                if (retornoGet.StatusCode == HttpStatusCode.OK)
-                    cardapioDAO.ExcluirPorId(id);
-                else
-                    return retornoGet;
-
-                return Request.CreateResponse(HttpStatusCode.OK);
+                return Request.CreateResponse(HttpStatusCode.OK, cardapio);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string mensagem = string.Format("nao foi possivel deletar o cardápio. erro: {0}", ex);
+                string mensagem = "Não foi possível atualizar o cardapio. Por favor, tente novamente ou entre em contato com o administrador do sistema";
                 HttpError error = new HttpError(mensagem);
+
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
 
-        public HttpResponseMessage Patch([FromBody] MenuCardapio cardapio, [FromUri] int id)
+
+        /// <summary>
+        /// Inativa um cardapio
+        /// </summary>
+        /// <param name="cardapio">cardapio que será atualizado</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/MenuCardapio/Excluir")]
+        public HttpResponseMessage ExcluirCardapio([FromBody] MenuCardapio cardapio)
         {
             try
             {
-                MenuCardapio cardapioAtual = cardapioDAO.BuscarPorId(id);
+                cardapioDAO.Excluir(cardapio);
 
-                if (cardapioAtual == null)
-                    return Request.CreateResponse(HttpStatusCode.NotFound);
-
-                cardapioAtual.Nome = cardapio.Nome;
-                cardapioAtual.Ativo = cardapio.Ativo;
-
-                cardapioDAO.Atualizar(cardapioAtual);
-
-                return Request.CreateResponse(HttpStatusCode.OK);
+                return Request.CreateResponse(HttpStatusCode.OK, cardapio);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string mensagem = string.Format("nao foi possivel atualizar o cardápio. erro: {0}", ex);
+                string mensagem = "Não foi possível excluir o cardapio. Por favor, tente novamente ou entre em contato com o administrador do sistema";
                 HttpError error = new HttpError(mensagem);
+
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
