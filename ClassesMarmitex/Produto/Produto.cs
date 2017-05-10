@@ -72,4 +72,20 @@
             return new ProdutoCliente { NomeProduto = this.NomeProduto, QtdProduto = this.QtdProduto, IdPedido = this.IdPedido };
         }
     }
+
+    /// <summary>
+    /// Classe para armazenar um produto e seus produtos adicionais. 
+    /// Utilizada na tela de produtos do painel admin
+    /// </summary>
+    public class ProdutoDetalhes
+    {
+        public Produto Produto { get; set; }
+        public List<ProdutoAdicionalDetalhes> ProdutosAdicionais { get; set; }
+    }
+
+    public class ProdutoAdicionalDetalhes
+    {
+        public DadosProdutoAdicional ProdutosAdicionais { get; set; }
+        public DadosProdutoAdicionalProduto ProdutosAdicionaisProduto { get; set; }
+    }
 }
