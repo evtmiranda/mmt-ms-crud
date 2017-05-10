@@ -68,9 +68,9 @@ namespace ms_crud_rest.DAO
 	                                                            tpa.id_produto_adicional,
 	                                                            tpa.nm_adicional,
 	                                                            tpa.nm_descricao,
-	                                                            tpa.nr_qtd_min,
-	                                                            tpa.nr_qtd_max,
-	                                                            tpa.nr_ordem_exibicao,
+	                                                            tpap.nr_qtd_min,
+	                                                            tpap.nr_qtd_max,
+	                                                            tpap.nr_ordem_exibicao,
 	                                                            tpa.bol_ativo
                                                             FROM tab_produto_adicional_produto AS tpap
                                                             INNER JOIN tab_produto_adicional AS tpa
@@ -130,7 +130,10 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.CommandText = @"SELECT
 	                                                id_produto_adicional_produto,
 	                                                id_produto,
-	                                                id_produto_adicional
+	                                                id_produto_adicional,
+	                                                nr_qtd_min,
+	                                                nr_qtd_max,
+	                                                nr_ordem_exibicao
                                                 FROM tab_produto_adicional_produto;";
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
@@ -191,5 +194,6 @@ namespace ms_crud_rest.DAO
                 sqlConn.CloseConnection();
             }
         }
+
     }
 }

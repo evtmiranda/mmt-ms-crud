@@ -10,9 +10,6 @@ namespace ClassesMarmitex
         public string Nome { get; set; }
         public string Descricao { get; set; }
         public List<DadosProdutoAdicionalItem> ItensAdicionais { get; set; }
-        public int QtdMin { get; set; }
-        public int QtdMax { get; set; }
-        public int OrdemExibicao { get; set; }
         public bool Ativo { get; set; }
     }
 
@@ -28,22 +25,12 @@ namespace ClassesMarmitex
         [Column("nm_descricao")]
         public string Descricao { get; set; }
 
-        [Column("nr_qtd_min")]
-        public int QtdMin { get; set; }
-
-        [Column("nr_qtd_max")]
-        public int QtdMax { get; set; }
-
-        [Column("nr_ordem_exibicao")]
-        public int OrdemExibicao { get; set; }
-
         [Column("bol_ativo")]
         public bool Ativo { get; set; }
 
         public DadosProdutoAdicional ToProdutoAdicional()
         {
-            return new DadosProdutoAdicional { Id = this.Id, Nome = this.Nome, Descricao = this.Descricao,
-                QtdMin = this.QtdMin, QtdMax = this.QtdMax, OrdemExibicao = this.OrdemExibicao, Ativo = this.Ativo };
+            return new DadosProdutoAdicional { Id = this.Id, Nome = this.Nome, Descricao = this.Descricao, Ativo = this.Ativo };
         }
     }
 
@@ -90,6 +77,9 @@ namespace ClassesMarmitex
         public int Id { get; set; }
         public int IdProduto { get; set; }
         public int IdProdutoAdicional { get; set; }
+        public int QtdMin { get; set; }
+        public int QtdMax { get; set; }
+        public int OrdemExibicao { get; set; }
     }
 
     [Table("tab_produto_adicional_produto")]
@@ -104,9 +94,19 @@ namespace ClassesMarmitex
         [Column("id_produto_adicional")]
         public int IdProdutoAdicional { get; set; }
 
+        [Column("nr_qtd_min")]
+        public int QtdMin { get; set; }
+
+        [Column("nr_qtd_max")]
+        public int QtdMax { get; set; }
+
+        [Column("nr_ordem_exibicao")]
+        public int OrdemExibicao { get; set; }
+
         public DadosProdutoAdicionalProduto ToProdutoAdicionalProduto()
         {
-            return new DadosProdutoAdicionalProduto { Id = this.Id, IdProduto = this.IdProduto, IdProdutoAdicional = this.IdProdutoAdicional };
+            return new DadosProdutoAdicionalProduto { Id = this.Id, IdProduto = this.IdProduto, IdProdutoAdicional = this.IdProdutoAdicional,
+                QtdMin = this.QtdMin, QtdMax = this.QtdMax, OrdemExibicao = this.OrdemExibicao};
         }
     }
 
