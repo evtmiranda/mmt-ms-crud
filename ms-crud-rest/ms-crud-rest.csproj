@@ -201,6 +201,7 @@
     <Compile Include="Controllers\LojaController.cs" />
     <Compile Include="Controllers\ParceiroController.cs" />
     <Compile Include="Controllers\PedidoController.cs" />
+    <Compile Include="Controllers\ProdutoAdicionalController.cs" />
     <Compile Include="Controllers\ProdutoController.cs" />
     <Compile Include="Controllers\UsuarioController.cs" />
     <Compile Include="DAO\FormaPagamentoDAO.cs" />
@@ -211,6 +212,7 @@
     <Compile Include="DAO\MenuCardapioDAO.cs" />
     <Compile Include="DAO\ParceiroDAO.cs" />
     <Compile Include="DAO\PedidoDAO.cs" />
+    <Compile Include="DAO\ProdutoAdicionalDAO.cs" />
     <Compile Include="DAO\ProdutoDAO.cs" />
     <Compile Include="DAO\UsuarioDAO.cs" />
     <Compile Include="Exceptions\ApiException.cs" />
