@@ -21,6 +21,12 @@ namespace ms_crud_rest.Controllers
             this.logDAO = logDAO;
         }
 
+        /// <summary>
+        /// Busca um produto por id
+        /// </summary>
+        /// <param name="id">id do produto</param>
+        /// <returns></returns>
+        [Route("api/Produto/{id}")]
         public HttpResponseMessage Get(int id)
         {
             try
@@ -129,6 +135,8 @@ namespace ms_crud_rest.Controllers
                 return Request.CreateResponse(HttpStatusCode.NotFound, error);
             }
         }
+
+
 
     }
 }

@@ -80,12 +80,6 @@
     public class ProdutoDetalhes
     {
         public Produto Produto { get; set; }
-        public List<ProdutoAdicionalDetalhes> ProdutosAdicionais { get; set; }
-    }
-
-    public class ProdutoAdicionalDetalhes
-    {
-        public DadosProdutoAdicional ProdutosAdicionais { get; set; }
-        public DadosProdutoAdicionalProduto ProdutosAdicionaisProduto { get; set; }
+        public List<DadosProdutoAdicionalProduto> ProdutosAdicionais { get; set; }
     }
 }

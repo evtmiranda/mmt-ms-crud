@@ -22,18 +22,40 @@ namespace ms_crud_rest.Controllers
         }
 
         /// <summary>
-        /// Retorna todos os produtos existentes dentro do cardápio enviado como parâmetro
+        /// Retorna todos os produtos adicionais de uma determinada loja
         /// </summary>
-        /// <param name="idMenuCardapio">Id do cardápio ao qual os produtos pertencem</param>
+        /// <param name="idLoja">Id da loja ao qual os produtos pertencem</param>
         /// <returns></returns>
         [HttpGet]
         [Route("api/ProdutoAdicional/Listar/{idLoja}")]
-        public HttpResponseMessage ListarProdutos(int idLoja)
+        public HttpResponseMessage ListarProdutosAdicionais(int idLoja)
         {
             try
             {
-                IList<DadosProdutoAdicional> produtosAdicionais = produtoAdicionalDAO.Listar(idLoja);
+                List<DadosProdutoAdicional> produtosAdicionais = produtoAdicionalDAO.Listar(idLoja);
                 return Request.CreateResponse(HttpStatusCode.OK, produtosAdicionais);
+            }
+            catch (Exception)
+            {
+                string mensagem = string.Format("ocorreu um problema ao buscar os produtos adicionais. por favor, tente atualizar a página ou acessar dentro de alguns minutos...");
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+            }
+        }
+
+        /// <summary>
+        /// Retorna todos os produtos adicionais de um determinado produto
+        /// </summary>
+        /// <param name="idProduto">Id do produto ao qual os produtos adicionais devem ser consultados</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("api/ProdutoAdicional/BuscarProdutosAdicionaisDeUmProduto/{idProduto}")]
+        public HttpResponseMessage BuscarProdutosAdicionaisDeUmProduto(int idProduto)
+        {
+            try
+            {
+                List<DadosProdutoAdicionalProduto> produtosAdicionaisProduto = produtoAdicionalDAO.BuscarProdutosAdicionaisDeUmProduto(idProduto);
+                return Request.CreateResponse(HttpStatusCode.OK, produtosAdicionaisProduto);
             }
             catch (Exception)
             {

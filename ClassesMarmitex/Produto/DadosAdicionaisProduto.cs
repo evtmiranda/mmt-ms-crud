@@ -77,6 +77,8 @@ namespace ClassesMarmitex
         public int Id { get; set; }
         public int IdProduto { get; set; }
         public int IdProdutoAdicional { get; set; }
+        public string NomeProdutoAdicional { get; set; }
+        public string DescricaoProdutoAdicional { get; set; }
         public int QtdMin { get; set; }
         public int QtdMax { get; set; }
         public int OrdemExibicao { get; set; }
@@ -94,6 +96,15 @@ namespace ClassesMarmitex
         [Column("id_produto_adicional")]
         public int IdProdutoAdicional { get; set; }
 
+        //os campos NomeProdutoAdicional e DescricaoProdutoAdicional
+        //são lidos da tabela tab_produto_adicional
+
+        [Column("nm_adicional")]
+        public string NomeProdutoAdicional { get; set; }
+
+        [Column("nm_descricao")]
+        public string DescricaoProdutoAdicional { get; set; }
+
         [Column("nr_qtd_min")]
         public int QtdMin { get; set; }
 
@@ -106,6 +117,7 @@ namespace ClassesMarmitex
         public DadosProdutoAdicionalProduto ToProdutoAdicionalProduto()
         {
             return new DadosProdutoAdicionalProduto { Id = this.Id, IdProduto = this.IdProduto, IdProdutoAdicional = this.IdProdutoAdicional,
+                NomeProdutoAdicional = this.NomeProdutoAdicional, DescricaoProdutoAdicional = this.DescricaoProdutoAdicional,
                 QtdMin = this.QtdMin, QtdMax = this.QtdMax, OrdemExibicao = this.OrdemExibicao};
         }
     }
