@@ -87,6 +87,7 @@ namespace ClassesMarmitex
         public int QtdMin { get; set; }
         public int QtdMax { get; set; }
         public int OrdemExibicao { get; set; }
+        public bool Ativo { get; set; }
     }
 
     [Table("tab_produto_adicional_produto")]
@@ -123,11 +124,15 @@ namespace ClassesMarmitex
         [Column("nr_ordem_exibicao")]
         public int OrdemExibicao { get; set; }
 
+        [Column("bol_ativo")]
+        public bool Ativo { get; set; }
+
         public DadosProdutoAdicionalProduto ToProdutoAdicionalProduto()
         {
             return new DadosProdutoAdicionalProduto { Id = this.Id, IdProduto = this.IdProduto, NomeProduto = this.NomeProduto,
                 IdProdutoAdicional = this.IdProdutoAdicional, NomeProdutoAdicional = this.NomeProdutoAdicional,
-                DescricaoProdutoAdicional = this.DescricaoProdutoAdicional, QtdMin = this.QtdMin, QtdMax = this.QtdMax, OrdemExibicao = this.OrdemExibicao};
+                DescricaoProdutoAdicional = this.DescricaoProdutoAdicional, QtdMin = this.QtdMin, QtdMax = this.QtdMax,
+                OrdemExibicao = this.OrdemExibicao, Ativo = this.Ativo};
         }
     }
 

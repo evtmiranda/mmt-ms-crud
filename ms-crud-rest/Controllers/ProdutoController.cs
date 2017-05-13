@@ -163,7 +163,7 @@ namespace ms_crud_rest.Controllers
         /// <param name="idProduto">Id do produto ao qual os produtos adicionais devem ser consultados</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("api/ProdutoAdicional/BuscarProdutosAdicionaisDeUmProduto/{idProduto}")]
+        [Route("api/Produto/BuscarProdutosAdicionaisDeUmProduto/{idProduto}")]
         public HttpResponseMessage BuscarProdutosAdicionaisDeUmProduto(int idProduto)
         {
             try
@@ -176,6 +176,76 @@ namespace ms_crud_rest.Controllers
                 string mensagem = string.Format("ocorreu um problema ao buscar os produtos adicionais. por favor, tente atualizar a página ou acessar dentro de alguns minutos...");
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.NotFound, error);
+            }
+        }
+
+        /// <summary>
+        /// Retorna um produto adicional
+        /// </summary>
+        /// <param name="idProdutoAdicionalProduto">Id do produto ao qual os produtos adicionais devem ser consultados</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("api/Produto/BuscarProdutoAdicional/{idProdutoAdicionalProduto}")]
+        public HttpResponseMessage BuscarProdutoAdicional(int idProdutoAdicionalProduto)
+        {
+            try
+            {
+                DadosProdutoAdicionalProduto produtoAdicionalProduto = produtoDAO.BuscarProdutoAdicionalDeUmProduto(idProdutoAdicionalProduto);
+                return Request.CreateResponse(HttpStatusCode.OK, produtoAdicionalProduto);
+            }
+            catch (Exception)
+            {
+                string mensagem = string.Format("ocorreu um problema ao buscar o produto adicional. por favor, tente atualizar a página ou acessar dentro de alguns minutos...");
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+            }
+        }
+
+        /// <summary>
+        /// Inativa um produto adicional do produto
+        /// </summary>
+        /// <param name="produtoAdicional">produto que será atualizado</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/Produto/ExcluirProdutoAdicional")]
+        public HttpResponseMessage ExcluirProdutoAdicional([FromBody] DadosProdutoAdicionalProduto produtoAdicional)
+        {
+            try
+            {
+                produtoDAO.ExcluirProdutoAdicional(produtoAdicional);
+
+                return Request.CreateResponse(HttpStatusCode.OK, produtoAdicional);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível excluir o produto adicional. Por favor, tente novamente ou entre em contato com o administrador do sistema";
+                HttpError error = new HttpError(mensagem);
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        /// <summary>
+        /// Atualiza os dados de um produto adicional do produto
+        /// </summary>
+        /// <param name="produto">produto que será atualizado</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/Produto/ProdutoAdicional/Atualizar")]
+        public HttpResponseMessage AtualizarProdutoAdicionalProduto([FromBody] DadosProdutoAdicionalProduto dadosProdutoAdicionalProduto)
+        {
+            try
+            {
+                produtoDAO.AtualizarProdutoAdicionalProduto(dadosProdutoAdicionalProduto);
+
+                return Request.CreateResponse(HttpStatusCode.OK, dadosProdutoAdicionalProduto);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível atualizar o produto adicional do produto. Por favor, tente novamente ou entre em contato com o administrador do sistema";
+                HttpError error = new HttpError(mensagem);
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
 
