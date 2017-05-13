@@ -73,13 +73,13 @@
         }
     }
 
-    /// <summary>
-    /// Classe para armazenar um produto e seus produtos adicionais. 
-    /// Utilizada na tela de produtos do painel admin
-    /// </summary>
-    public class ProdutoDetalhes
-    {
-        public Produto Produto { get; set; }
-        public List<DadosProdutoAdicionalProduto> ProdutosAdicionais { get; set; }
-    }
+    ///// <summary>
+    ///// Classe para armazenar um produto e seus produtos adicionais. 
+    ///// Utilizada na tela de produtos do painel admin
+    ///// </summary>
+    //public class ProdutoDetalhes
+    //{
+    //    public Produto Produto { get; set; }
+    //    public List<DadosProdutoAdicionalProduto> ProdutosAdicionais { get; set; }
+    //}
 }

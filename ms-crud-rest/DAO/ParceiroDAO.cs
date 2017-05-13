@@ -256,23 +256,12 @@ namespace ms_crud_rest.DAO
         /// </summary>
         /// <param name="parceiro">dados do parceiro</param>
         /// <returns></returns>
-        public void AdicionarParceiro(string urlLoja, Parceiro parceiro)
+        public void AdicionarParceiro(int idLoja, Parceiro parceiro)
         {
             try
             {
 
                 int idEndereco = 0;
-
-                #region busca o id da loja
-
-                Loja loja = new Loja();
-
-                loja = lojaDAO.BuscarLoja(urlLoja);
-
-                if (loja == null)
-                    throw new Exception("Não foi possível identificar a loja");
-
-                #endregion
 
                 sqlConn.StartConnection();
                 sqlConn.BeginTransaction();
@@ -306,7 +295,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_parceiro(id_loja, nm_parceiro, nm_descricao, id_endereco, nm_codigo)
                                                               VALUES(@id_loja, @nm_parceiro, @nm_descricao, @id_endereco, @nm_codigo)");
 
-                sqlConn.Command.Parameters.AddWithValue("@id_loja", loja.Id);
+                sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
                 sqlConn.Command.Parameters.AddWithValue("@nm_parceiro", parceiro.Nome);
                 sqlConn.Command.Parameters.AddWithValue("@nm_descricao", parceiro.Descricao ?? "");
                 sqlConn.Command.Parameters.AddWithValue("@id_endereco", idEndereco);

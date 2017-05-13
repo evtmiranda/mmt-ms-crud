@@ -22,8 +22,8 @@ namespace ms_crud_rest.Controllers
         }
 
         [HttpPost]
-        [Route("api/Parceiro/Adicionar/{urlLoja}")]
-        public HttpResponseMessage AdicionarParceiro([FromUri] string urlLoja, [FromBody] Parceiro parceiro)
+        [Route("api/Parceiro/Adicionar/{idLoja}")]
+        public HttpResponseMessage AdicionarParceiro([FromUri] int idLoja, [FromBody] Parceiro parceiro)
         {
             try
             {
@@ -34,7 +34,7 @@ namespace ms_crud_rest.Controllers
                 if (parceiroExiste.Id != 0)
                     throw new ParceiroJaExisteException();
 
-                parceiroDAO.AdicionarParceiro(urlLoja, parceiro);
+                parceiroDAO.AdicionarParceiro(idLoja, parceiro);
 
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created);
 

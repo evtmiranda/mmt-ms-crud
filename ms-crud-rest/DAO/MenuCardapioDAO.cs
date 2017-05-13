@@ -144,28 +144,17 @@ namespace ms_crud_rest.DAO
         /// </summary>
         /// <param name="cardapio">dados do cardápio</param>
         /// <returns></returns>
-        public void AdicionarCardapio(string urlLoja, MenuCardapio cardapio)
+        public void AdicionarCardapio(int idLoja, MenuCardapio cardapio)
         {
             try
             {
-                #region busca o id da loja
-
-                Loja loja = new Loja();
-
-                loja = lojaDAO.BuscarLoja(urlLoja);
-
-                if (loja == null)
-                    throw new Exception("Não foi possível identificar a loja");
-
-                #endregion
-
                 sqlConn.StartConnection();
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
 
                 sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_menu_cardapio(id_loja, nm_cardapio, nr_ordem_exibicao, bol_ativo)
                                                               VALUES(@id_loja, @nm_cardapio, @nr_ordem_exibicao, @bol_ativo);");
 
-                sqlConn.Command.Parameters.AddWithValue("@id_loja", loja.Id);
+                sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
                 sqlConn.Command.Parameters.AddWithValue("@nm_cardapio", cardapio.Nome);
                 sqlConn.Command.Parameters.AddWithValue("@nr_ordem_exibicao", cardapio.OrdemExibicao);
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", cardapio.Ativo);

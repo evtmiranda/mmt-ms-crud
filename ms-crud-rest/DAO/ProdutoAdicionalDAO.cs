@@ -27,6 +27,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
                 sqlConn.Command.CommandText = string.Format(@"SELECT
 	                                                            id_produto_adicional,
+                                                                id_loja,
 	                                                            nm_adicional,
 	                                                            nm_descricao,
 	                                                            bol_ativo
@@ -101,66 +102,30 @@ namespace ms_crud_rest.DAO
             }
         }
 
-        public List<DadosProdutoAdicionalProduto> BuscarProdutosAdicionaisDeUmProduto(int idProduto)
+        public override void Adicionar(DadosProdutoAdicional produtoAdicional)
         {
-            List<DadosProdutoAdicionalProdutoEntidade> listaProdutoAdicionalProdutoEntidade = new List<DadosProdutoAdicionalProdutoEntidade>();
-            List<DadosProdutoAdicionalProduto> listaProdutoAdicionalProduto = new List<DadosProdutoAdicionalProduto>();
-
             try
             {
                 sqlConn.StartConnection();
 
-
-                #region Produtos Adicionais do Produto
                 //busca o produtos
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
-                sqlConn.Command.CommandText = string.Format(@"SELECT
-	                                                            id_produto_adicional_produto,
-	                                                            id_produto,
-	                                                            tpap.id_produto_adicional,
-	                                                            tpa.nm_adicional,
-	                                                            tpa.nm_descricao,
-	                                                            nr_qtd_min,
-	                                                            nr_qtd_max,
-	                                                            nr_ordem_exibicao
-                                                            FROM tab_produto_adicional_produto AS tpap
-                                                            INNER JOIN tab_produto_adicional AS tpa
-                                                            ON tpap.id_produto_adicional = tpa.id_produto_adicional
-                                                            WHERE id_produto = @id_produto;");
+                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_produto_adicional(id_loja, nm_adicional, nm_descricao, bol_ativo)
+                                                              VALUES(@id_loja, @nm_adicional, @nm_descricao, @bol_ativo);");
 
                 sqlConn.Command.Parameters.Clear();
-                sqlConn.Command.Parameters.AddWithValue("@id_produto", idProduto);
-                sqlConn.Reader = sqlConn.Command.ExecuteReader();
+                sqlConn.Command.Parameters.AddWithValue("@id_loja", produtoAdicional.IdLoja);
+                sqlConn.Command.Parameters.AddWithValue("@nm_adicional", produtoAdicional.Nome);
+                sqlConn.Command.Parameters.AddWithValue("@nm_descricao", produtoAdicional.Descricao);
+                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", produtoAdicional.Ativo);
 
-                //transforma a entidade em objeto
-                listaProdutoAdicionalProdutoEntidade = new ModuloClasse().PreencheClassePorDataReader<DadosProdutoAdicionalProdutoEntidade>(sqlConn.Reader);
-
-                foreach (var produtoAdicionalProdutoEntidade in listaProdutoAdicionalProdutoEntidade)
-                {
-                    listaProdutoAdicionalProduto.Add(produtoAdicionalProdutoEntidade.ToProdutoAdicionalProduto());
-                }
-
-                //limpa os dados da execução anterior
-                sqlConn.Command.CommandText = "";
-                if (sqlConn.Reader != null)
-                    sqlConn.Reader.Close();
-
-                #endregion
-
-                return listaProdutoAdicionalProduto;
+                sqlConn.Command.ExecuteNonQuery();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                logDAO.Adicionar(new Log { Mensagem = "erro ao buscar os produtos adicionais do produto", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+                throw;
+            }
 
-                throw ex;
-            }
-            finally
-            {
-                sqlConn.Command.Parameters.Clear();
-                sqlConn.CloseConnection();
-            }
         }
-
     }
 }

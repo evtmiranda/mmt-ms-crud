@@ -67,6 +67,7 @@ namespace ms_crud_rest.DAO
                 //busca os dados adicionais do produto
                 sqlConn.Command.CommandText = string.Format(@"SELECT
 	                                                            tpa.id_produto_adicional,
+                                                                tpa.id_loja,
 	                                                            tpa.nm_adicional,
 	                                                            tpa.nm_descricao,
 	                                                            tpap.nr_qtd_min,
@@ -130,7 +131,8 @@ namespace ms_crud_rest.DAO
                 //monta a relação de adicionais por produto
                 sqlConn.Command.CommandText = @"SELECT
 	                                                id_produto_adicional_produto,
-	                                                id_produto,
+	                                                tpap.id_produto,
+                                                    tp.nm_produto,
 	                                                tpap.id_produto_adicional,
 	                                                tpa.nm_adicional,
 	                                                tpa.nm_descricao,
@@ -139,7 +141,9 @@ namespace ms_crud_rest.DAO
 	                                                nr_ordem_exibicao
                                                 FROM tab_produto_adicional_produto AS tpap
                                                 INNER JOIN tab_produto_adicional AS tpa
-                                                ON tpap.id_produto_adicional = tpa.id_produto_adicional;";
+                                                ON tpap.id_produto_adicional = tpa.id_produto_adicional
+                                                INNER JOIN tab_produto AS tp
+                                                ON tp.id_produto = tpap.id_produto;";
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
@@ -256,6 +260,7 @@ namespace ms_crud_rest.DAO
                 //busca os dados adicionais dos produtos
                 sqlConn.Command.CommandText = string.Format(@"SELECT
 	                                                            tpa.id_produto_adicional,
+                                                                tpa.id_loja,
 	                                                            tpa.nm_adicional,
 	                                                            tpa.nm_descricao,
 	                                                            tpap.nr_qtd_min,
@@ -319,7 +324,8 @@ namespace ms_crud_rest.DAO
                 //monta a relação de adicionais por produto
                 sqlConn.Command.CommandText = @"SELECT
 	                                            id_produto_adicional_produto,
-	                                            id_produto,
+	                                            tpap.id_produto,
+                                                tp.nm_produto,
 	                                            tpap.id_produto_adicional,
 	                                            tpa.nm_adicional,
 	                                            tpa.nm_descricao,
@@ -328,7 +334,9 @@ namespace ms_crud_rest.DAO
 	                                            nr_ordem_exibicao
                                             FROM tab_produto_adicional_produto AS tpap
                                             INNER JOIN tab_produto_adicional AS tpa
-                                            ON tpap.id_produto_adicional = tpa.id_produto_adicional;";
+                                            ON tpap.id_produto_adicional = tpa.id_produto_adicional
+                                            INNER JOIN tab_produto AS tp
+                                            ON tp.id_produto = tpap.id_produto;";
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
@@ -388,6 +396,256 @@ namespace ms_crud_rest.DAO
                 sqlConn.CloseConnection();
             }
         }
+
+        public override void Adicionar(Produto produto)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+
+                //busca o produtos
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_produto(id_menu_cardapio, nm_produto, nm_descricao, vlr_produto, url_imagem, bol_ativo)
+                                                          VALUES(@id_menu_cardapio, @nm_produto, @nm_descricao, @vlr_produto, @url_imagem, @bol_ativo);");
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@id_menu_cardapio", produto.IdMenuCardapio);
+                sqlConn.Command.Parameters.AddWithValue("@nm_produto", produto.Nome);
+                sqlConn.Command.Parameters.AddWithValue("@nm_descricao", produto.Descricao);
+                sqlConn.Command.Parameters.AddWithValue("@vlr_produto", produto.Valor);
+                sqlConn.Command.Parameters.AddWithValue("@url_imagem", produto.Imagem);
+                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", produto.Ativo);
+
+                sqlConn.Command.ExecuteNonQuery();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
+
+        public override void ExcluirPorId(int id)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                #region atualiza os dados do parceiro
+
+                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", 0);
+                sqlConn.Command.Parameters.AddWithValue("@id_produto", id);
+
+                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_produto
+	                                                            SET bol_ativo = @bol_ativo
+                                                            WHERE id_produto = @id_produto;");
+
+                sqlConn.Command.ExecuteNonQuery();
+
+                #endregion
+
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { Mensagem = "Erro ao excluir o produto ", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
+        }
+
+        /// <summary>
+        /// Seta um produto como inativo
+        /// </summary>
+        /// <param name="produto">produto que será inativado</param>
+        /// <returns></returns>
+        public override void Excluir(Produto produto)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                #region atualiza os dados do parceiro
+
+                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", produto.Ativo);
+                sqlConn.Command.Parameters.AddWithValue("@id_produto", produto.Id);
+
+                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_produto
+	                                                            SET bol_ativo = @bol_ativo
+                                                            WHERE id_produto = @id_produto;");
+
+                sqlConn.Command.ExecuteNonQuery();
+
+                #endregion
+
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { Mensagem = "Erro ao atualizar os dados do produto", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
+        }
+
+        /// <summary>
+        /// Atualiza os dados de um parceiro
+        /// </summary>
+        /// <param name="parceiro">parceiro que será atualizado</param>
+        /// <returns></returns>
+        public override void Atualizar(Produto produto)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                #region atualiza os dados do produto
+
+                sqlConn.Command.Parameters.AddWithValue("@id_produto", produto.Id);
+                sqlConn.Command.Parameters.AddWithValue("@id_menu_cardapio", produto.IdMenuCardapio);
+                sqlConn.Command.Parameters.AddWithValue("@nm_produto", produto.Nome);
+                sqlConn.Command.Parameters.AddWithValue("@nm_descricao", produto.Descricao);
+                sqlConn.Command.Parameters.AddWithValue("@vlr_produto", produto.Valor);
+                sqlConn.Command.Parameters.AddWithValue("@url_imagem", produto.Imagem);
+                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", produto.Ativo);
+
+                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_produto
+	                                                            SET id_menu_cardapio = @id_menu_cardapio,
+		                                                            nm_produto = @nm_produto,
+		                                                            nm_descricao = @nm_descricao,
+                                                                    vlr_produto = @vlr_produto,
+                                                                    url_imagem = @url_imagem,
+                                                                    bol_ativo = @bol_ativo
+                                                            WHERE id_produto = @id_produto;");
+
+                sqlConn.Command.ExecuteNonQuery();
+
+                #endregion
+
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { Mensagem = "Erro ao atualizar os dados do produto", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+
+                sqlConn.Rollback();
+
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
+        }
+
+
+        #region produtos adicionais do produto
+
+        public List<DadosProdutoAdicionalProduto> BuscarProdutosAdicionaisDeUmProduto(int idProduto)
+        {
+            List<DadosProdutoAdicionalProdutoEntidade> listaProdutoAdicionalProdutoEntidade = new List<DadosProdutoAdicionalProdutoEntidade>();
+            List<DadosProdutoAdicionalProduto> listaProdutoAdicionalProduto = new List<DadosProdutoAdicionalProduto>();
+
+            try
+            {
+                sqlConn.StartConnection();
+
+
+                #region Produtos Adicionais do Produto
+                //busca o produtos
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+                sqlConn.Command.CommandText = string.Format(@"SELECT
+	                                                            id_produto_adicional_produto,
+	                                                            tpap.id_produto,
+                                                                tp.nm_produto,
+	                                                            tpap.id_produto_adicional,
+	                                                            tpa.nm_adicional,
+	                                                            tpa.nm_descricao,
+	                                                            nr_qtd_min,
+	                                                            nr_qtd_max,
+	                                                            nr_ordem_exibicao
+                                                            FROM tab_produto_adicional_produto AS tpap
+                                                            INNER JOIN tab_produto_adicional AS tpa
+                                                            ON tpap.id_produto_adicional = tpa.id_produto_adicional
+                                                            INNER JOIN tab_produto AS tp
+                                                            ON tp.id_produto = tpap.id_produto
+                                                            WHERE tpap.id_produto = @id_produto;");
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@id_produto", idProduto);
+                sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                //transforma a entidade em objeto
+                listaProdutoAdicionalProdutoEntidade = new ModuloClasse().PreencheClassePorDataReader<DadosProdutoAdicionalProdutoEntidade>(sqlConn.Reader);
+
+                foreach (var produtoAdicionalProdutoEntidade in listaProdutoAdicionalProdutoEntidade)
+                {
+                    listaProdutoAdicionalProduto.Add(produtoAdicionalProdutoEntidade.ToProdutoAdicionalProduto());
+                }
+
+                //limpa os dados da execução anterior
+                sqlConn.Command.CommandText = "";
+                if (sqlConn.Reader != null)
+                    sqlConn.Reader.Close();
+
+                #endregion
+
+                return listaProdutoAdicionalProduto;
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { Mensagem = "erro ao buscar os produtos adicionais do produto", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.CloseConnection();
+            }
+        }
+
+        public void AdicionarProdutoAdicional(DadosProdutoAdicionalProduto produtoAdicionalProduto)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+
+                //insere o produto adicional para o produto
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_produto_adicional_produto(id_produto, id_produto_adicional, nr_qtd_min, nr_qtd_max, nr_ordem_exibicao)
+                                                                VALUES(@id_produto, @id_produto_adicional, @nr_qtd_min, @nr_qtd_max, @nr_ordem_exibicao);");
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@id_produto", produtoAdicionalProduto.IdProduto);
+                sqlConn.Command.Parameters.AddWithValue("@id_produto_adicional", produtoAdicionalProduto.IdProdutoAdicional);
+                sqlConn.Command.Parameters.AddWithValue("@nr_qtd_min", produtoAdicionalProduto.QtdMin);
+                sqlConn.Command.Parameters.AddWithValue("@nr_qtd_max", produtoAdicionalProduto.QtdMax);
+                sqlConn.Command.Parameters.AddWithValue("@nr_ordem_exibicao", produtoAdicionalProduto.OrdemExibicao);
+
+                sqlConn.Command.ExecuteNonQuery();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
+
+        #endregion
 
     }
 }

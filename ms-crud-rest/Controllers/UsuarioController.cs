@@ -48,11 +48,10 @@
         /// Cadastro de um usuário do tipo loja
         /// </summary>
         /// <param name="usuario">objeto com todos os dados do usuário</param>
-        /// <param name="dominioLoja">dominio da loja ao qual o usuário pertence</param>
         /// <returns></returns>
         [HttpPost]
-        [Route("api/Usuario/Cadastrar/UsuarioLoja/{dominioLoja}")]
-        public HttpResponseMessage CadastrarUsuarioLoja([FromBody] UsuarioLoja usuario, [FromUri] string dominioLoja)
+        [Route("api/Usuario/Cadastrar/UsuarioLoja")]
+        public HttpResponseMessage CadastrarUsuarioLoja([FromBody] UsuarioLoja usuario)
         {
             try
             {
@@ -87,8 +86,8 @@
         }
 
         [HttpPost]
-        [Route("api/Usuario/Cadastrar/UsuarioParceiro/{dominioLoja}")]
-        public HttpResponseMessage CadastrarUsuarioParceiro([FromBody] UsuarioParceiro usuario, [FromUri] string dominioLoja)
+        [Route("api/Usuario/Cadastrar/UsuarioParceiro")]
+        public HttpResponseMessage CadastrarUsuarioParceiro([FromBody] UsuarioParceiro usuario)
         {
             try
             {

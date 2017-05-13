@@ -11,13 +11,15 @@ namespace ms_crud_rest.Controllers
     public class ProdutoAdicionalController : ApiController
     {
         private ProdutoAdicionalDAO produtoAdicionalDAO;
+        private LojaDAO lojaDAO;
         private LogDAO logDAO;
 
         //construtor do controller, recebe um produtoDAO e um logDAO, que por sua vez recebe uma ISession.
         //O Ninject é o responsável por cuidar da criação de todos esses objetos
-        public ProdutoAdicionalController(ProdutoAdicionalDAO produtoAdicionalDAO, LogDAO logDAO)
+        public ProdutoAdicionalController(ProdutoAdicionalDAO produtoAdicionalDAO,  LojaDAO lojaDAO, LogDAO logDAO)
         {
             this.produtoAdicionalDAO = produtoAdicionalDAO;
+            this.lojaDAO = lojaDAO;
             this.logDAO = logDAO;
         }
 
@@ -43,25 +45,24 @@ namespace ms_crud_rest.Controllers
             }
         }
 
-        /// <summary>
-        /// Retorna todos os produtos adicionais de um determinado produto
-        /// </summary>
-        /// <param name="idProduto">Id do produto ao qual os produtos adicionais devem ser consultados</param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("api/ProdutoAdicional/BuscarProdutosAdicionaisDeUmProduto/{idProduto}")]
-        public HttpResponseMessage BuscarProdutosAdicionaisDeUmProduto(int idProduto)
+        [Route("api/ProdutoAdicional/Adicionar/{idLoja}")]
+        public HttpResponseMessage Post([FromBody] DadosProdutoAdicional produtoAdicional, [FromUri] int idLoja)
         {
             try
             {
-                List<DadosProdutoAdicionalProduto> produtosAdicionaisProduto = produtoAdicionalDAO.BuscarProdutosAdicionaisDeUmProduto(idProduto);
-                return Request.CreateResponse(HttpStatusCode.OK, produtosAdicionaisProduto);
+                produtoAdicional.IdLoja = idLoja;
+
+                produtoAdicionalDAO.Adicionar(produtoAdicional);
+
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created);
+
+                return response;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                string mensagem = string.Format("ocorreu um problema ao buscar os produtos adicionais. por favor, tente atualizar a página ou acessar dentro de alguns minutos...");
+                string mensagem = string.Format("nao foi possivel cadastrar o produto adicional. erro: {0}", ex);
                 HttpError error = new HttpError(mensagem);
-                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
     }

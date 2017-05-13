@@ -14,13 +14,15 @@ namespace ms_crud_rest.Controllers
     {
         private MenuCardapioDAO cardapioDAO;
         private LogDAO logDAO;
+        private LojaDAO lojaDAO;
 
         //construtor do controller, recebe um usuarioDAO e um logDAO, que por sua vez recebe uma ISession.
         //O Ninject é o responsável por cuidar da criação de todos esses objetos
-        public MenuCardapioController(MenuCardapioDAO cardapioDAO, LogDAO logDAO)
+        public MenuCardapioController(MenuCardapioDAO cardapioDAO, LojaDAO lojaDAO, LogDAO logDAO)
         {
             this.cardapioDAO = cardapioDAO;
             this.logDAO = logDAO;
+            this.lojaDAO = lojaDAO;
         }
 
         [Route("api/Cardapio/BuscarCardapio/{id}")]
@@ -43,12 +45,12 @@ namespace ms_crud_rest.Controllers
             }
         }
 
-        [Route("api/MenuCardapio/Cadastrar/{urlLoja}")]
-        public HttpResponseMessage Post([FromUri] string urlLoja, [FromBody] MenuCardapio cardapio)
+        [Route("api/MenuCardapio/Cadastrar/{idLoja}")]
+        public HttpResponseMessage Post([FromUri] int idLoja, [FromBody] MenuCardapio cardapio)
         {
             try
             {
-                cardapioDAO.AdicionarCardapio(urlLoja, cardapio);
+                cardapioDAO.AdicionarCardapio(idLoja, cardapio);
 
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created);
 

@@ -7,6 +7,7 @@ namespace ClassesMarmitex
     public class DadosProdutoAdicional
     {
         public int Id { get; set; }
+        public int IdLoja { get; set; }
         public string Nome { get; set; }
         public string Descricao { get; set; }
         public List<DadosProdutoAdicionalItem> ItensAdicionais { get; set; }
@@ -19,6 +20,9 @@ namespace ClassesMarmitex
         [Column("id_produto_adicional")]
         public int Id { get; set; }
 
+        [Column("id_loja")]
+        public int IdLoja { get; set; }
+
         [Column("nm_adicional")]
         public string Nome { get; set; }
 
@@ -30,7 +34,7 @@ namespace ClassesMarmitex
 
         public DadosProdutoAdicional ToProdutoAdicional()
         {
-            return new DadosProdutoAdicional { Id = this.Id, Nome = this.Nome, Descricao = this.Descricao, Ativo = this.Ativo };
+            return new DadosProdutoAdicional { Id = this.Id, IdLoja = this.IdLoja, Nome = this.Nome, Descricao = this.Descricao, Ativo = this.Ativo };
         }
     }
 
@@ -76,6 +80,7 @@ namespace ClassesMarmitex
     {
         public int Id { get; set; }
         public int IdProduto { get; set; }
+        public string NomeProduto { get; set; }
         public int IdProdutoAdicional { get; set; }
         public string NomeProdutoAdicional { get; set; }
         public string DescricaoProdutoAdicional { get; set; }
@@ -92,6 +97,10 @@ namespace ClassesMarmitex
 
         [Column("id_produto")]
         public int IdProduto { get; set; }
+
+        //o campo NomeProduto é lido da tabela tab_produto
+        [Column("nm_produto")]
+        public string NomeProduto { get; set; }
 
         [Column("id_produto_adicional")]
         public int IdProdutoAdicional { get; set; }
@@ -116,9 +125,9 @@ namespace ClassesMarmitex
 
         public DadosProdutoAdicionalProduto ToProdutoAdicionalProduto()
         {
-            return new DadosProdutoAdicionalProduto { Id = this.Id, IdProduto = this.IdProduto, IdProdutoAdicional = this.IdProdutoAdicional,
-                NomeProdutoAdicional = this.NomeProdutoAdicional, DescricaoProdutoAdicional = this.DescricaoProdutoAdicional,
-                QtdMin = this.QtdMin, QtdMax = this.QtdMax, OrdemExibicao = this.OrdemExibicao};
+            return new DadosProdutoAdicionalProduto { Id = this.Id, IdProduto = this.IdProduto, NomeProduto = this.NomeProduto,
+                IdProdutoAdicional = this.IdProdutoAdicional, NomeProdutoAdicional = this.NomeProdutoAdicional,
+                DescricaoProdutoAdicional = this.DescricaoProdutoAdicional, QtdMin = this.QtdMin, QtdMax = this.QtdMax, OrdemExibicao = this.OrdemExibicao};
         }
     }
 
