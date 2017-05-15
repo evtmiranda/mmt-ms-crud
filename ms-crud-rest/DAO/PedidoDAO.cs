@@ -548,11 +548,12 @@ namespace ms_crud_rest.DAO
 
                         sqlConn.Command.CommandText = @"SELECT
                                                             tpa.id_produto_adicional,
+                                                            tpa.id_loja,
                                                             tpa.nm_adicional,
                                                             tpa.nm_descricao,
-                                                            tpa.nr_qtd_min,
-                                                            tpa.nr_qtd_max,
-                                                            tpa.nr_ordem_exibicao,
+                                                            tpap.nr_qtd_min,
+                                                            tpap.nr_qtd_max,
+                                                            tpap.nr_ordem_exibicao,
                                                             tpa.bol_ativo
                                                         FROM tab_produto_adicional AS tpa
                                                         INNER JOIN tab_produto_adicional_produto AS tpap

@@ -122,17 +122,17 @@ namespace ms_crud_rest.DAO
                 sqlConn.StartConnection();
 
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
-                sqlConn.Command.CommandText = string.Format(@"SELECT
-	                                                            COUNT(1) 
-                                                            FROM tab_usuario_parceiro AS tup
-                                                            INNER JOIN tab_parceiro AS tp
-                                                                ON tup.id_parceiro = tp.id_parceiro
-                                                            INNER JOIN tab_loja AS tl
-                                                                ON tl.id_loja = tp.id_loja
-                                                            WHERE tup.nm_email = @email 
-                                                            AND tup.nm_senha = @senha 
-                                                            AND tl.nm_dominio_loja = @nm_dominio_loja
-                                                            AND tup.bol_ativo = 1");
+                    sqlConn.Command.CommandText = string.Format(@"SELECT
+	                                                                COUNT(1) 
+                                                                FROM tab_usuario_parceiro AS tup
+                                                                INNER JOIN tab_parceiro AS tp
+                                                                    ON tup.id_parceiro = tp.id_parceiro
+                                                                INNER JOIN tab_loja AS tl
+                                                                    ON tl.id_loja = tp.id_loja
+                                                                WHERE tup.nm_email = @email 
+                                                                AND tup.nm_senha = @senha 
+                                                                AND tl.nm_dominio_loja = @nm_dominio_loja
+                                                                AND tup.bol_ativo = 1");
 
                 sqlConn.Command.Parameters.AddWithValue("@email", usuario.Email);
                 sqlConn.Command.Parameters.AddWithValue("@senha", usuario.Senha);

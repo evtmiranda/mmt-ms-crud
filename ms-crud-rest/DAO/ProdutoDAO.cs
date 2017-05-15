@@ -79,7 +79,9 @@ namespace ms_crud_rest.DAO
                                                             ON tpap.id_produto_adicional = tpa.id_produto_adicional
                                                             INNER JOIN tab_produto AS tp
                                                             ON tp.id_produto = tpap.id_produto
-                                                            WHERE tpa.bol_ativo = 1
+                                                            WHERE tpap.bol_ativo = 1
+                                                            AND tpa.bol_ativo = 1
+                                                            AND tp.bol_ativo = 1
                                                             AND tp.id_produto = @id_produto;");
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
@@ -108,7 +110,8 @@ namespace ms_crud_rest.DAO
 	                                                nm_descricao_item,
 	                                                vlr_adicional_item,
 	                                                bol_ativo
-                                                FROM tab_produto_adicional_item;";
+                                                FROM tab_produto_adicional_item
+                                                WHERE bol_ativo = 1;";
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
@@ -145,7 +148,9 @@ namespace ms_crud_rest.DAO
                                                 ON tpap.id_produto_adicional = tpa.id_produto_adicional
                                                 INNER JOIN tab_produto AS tp
                                                 ON tp.id_produto = tpap.id_produto
-                                                WHERE tpap.bol_ativo = 1;";
+                                                WHERE tpap.bol_ativo = 1
+                                                AND tpa.bol_ativo = 1
+                                                AND tp.bol_ativo = 1;";
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
@@ -274,7 +279,9 @@ namespace ms_crud_rest.DAO
                                                             ON tpap.id_produto_adicional = tpa.id_produto_adicional
                                                             INNER JOIN tab_produto AS tp
                                                             ON tp.id_produto = tpap.id_produto
-                                                            WHERE tpa.bol_ativo = 1
+                                                            WHERE tpap.bol_ativo = 1
+                                                            AND tpa.bol_ativo = 1
+                                                            AND tp.bol_ativo = 1
                                                             AND tp.id_menu_cardapio = @id_menu_cardapio;");
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
@@ -303,7 +310,8 @@ namespace ms_crud_rest.DAO
 	                                                nm_descricao_item,
 	                                                vlr_adicional_item,
 	                                                bol_ativo
-                                                FROM tab_produto_adicional_item;";
+                                                FROM tab_produto_adicional_item
+                                                WHERE bol_ativo = 1;";
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
@@ -325,22 +333,24 @@ namespace ms_crud_rest.DAO
                 #region Relação de adicionais para um produto
                 //monta a relação de adicionais por produto
                 sqlConn.Command.CommandText = @"SELECT
-	                                            id_produto_adicional_produto,
-	                                            tpap.id_produto,
-                                                tp.nm_produto,
-	                                            tpap.id_produto_adicional,
-	                                            tpa.nm_adicional,
-	                                            tpa.nm_descricao,
-	                                            nr_qtd_min,
-	                                            nr_qtd_max,
-	                                            nr_ordem_exibicao,
-                                                tpap.bol_ativo
-                                            FROM tab_produto_adicional_produto AS tpap
-                                            INNER JOIN tab_produto_adicional AS tpa
-                                            ON tpap.id_produto_adicional = tpa.id_produto_adicional
-                                            INNER JOIN tab_produto AS tp
-                                            ON tp.id_produto = tpap.id_produto
-                                            WHERE tpap.bol_ativo = 1;";
+	                                                id_produto_adicional_produto,
+                                                    tpap.id_produto,
+                                                    tp.nm_produto,
+                                                    tpap.id_produto_adicional,
+                                                    tpa.nm_adicional,
+                                                    tpa.nm_descricao,
+                                                    nr_qtd_min,
+                                                    nr_qtd_max,
+                                                    nr_ordem_exibicao,
+                                                    tpap.bol_ativo
+                                                FROM tab_produto_adicional_produto AS tpap
+                                                INNER JOIN tab_produto_adicional AS tpa
+                                                ON tpap.id_produto_adicional = tpa.id_produto_adicional
+                                                INNER JOIN tab_produto AS tp
+                                                ON tp.id_produto = tpap.id_produto
+                                                WHERE tp.bol_ativo = 1
+                                                AND tpa.bol_ativo = 1
+                                                AND tpap.bol_ativo = 1;";
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
@@ -587,7 +597,9 @@ namespace ms_crud_rest.DAO
                                                             INNER JOIN tab_produto AS tp
                                                             ON tp.id_produto = tpap.id_produto
                                                             WHERE tpap.id_produto = @id_produto
-                                                            AND tpap.bol_ativo = 1;");
+                                                            AND tpap.bol_ativo = 1
+                                                            AND tpa.bol_ativo = 1
+                                                            AND tp.bol_ativo = 1;");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_produto", idProduto);
@@ -653,7 +665,9 @@ namespace ms_crud_rest.DAO
                                                             INNER JOIN tab_produto AS tp
                                                             ON tp.id_produto = tpap.id_produto
                                                             WHERE tpap.id_produto_adicional_produto = @id_produto_adicional_produto
-                                                            AND tpap.bol_ativo = 1;");
+                                                            AND tpap.bol_ativo = 1
+                                                            AND tpa.bol_ativo = 1
+                                                            AND tp.bol_ativo = 1;");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_produto_adicional_produto", idProdutoAdicionalProduto);
