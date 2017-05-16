@@ -24,6 +24,30 @@ namespace ms_crud_rest.Controllers
         }
 
         /// <summary>
+        /// Busca um produto adicional por id
+        /// </summary>
+        /// <param name="id">id do produto adicional</param>
+        /// <returns></returns>
+        [Route("api/ProdutoAdicional/{id}")]
+        public HttpResponseMessage Get(int id)
+        {
+            try
+            {
+                DadosProdutoAdicional produtoAdicional = produtoAdicionalDAO.BuscarPorId(id);
+                if (produtoAdicional == null)
+                    throw new KeyNotFoundException();
+
+                return Request.CreateResponse(HttpStatusCode.OK, produtoAdicional);
+            }
+            catch (KeyNotFoundException)
+            {
+                string mensagem = string.Format("O produto adicional {0} não foi encontrado", id);
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+            }
+        }
+
+        /// <summary>
         /// Retorna todos os produtos adicionais de uma determinada loja
         /// </summary>
         /// <param name="idLoja">Id da loja ao qual os produtos pertencem</param>
@@ -65,5 +89,134 @@ namespace ms_crud_rest.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
+
+        /// <summary>
+        /// Inativa um produto adicional
+        /// </summary>
+        /// <param name="produtoAdicional">produto adicional que será atualizado</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/ProdutoAdicional/Excluir")]
+        public HttpResponseMessage Excluir([FromBody] DadosProdutoAdicional produtoAdicional)
+        {
+            try
+            {
+                produtoAdicionalDAO.Excluir(produtoAdicional);
+
+                return Request.CreateResponse(HttpStatusCode.OK, produtoAdicional);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível excluir o produto adicional. Por favor, tente novamente ou entre em contato com o administrador do sistema";
+                HttpError error = new HttpError(mensagem);
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        /// <summary>
+        /// Atualiza os dados de um produto adicional
+        /// </summary>
+        /// <param name="produtoAdicional">produto adicional que será atualizado</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/ProdutoAdicional/Atualizar")]
+        public HttpResponseMessage AtualizarProduto([FromBody] DadosProdutoAdicional produtoAdicional)
+        {
+            try
+            {
+                produtoAdicionalDAO.Atualizar(produtoAdicional);
+
+                return Request.CreateResponse(HttpStatusCode.OK, produtoAdicional);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível atualizar o produto adicional. Por favor, tente novamente ou entre em contato com o administrador do sistema";
+                HttpError error = new HttpError(mensagem);
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        #region item produto adicional
+
+        [Route("api/ProdutoAdicional/AdicionarItem")]
+        public HttpResponseMessage AdicionarItem([FromBody] DadosProdutoAdicionalItem item)
+        {
+            try
+            {
+                produtoAdicionalDAO.AdicionarItem(item);
+
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                string mensagem = string.Format("nao foi possivel cadastrar o item. erro: {0}", ex);
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/ProdutoAdicional/ExcluirItem")]
+        public HttpResponseMessage ExcluirItem([FromBody] DadosProdutoAdicionalItem item)
+        {
+            try
+            {
+                produtoAdicionalDAO.ExcluirItem(item);
+
+                return Request.CreateResponse(HttpStatusCode.OK, item);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível excluir o item. Por favor, tente novamente ou entre em contato com o administrador do sistema";
+                HttpError error = new HttpError(mensagem);
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/ProdutoAdicional/Item/{id}")]
+        public HttpResponseMessage BuscarItem(int id)
+        {
+            try
+            {
+                DadosProdutoAdicionalItem item = produtoAdicionalDAO.BuscarItemPorId(id);
+                if (item == null)
+                    throw new KeyNotFoundException();
+
+                return Request.CreateResponse(HttpStatusCode.OK, item);
+            }
+            catch (KeyNotFoundException)
+            {
+                string mensagem = string.Format("O item {0} não foi encontrado", id);
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/ProdutoAdicional/AtualizarItem")]
+        public HttpResponseMessage AtualizarItem([FromBody] DadosProdutoAdicionalItem item)
+        {
+            try
+            {
+                produtoAdicionalDAO.AtualizarItem(item);
+
+                return Request.CreateResponse(HttpStatusCode.OK, item);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível atualizar o item. Por favor, tente novamente ou entre em contato com o administrador do sistema";
+                HttpError error = new HttpError(mensagem);
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        #endregion
     }
 }
