@@ -1,7 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClassesMarmitex
 {
+
+    public class DadosHorarioEntrega
+    {
+        public List<HorarioEntrega> HorariosEntrega { get; set; }
+        public TempoAntecedenciaEntrega TempoAntecedenciaEntrega { get; set; }
+    }
+
     public class HorarioEntrega
     {
         public int Id { get; set; }
@@ -54,6 +62,11 @@ namespace ClassesMarmitex
 
         [Column("bol_ativo")]
         public bool Ativo { get; set; }
+
+        public TempoAntecedenciaEntrega ToTempoAntecedenciaEntrega()
+        {
+            return new TempoAntecedenciaEntrega { Id = this.Id, IdLoja = this.IdLoja, MinutosAntecedencia = this.MinutosAntecedencia, Ativo = this.Ativo };
+        }
     }
 
 }
