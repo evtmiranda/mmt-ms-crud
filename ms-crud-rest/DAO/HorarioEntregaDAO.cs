@@ -10,7 +10,7 @@ namespace ms_crud_rest.DAO
     {
         public HorarioEntregaDAO(SqlServer sqlConn, LogDAO logDAO) : base(sqlConn, logDAO) { }
 
-        public override HorarioEntrega BuscarPorId(int id)
+        public override HorarioEntrega BuscarPorId(int id, int idLoja)
         {
             HorarioEntrega horarioEntrega;
             List<HorarioEntregaEntidade> listahorarioEntregaEntidade;
@@ -40,14 +40,16 @@ namespace ms_crud_rest.DAO
 
                 horarioEntrega = listahorarioEntregaEntidade[0].ToHorarioEntrega();
 
-                //fecha o reader
-                sqlConn.Reader.Close();
-
                 return horarioEntrega;
+            }
+            catch (KeyNotFoundException keyEx)
+            {
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Horario de entrega nao encontrado com id " + id, Descricao = keyEx.Message ?? "", StackTrace = keyEx.StackTrace ?? "" });
+                throw keyEx;
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao buscar o horário de entrega", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao buscar o horario de entrega com id " + id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -79,7 +81,8 @@ namespace ms_crud_rest.DAO
 	                                                            bol_ativo
                                                             FROM tab_horario_entrega
                                                             WHERE id_loja = @id_loja
-                                                            AND bol_ativo = 1;");
+                                                            AND bol_ativo = 1
+                                                            ORDER BY nm_horario;");
 
                 sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
 
@@ -91,9 +94,9 @@ namespace ms_crud_rest.DAO
                 foreach (var horario in listaHorariosEntidade)
                     listaHorarios.Add(horario.ToHorarioEntrega());
 
-                //verifica se o retorno foi positivo
+                //verifica se existem horários de entrega
                 if (listaHorarios.Count == 0)
-                    throw new HorarioNaoEncontradoException();
+                    throw new KeyNotFoundException("Não foram encontrados horários de entrega");
 
                 //fecha o reader
                 sqlConn.Reader.Close();
@@ -117,7 +120,7 @@ namespace ms_crud_rest.DAO
                 listaTempoAntecedenciaEntidade = new ModuloClasse().PreencheClassePorDataReader<TempoAntecedenciaEntregaEntidade>(sqlConn.Reader);
 
                 if (listaTempoAntecedenciaEntidade.Count == 0)
-                    throw new Exception("Não foi possível consultar o tempo de mínimo de antecedência de pedidos");
+                    throw new KeyNotFoundException("Não foi encontrado o tempo mínimo de antecedência ao pedido");
 
                 tempoAntecedencia = listaTempoAntecedenciaEntidade.FirstOrDefault().ToTempoAntecedenciaEntrega();
 
@@ -136,14 +139,14 @@ namespace ms_crud_rest.DAO
 
                 return dadosHorarioEntrega;
             }
-            catch (HorarioNaoEncontradoException)
+            catch (KeyNotFoundException keyEx)
             {
-                throw;
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Não foram encontrados horários de entrega ou o tempo mínimo de antecedência ao pedido.", Descricao = keyEx.Message ?? "", StackTrace = keyEx.StackTrace ?? "" });
+                throw keyEx;
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "erro ao buscar os horários de entrega", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao buscar os horários de entrega.", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -170,7 +173,7 @@ namespace ms_crud_rest.DAO
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao cadastrar o horário de entrega", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+                logDAO.Adicionar(new Log { IdLoja = horarioEntrega.IdLoja, Mensagem = "Erro ao cadastrar o horário de entrega", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -200,8 +203,7 @@ namespace ms_crud_rest.DAO
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao atualizar o horário de entrega", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-
+                logDAO.Adicionar(new Log { IdLoja = horarioEntrega.IdLoja, Mensagem = "Erro ao atualizar o horário de entrega", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -230,8 +232,7 @@ namespace ms_crud_rest.DAO
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao atualizar o horário de entrega", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-
+                logDAO.Adicionar(new Log { IdLoja = horarioEntrega.IdLoja, Mensagem = "Erro ao excluir o horário de entrega", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -242,7 +243,7 @@ namespace ms_crud_rest.DAO
 
         #region tempo antecedencia
 
-        public TempoAntecedenciaEntrega BuscarTempoAntecedencia(int id)
+        public TempoAntecedenciaEntrega BuscarTempoAntecedencia(int id, int idLoja)
         {
             TempoAntecedenciaEntrega tempoAntecedenciaEntrega;
             List<TempoAntecedenciaEntregaEntidade> listaTempoAntecedenciaEntregaEntidade;
@@ -272,14 +273,16 @@ namespace ms_crud_rest.DAO
 
                 tempoAntecedenciaEntrega = listaTempoAntecedenciaEntregaEntidade[0].ToTempoAntecedenciaEntrega();
 
-                //fecha o reader
-                sqlConn.Reader.Close();
-
                 return tempoAntecedenciaEntrega;
+            }
+            catch (KeyNotFoundException keyEx)
+            {
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Tempo de antecedência nao encontrado com id " + id, Descricao = keyEx.Message ?? "", StackTrace = keyEx.StackTrace ?? "" });
+                throw keyEx;
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao buscar o tempo de antecedência", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao buscar o tempo de antecedência com id " + id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -310,8 +313,7 @@ namespace ms_crud_rest.DAO
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao atualizar o tempo de antecedência", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-
+                logDAO.Adicionar(new Log { IdLoja = tempoAntecedenciaEntrega.IdLoja, Mensagem = "Erro ao atualizar o tempo de antecedência", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally

@@ -1,6 +1,5 @@
 ﻿using ClassesMarmitex;
 using ms_crud_rest.DAO;
-using ms_crud_rest.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -23,11 +22,6 @@ namespace ms_crud_rest.Controllers
             this.pagamentoDAO = pagamentoDAO;
         }
 
-        /// <summary>
-        /// Faz o cadastro de um pedido
-        /// </summary>
-        /// <param name="pedido">objeto com todos os dados do pedido</param>
-        /// <returns></returns>
         [HttpPost]
         [Route("api/Pedido/Cadastrar")]
         public HttpResponseMessage CadastrarPedido([FromBody] Pedido pedido)
@@ -40,7 +34,7 @@ namespace ms_crud_rest.Controllers
                     if (pedido.ListaFormaPagamento[i].Nome == null)
                         continue;
 
-                    pedido.ListaFormaPagamento[i] = pagamentoDAO.BuscarPorNome(pedido.ListaFormaPagamento[i].Nome, pedido.Cliente.IdParceiro);
+                    pedido.ListaFormaPagamento[i] = pagamentoDAO.BuscarPorId(pedido.ListaFormaPagamento[i].Id, pedido.Cliente.IdParceiro);
                 }
 
                 //remove as formas de pagamento com id = 0
@@ -57,19 +51,9 @@ namespace ms_crud_rest.Controllers
 
                 return response;
             }
-            catch (PedidoNaoCadastradoClienteException pncEx)
+            catch (Exception)
             {
-                //string mensagem = pncEx.Message;
-                //HttpError error = new HttpError(mensagem);
-                //return Request.CreateResponse(HttpStatusCode.NotModified, error);
-
-                string mensagem = string.Format("nao foi possivel cadastrar o pedido. erro: {0}", pncEx);
-                HttpError error = new HttpError(mensagem);
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
-            }
-            catch (Exception ex)
-            {
-                string mensagem = string.Format("nao foi possivel cadastrar o pedido. erro: {0}", ex);
+                string mensagem = string.Format("Não foi possivel cadastrar o pedido. Por favor, tente novamente ou entre em contato com nosso suporte.");
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
@@ -80,34 +64,29 @@ namespace ms_crud_rest.Controllers
         /// </summary>
         /// <param name="idLoja">Id da loja</param>
         /// <param name="ehDoDia">Diz se quer buscar os pedidos do dia</param>
-        /// <param name="ehPedidoFila">Diz se quer buscar os pedidos que estão na fila de entrega</param>
-        /// <param name="ehPedidoAndamento">Diz se quer buscar os pedidos que estão em andamento</param>
-        /// <param name="ehPedidoEntregue">Diz se quer buscar os pedidos que já foram entregues</param>
-        /// <returns></returns>
+        /// <param name="estadoPedido">Estado do pedido que deseja buscar. Na fila, em andamento ou entregue</param>
         [HttpGet]
-        [Route("api/Pedido/BuscarPedidos/{idLoja}/{ehDoDia}/{ehPedidoFila}/{ehPedidoAndamento}/{ehPedidoEntregue}")]
-        public HttpResponseMessage BuscarPedidos(int idLoja, bool ehDoDia, bool ehPedidoFila = false, bool ehPedidoAndamento = false, bool ehPedidoEntregue = false)
+        [Route("api/Pedido/BuscarPedidos/{idLoja}/{ehDoDia}")]
+        public HttpResponseMessage BuscarPedidos(int idLoja, bool ehDoDia, EstadoPedido estadoPedido)
         {
             List<Pedido> listaPedidosCliente = new List<Pedido>();
 
             try
             {
                 //busca os pedidos
-                listaPedidosCliente = pedidoDAO.ConsultarPedidosLoja(idLoja, ehDoDia, ehPedidoFila, ehPedidoAndamento, ehPedidoEntregue);
+                listaPedidosCliente = pedidoDAO.ConsultarPedidosLoja(idLoja, ehDoDia, estadoPedido);
 
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, listaPedidosCliente);
 
                 return response;
             }
-            catch (LojaNaoPossuiPedidosException)
+            catch (KeyNotFoundException)
             {
-                //string mensagem = cnpEx.Message;
-                //HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.NoContent);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string mensagem = string.Format("nao foi possivel consultar os pedidos. erro: {0}", ex);
+                string mensagem = "Não foi possível buscar os pedidos. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
@@ -119,41 +98,36 @@ namespace ms_crud_rest.Controllers
         /// <param name="idUsuarioParceiro">id do cliente para consultar os pedidos</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("api/Pedido/BuscarHistorico/{idUsuarioParceiro}")]
-        public HttpResponseMessage BuscarHistoricoPedidos(int idUsuarioParceiro)
+        [Route("api/Pedido/BuscarHistorico/{idUsuarioParceiro}/{idLoja}")]
+        public HttpResponseMessage BuscarHistoricoPedidos(int idUsuarioParceiro, int idLoja)
         {
             List<Pedido> listaPedidosCliente = new List<Pedido>();
             
             try
             {
-                //busca os pedidos
-                listaPedidosCliente = pedidoDAO.ConsultarPedidosCliente(idUsuarioParceiro);
-
-                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, listaPedidosCliente);
-
-                return response;
+                listaPedidosCliente = pedidoDAO.ConsultarPedidosCliente(idUsuarioParceiro, idLoja);
+                return Request.CreateResponse(HttpStatusCode.OK, listaPedidosCliente);
             }
-            catch (ClienteNuncaFezPedidosException)
+            catch (KeyNotFoundException)
             {
-                //string mensagem = cnpEx.Message;
-                //HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.NoContent);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string mensagem = string.Format("nao foi possivel consultar os pedidos. erro: {0}", ex);
+                string mensagem = "Não foi possível buscar o histórico de pedidos. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
 
-        [Route("api/Pedido/AtualizarStatusPedido")]
-        public HttpResponseMessage AtualizarStatusPedido([FromBody] DadosAtualizarStatusPedido dadosPedido)
+        [Route("api/Pedido/AtualizarStatusPedido/{idLoja}")]
+        public HttpResponseMessage AtualizarStatusPedido([FromBody] DadosAtualizarStatusPedido dadosPedido, int idLoja)
         {
             Pedido pedido = new Pedido();
+
             try
             {
-                Pedido pedidoAtual = pedidoDAO.BuscarPorId(dadosPedido.IdPedido);
+                Pedido pedidoAtual = pedidoDAO.BuscarPorId(dadosPedido.IdPedido, idLoja);
 
                 pedidoAtual.PedidoStatus = new PedidoStatus()
                 {
@@ -164,13 +138,9 @@ namespace ms_crud_rest.Controllers
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
-            catch(PedidoNaoEncontradoException)
-            {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
-            }
             catch (Exception ex)
             {
-                string mensagem = string.Format("nao foi possivel atualizar o pedido. erro: {0}", ex);
+                string mensagem = "Não foi possível atualizar o pedido. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }

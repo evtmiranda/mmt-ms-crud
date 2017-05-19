@@ -215,7 +215,9 @@
     <Compile Include="DAO\ProdutoAdicionalDAO.cs" />
     <Compile Include="DAO\ProdutoDAO.cs" />
     <Compile Include="DAO\UsuarioDAO.cs" />
-    <Compile Include="Exceptions\ApiException.cs" />
+    <Compile Include="Exceptions\EnderecoNaoCadastradoException.cs" />
+    <Compile Include="Exceptions\PedidoNaoCadastradoClienteException.cs" />
+    <Compile Include="Exceptions\UsuarioNaoAutenticadoException.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

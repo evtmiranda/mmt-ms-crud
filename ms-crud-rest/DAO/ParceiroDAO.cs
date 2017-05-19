@@ -1,5 +1,4 @@
 ﻿using ClassesMarmitex;
-using ms_crud_rest.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,17 +8,13 @@ namespace ms_crud_rest.DAO
     public class ParceiroDAO : GenericDAO<Parceiro>
     {
         LojaDAO lojaDAO;
+
         public ParceiroDAO(SqlServer sqlConn, LogDAO logDAO, LojaDAO lojaDAO) : base(sqlConn, logDAO)
         {
             this.lojaDAO = lojaDAO;
         }
 
-        /// <summary>
-        /// Faz a busca de um parceiro pelo id parceiro
-        /// </summary>
-        /// <param name="idParceiro">id do parceiro</param>
-        /// <returns></returns>
-        public Parceiro BuscarParceiro(int idParceiro)
+        public Parceiro BuscarParceiro(int idParceiro, int idLoja)
         {
             Parceiro parceiro;
             List<ParceiroEntidade> listaParceirosEntidade;
@@ -47,7 +42,7 @@ namespace ms_crud_rest.DAO
                 listaParceirosEntidade = new ModuloClasse().PreencheClassePorDataReader<ParceiroEntidade>(sqlConn.Reader);
 
                 if (listaParceirosEntidade.Count == 0)
-                    throw new ParceiroNaoEncontradoException();
+                    throw new KeyNotFoundException("Parceiro não encontrado com o id: " + idParceiro);
 
                 parceiro = listaParceirosEntidade[0].ToParceiro();
 
@@ -79,7 +74,7 @@ namespace ms_crud_rest.DAO
                 endEntidade = new ModuloClasse().PreencheClassePorDataReader<EnderecoEntidade>(sqlConn.Reader);
 
                 if (endEntidade.Count == 0)
-                    throw new Exception("Não foi possível consultar o endereço do parceiro: " + parceiro.Nome);
+                    throw new KeyNotFoundException("Endereço não encontrado com o id: " + parceiro.Endereco.Id);
 
                 endereco = endEntidade.FirstOrDefault().ToEndereco();
 
@@ -89,9 +84,14 @@ namespace ms_crud_rest.DAO
 
                 return parceiro;
             }
+            catch (KeyNotFoundException keyEx)
+            {
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Parceiro ou endereço do parceiro não encontrado. id parceiro: " + idParceiro, Descricao = keyEx.Message ?? "", StackTrace = keyEx.StackTrace ?? "" });
+                throw keyEx;
+            }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao buscar os dados do parceiro", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao buscar o parceiro com id: " + idParceiro, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -101,62 +101,6 @@ namespace ms_crud_rest.DAO
             }
         }
 
-        /// <summary>
-        /// Faz a busca de um parceiro pelo nome
-        /// </summary>
-        /// <param name="idParceiro">id do parceiro</param>
-        /// <returns></returns>
-        public Parceiro BuscarParceiro(string nomeParceiro)
-        {
-            Parceiro parceiro = new Parceiro();
-            List<ParceiroEntidade> listaParceirosEntidade;
-
-            try
-            {
-                sqlConn.StartConnection();
-
-                sqlConn.Command.CommandType = System.Data.CommandType.Text;
-                sqlConn.Command.CommandText = string.Format(@"SELECT
-	                                                            id_parceiro,
-	                                                            id_loja,
-	                                                            nm_parceiro,
-	                                                            nm_descricao,
-	                                                            id_endereco,
-	                                                            nm_codigo,
-	                                                            bol_ativo
-                                                            FROM tab_parceiro
-                                                            WHERE nm_parceiro = @nm_parceiro;");
-
-                sqlConn.Command.Parameters.AddWithValue("@nm_parceiro", nomeParceiro);
-
-                sqlConn.Reader = sqlConn.Command.ExecuteReader();
-
-                listaParceirosEntidade = new ModuloClasse().PreencheClassePorDataReader<ParceiroEntidade>(sqlConn.Reader);
-
-                if (listaParceirosEntidade != null && listaParceirosEntidade.Count > 0)
-                    parceiro = listaParceirosEntidade[0].ToParceiro();
-
-
-
-                return parceiro;
-            }
-            catch (Exception ex)
-            {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao buscar os dados do parceiro", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-                throw ex;
-            }
-            finally
-            {
-                sqlConn.CloseConnection();
-                sqlConn.Reader.Close();
-            }
-        }
-
-        /// <summary>
-        /// Faz a busca dos parceiros de uma determinada loja
-        /// </summary>
-        /// <param name="idLoja">id do parceiro</param>
-        /// <returns></returns>
         public List<Parceiro> BuscarParceiroPorLoja(int idLoja)
         {
             List<Parceiro> listaParceiros = new List<Parceiro>();
@@ -176,7 +120,8 @@ namespace ms_crud_rest.DAO
 	                                                            nm_codigo,
 	                                                            bol_ativo
                                                             FROM tab_parceiro
-                                                            WHERE id_loja = @id_loja;");
+                                                            WHERE id_loja = @id_loja
+                                                            AND bol_ativo = 1;");
 
                 sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
 
@@ -186,11 +131,10 @@ namespace ms_crud_rest.DAO
                 sqlConn.Reader.Close();
 
                 if (listaParceirosEntidade.Count == 0)
-                    throw new LojaNaoPossuiParceirosException();
+                    throw new KeyNotFoundException();
 
                 foreach (var parceiro in listaParceirosEntidade)
                 {
-
                     try
                     {
                         #region busca o endereco
@@ -218,7 +162,7 @@ namespace ms_crud_rest.DAO
                         endEntidade = new ModuloClasse().PreencheClassePorDataReader<EnderecoEntidade>(sqlConn.Reader);
 
                         if (endEntidade.Count == 0)
-                            throw new Exception("Não foi possível consultar o endereço do parceiro: " + parceiro.Nome);
+                            throw new KeyNotFoundException("Não foi possível consultar o endereço do parceiro: " + parceiro.Id);
 
                         endereco = endEntidade.FirstOrDefault().ToEndereco();
 
@@ -239,9 +183,14 @@ namespace ms_crud_rest.DAO
 
                 return listaParceiros;
             }
+            catch (KeyNotFoundException keyEx)
+            {
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Parceiros ou endereço de algum parceiro não encontrado para a loja: " + idLoja, Descricao = keyEx.Message ?? "", StackTrace = keyEx.StackTrace ?? "" });
+                throw keyEx;
+            }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao buscar os parceiros", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao buscar parceiros para a loja: " + idLoja, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -251,16 +200,10 @@ namespace ms_crud_rest.DAO
             }
         }
 
-        /// <summary>
-        /// Faz o cadastro de um parceiro
-        /// </summary>
-        /// <param name="parceiro">dados do parceiro</param>
-        /// <returns></returns>
         public void AdicionarParceiro(int idLoja, Parceiro parceiro)
         {
             try
             {
-
                 int idEndereco = 0;
 
                 sqlConn.StartConnection();
@@ -284,7 +227,7 @@ namespace ms_crud_rest.DAO
                 idEndereco = Convert.ToInt32(sqlConn.Command.ExecuteScalar());
 
                 if (idEndereco == 0)
-                    throw new Exception("Não foi cadastrar o endereço");
+                    throw new Exceptions.EnderecoNaoCadastradoException("Não foi possível cadastrar o endereço para o parceiro: " + parceiro.Id);
 
                 #endregion
 
@@ -308,10 +251,14 @@ namespace ms_crud_rest.DAO
                 sqlConn.Commit();
 
             }
+            catch (Exceptions.EnderecoNaoCadastradoException endEx)
+            {
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = endEx.Message ?? "Não foi possível cadastrar o endereço para o parceiro.", Descricao = endEx.Message ?? "", StackTrace = endEx.StackTrace ?? "" });
+                throw endEx;
+            }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao cadastrar o parceiro", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-                sqlConn.Rollback();
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao cadastrar um parceiro para a loja: " + idLoja, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -321,12 +268,6 @@ namespace ms_crud_rest.DAO
             }
         }
 
-
-        /// <summary>
-        /// Atualiza os dados de um parceiro
-        /// </summary>
-        /// <param name="parceiro">parceiro que será atualizado</param>
-        /// <returns></returns>
         public override void Atualizar(Parceiro parceiro)
         {
             try
@@ -385,10 +326,8 @@ namespace ms_crud_rest.DAO
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao atualizar os dados do parceiro", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-
                 sqlConn.Rollback();
-
+                logDAO.Adicionar(new Log { IdLoja = parceiro.IdLoja, Mensagem = "Erro ao atualizar os dados do parceiro: " + parceiro.Id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -397,20 +336,12 @@ namespace ms_crud_rest.DAO
             }
         }
 
-        /// <summary>
-        /// Seta um parceiro como inativo
-        /// </summary>
-        /// <param name="parceiro">parceiro que será inativado</param>
-        /// <returns></returns>
         public override void Excluir(Parceiro parceiro)
         {
             try
             {
                 sqlConn.StartConnection();
-
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
-
-                #region atualiza os dados do parceiro
 
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", parceiro.Ativo);
                 sqlConn.Command.Parameters.AddWithValue("@id_parceiro", parceiro.Id);
@@ -420,14 +351,10 @@ namespace ms_crud_rest.DAO
                                                             WHERE id_parceiro = @id_parceiro;");
 
                 sqlConn.Command.ExecuteNonQuery();
-
-                #endregion
-
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao atualizar os dados do parceiro", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-
+                logDAO.Adicionar(new Log { IdLoja = parceiro.IdLoja, Mensagem = "Erro ao excluir o parceiro: " + parceiro.Id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally

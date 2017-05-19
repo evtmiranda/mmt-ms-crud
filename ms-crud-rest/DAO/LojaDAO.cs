@@ -1,10 +1,6 @@
 ﻿using ClassesMarmitex;
-using ms_crud_rest.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Web;
 using System.Web.Http;
 
 namespace ms_crud_rest.DAO
@@ -13,16 +9,12 @@ namespace ms_crud_rest.DAO
     {
         public LojaDAO(SqlServer sqlConn, LogDAO logDAO) : base(sqlConn, logDAO) { }
 
-        /// <summary>
-        /// Busca uma loja pelo dominio de url
-        /// </summary>
-        /// <returns></returns>
-        [Authorize]
         [HttpGet]
         public Loja BuscarLoja(string dominio)
         {
             List<LojaEntidade> listaLojaEntidade = new List<LojaEntidade>();
             Loja loja = new Loja();
+
             try
             {
                 sqlConn.StartConnection();
@@ -46,34 +38,30 @@ namespace ms_crud_rest.DAO
 
                 listaLojaEntidade = new ModuloClasse().PreencheClassePorDataReader<LojaEntidade>(sqlConn.Reader);
 
-                //verifica se o retorno foi positivo
+                //verifica se alguma loja foi encontrada
                 if (listaLojaEntidade.Count == 0)
-                    throw new LojaNaoEncontradaException();
+                    throw new KeyNotFoundException();
 
                 loja = listaLojaEntidade[0].ToLoja();
 
-                //verifica se o retorno foi positivo
-                if (loja.Id == 0)
-                    throw new LojaNaoEncontradaException();
-
                 return loja;
             }
-            catch (LojaNaoEncontradaException)
+            catch (KeyNotFoundException keyEx)
             {
-                throw;
+                logDAO.Adicionar(new Log { IdLoja = 0, Mensagem = "Loja não encontrada com o dominio: " + dominio, Descricao = keyEx.Message ?? "", StackTrace = keyEx.StackTrace ?? "" });
+                throw keyEx;
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao buscar a loja", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+                logDAO.Adicionar(new Log { IdLoja = 0, Mensagem = "Erro ao buscar loja com o dominio: " + dominio, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
             {
                 sqlConn.CloseConnection();
-
-                if(sqlConn.Reader != null)
-                    sqlConn.Reader.Close();
+                sqlConn.Reader.Close();
             }
         }
+
     }
 }

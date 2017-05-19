@@ -1,6 +1,5 @@
 ﻿using ClassesMarmitex;
 using ms_crud_rest.DAO;
-using ms_crud_rest.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -33,40 +32,36 @@ namespace ms_crud_rest.Controllers
 
                 return response;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string mensagem = string.Format("nao foi possivel cadastrar a forma de pagamento. erro: {0}", ex);
+                string mensagem = "Não foi possível cadastrar a forma de pagamento. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
 
         [HttpGet]
-        [Route("api/FormaPagamento/{id}")]
-        public HttpResponseMessage Buscar(int id)
+        [Route("api/FormaPagamento/{id}/{idLoja}")]
+        public HttpResponseMessage Buscar(int id, int idLoja)
         {
             try
             {
                 FormaDePagamento pagamento = new FormaDePagamento();
 
-                pagamento = formaPagamentoDAO.BuscarPorId(id);
-
-                if (pagamento == null)
-                    throw new KeyNotFoundException();
+                pagamento = formaPagamentoDAO.BuscarPorId(id, idLoja);
 
                 return Request.CreateResponse(HttpStatusCode.OK, pagamento);
             }
             catch (KeyNotFoundException)
             {
-                return Request.CreateResponse(HttpStatusCode.NoContent);
-            }
-            catch (ParceiroNaoEncontradoException)
-            {
-                return Request.CreateResponse(HttpStatusCode.NoContent);
+                string mensagem = "Não foi possível consultar a forma de pagamento. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
             catch (Exception)
             {
-                string mensagem = "Não foi possível consultar a forma de pagamento. Por favor, tente novamente ou entre em contato com o administrador do sistema";
+                string mensagem = "Não foi possível consultar a forma de pagamento. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
 
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
@@ -82,15 +77,13 @@ namespace ms_crud_rest.Controllers
                 IList<FormaDePagamento> formasPagamento = formaPagamentoDAO.Listar(idLoja);
                 return Request.CreateResponse(HttpStatusCode.OK, formasPagamento);
             }
-            catch (PagamentoNaoEncontradoException pneEx)
+            catch (KeyNotFoundException)
             {
-                string mensagem = pneEx.Message;
-                HttpError error = new HttpError(mensagem);
-                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+                return Request.CreateResponse(HttpStatusCode.NoContent);
             }
             catch (Exception)
             {
-                string mensagem = string.Format("ocorreu um problema ao buscar as formas de pagamento. por favor, tente atualizar a página ou acessar dentro de alguns minutos...");
+                string mensagem = "Não foi possível consultar as formas de pagamento. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
@@ -109,7 +102,7 @@ namespace ms_crud_rest.Controllers
             }
             catch (Exception)
             {
-                string mensagem = "Não foi possível atualizar a forma de pagamento. Por favor, tente novamente ou entre em contato com o administrador do sistema";
+                string mensagem = "Não foi possível atualizar a forma de pagamento. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
 
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
@@ -129,7 +122,7 @@ namespace ms_crud_rest.Controllers
             }
             catch (Exception)
             {
-                string mensagem = "Não foi possível excluir a forma de pagamento. Por favor, tente novamente ou entre em contato com o administrador do sistema";
+                string mensagem = "Não foi possível excluir a forma de pagamento. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
 
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);

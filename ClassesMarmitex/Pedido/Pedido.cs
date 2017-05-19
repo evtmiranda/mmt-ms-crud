@@ -45,7 +45,7 @@
             Pedido pedido = new Pedido()
             {
                 Id = Id,
-                Cliente = new UsuarioParceiro { Id = IdCliente},
+                Cliente = new UsuarioParceiro { Id = IdCliente },
                 DataPedido = DataPedido,
                 DataEntrega = DataEntrega,
                 Troco = Troco.ToString(),
@@ -116,5 +116,12 @@
 
             return pedidoStatus;
         }
+    }
+
+    public enum EstadoPedido
+    {
+        Fila,
+        EmAndamento,
+        Entregue
     }
 }

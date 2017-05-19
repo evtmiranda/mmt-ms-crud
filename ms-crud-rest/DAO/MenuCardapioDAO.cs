@@ -15,6 +15,62 @@ namespace ms_crud_rest.DAO
             this.lojaDAO = lojaDAO;
         }
 
+        public override MenuCardapio BuscarPorId(int idCardapio, int idLoja)
+        {
+            List<MenuCardapioEntidade> listaMenuCardapioEntidade = new List<MenuCardapioEntidade>();
+            MenuCardapio cardapio = new MenuCardapio();
+
+            ProdutoDAO produtoDAO = new ProdutoDAO(sqlConn, logDAO);
+
+            try
+            {
+                sqlConn.StartConnection();
+
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+                sqlConn.Command.CommandText = string.Format(@"SELECT 
+	                                                            id_menu_cardapio,
+	                                                            id_loja,
+	                                                            nm_cardapio,
+	                                                            nr_ordem_exibicao,
+	                                                            bol_ativo
+                                                            FROM tab_menu_cardapio
+                                                            WHERE id_menu_cardapio = @id_menu_cardapio");
+
+                sqlConn.Command.Parameters.AddWithValue("@id_menu_cardapio", idCardapio);
+
+                sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                listaMenuCardapioEntidade = new ModuloClasse().PreencheClassePorDataReader<MenuCardapioEntidade>(sqlConn.Reader);
+
+                //fecha o reader
+                sqlConn.Reader.Close();
+
+                //verifica se encontrou algum cardápio
+                if (listaMenuCardapioEntidade.Count == 0)
+                    throw new KeyNotFoundException();
+
+                cardapio = listaMenuCardapioEntidade.FirstOrDefault().ToMenuCardapio();
+
+                cardapio.Produtos = produtoDAO.Listar(cardapio.Id);
+
+                return cardapio;
+            }
+            catch (KeyNotFoundException keyEx)
+            {
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Cardápio nao encontrado com id " + idCardapio, Descricao = keyEx.Message ?? "", StackTrace = keyEx.StackTrace ?? "" });
+                throw keyEx;
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao buscar o cardápio com id " + idCardapio, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
+        }
+
         public override List<MenuCardapio> Listar(int idLoja)
         {
             List<MenuCardapioEntidade> listaMenuCardapioEntidade = new List<MenuCardapioEntidade>();
@@ -37,25 +93,20 @@ namespace ms_crud_rest.DAO
                                                             WHERE id_loja = @id_loja
                                                             AND bol_ativo = 1;");
 
-
-
                 sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
                 listaMenuCardapioEntidade = new ModuloClasse().PreencheClassePorDataReader<MenuCardapioEntidade>(sqlConn.Reader);
 
-                //fecha o reader
-                sqlConn.Reader.Close();
-
                 foreach (var menuCardapio in listaMenuCardapioEntidade)
                 {
                     listaMenuCardapio.Add(menuCardapio.ToMenuCardapio());
                 }
 
-                //verifica se o retorno foi positivo
+                //verifica se encontrou algum cardápio
                 if (listaMenuCardapio.Count == 0)
-                    throw new NenhumCardapioEncontradoException();
+                    throw new KeyNotFoundException();
 
                 //adiciona os produtos ao cardápio
                 foreach (var menuCardapio in listaMenuCardapio)
@@ -65,85 +116,23 @@ namespace ms_crud_rest.DAO
 
                 return listaMenuCardapio;
             }
-            catch (NenhumCardapioEncontradoException)
+            catch (KeyNotFoundException keyEx)
             {
-                throw;
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Nenhum cardápio foi encontrado encontrado para a loja: " + idLoja, Descricao = keyEx.Message ?? "", StackTrace = keyEx.StackTrace ?? "" });
+                throw keyEx;
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "erro ao buscar os cardápios", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao buscar os cardápios para a loja: " + idLoja, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
             {
                 sqlConn.CloseConnection();
-            }
-        }
-
-        public override MenuCardapio BuscarPorId(int idCardapio)
-        {
-            List<MenuCardapioEntidade> listaMenuCardapioEntidade = new List<MenuCardapioEntidade>();
-            MenuCardapio cardapio = new MenuCardapio();
-
-            ProdutoDAO produtoDAO = new ProdutoDAO(sqlConn, logDAO);
-
-            try
-            {
-                sqlConn.StartConnection();
-
-                sqlConn.Command.CommandType = System.Data.CommandType.Text;
-                sqlConn.Command.CommandText = string.Format(@"SELECT 
-	                                                            id_menu_cardapio,
-	                                                            id_loja,
-	                                                            nm_cardapio,
-	                                                            nr_ordem_exibicao,
-	                                                            bol_ativo
-                                                            FROM tab_menu_cardapio
-                                                            WHERE id_menu_cardapio = @id_menu_cardapio");
-
-
-
-                sqlConn.Command.Parameters.AddWithValue("@id_menu_cardapio", idCardapio);
-
-                sqlConn.Reader = sqlConn.Command.ExecuteReader();
-
-                listaMenuCardapioEntidade = new ModuloClasse().PreencheClassePorDataReader<MenuCardapioEntidade>(sqlConn.Reader);
-
-                //fecha o reader
                 sqlConn.Reader.Close();
-
-                //verifica se o retorno foi positivo
-                if (listaMenuCardapioEntidade.Count == 0)
-                    throw new NenhumCardapioEncontradoException();
-
-                cardapio = listaMenuCardapioEntidade.FirstOrDefault().ToMenuCardapio();
-
-                cardapio.Produtos = produtoDAO.Listar(cardapio.Id);
-
-                return cardapio;
-            }
-            catch (NenhumCardapioEncontradoException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                logDAO.Adicionar(new Log { Mensagem = "erro ao buscar o cardápio", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-
-                throw ex;
-            }
-            finally
-            {
-                sqlConn.CloseConnection();
             }
         }
 
-        /// <summary>
-        /// Faz o cadastro de um cardápio
-        /// </summary>
-        /// <param name="cardapio">dados do cardápio</param>
-        /// <returns></returns>
         public void AdicionarCardapio(int idLoja, MenuCardapio cardapio)
         {
             try
@@ -163,8 +152,7 @@ namespace ms_crud_rest.DAO
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao cadastrar o cardápio", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-                sqlConn.Rollback();
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao cadastrar o cardápio com id " + cardapio.Id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -173,12 +161,6 @@ namespace ms_crud_rest.DAO
             }
         }
 
-
-        /// <summary>
-        /// Atualiza os dados de um cardapio
-        /// </summary>
-        /// <param name="cardapio">cardapio que será atualizado</param>
-        /// <returns></returns>
         public override void Atualizar(MenuCardapio cardapio)
         {
             try
@@ -198,14 +180,10 @@ namespace ms_crud_rest.DAO
                                                             WHERE id_menu_cardapio = @id_menu_cardapio;");
 
                 sqlConn.Command.ExecuteNonQuery();
-
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao atualizar os dados do cardápio", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-
-                sqlConn.Rollback();
-
+                logDAO.Adicionar(new Log { IdLoja = cardapio.IdLoja, Mensagem = "Erro ao atualizar o cardápio com id " + cardapio.Id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -214,19 +192,12 @@ namespace ms_crud_rest.DAO
             }
         }
 
-        /// <summary>
-        /// Seta um cardapio como inativo
-        /// </summary>
-        /// <param name="cardapio">cardapio que será inativado</param>
-        /// <returns></returns>
         public override void Excluir(MenuCardapio cardapio)
         {
             try
             {
                 sqlConn.StartConnection();
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
-
-                #region atualiza os dados do cardapio
 
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", cardapio.Ativo);
                 sqlConn.Command.Parameters.AddWithValue("@id_menu_cardapio", cardapio.Id);
@@ -236,14 +207,10 @@ namespace ms_crud_rest.DAO
                                                             WHERE id_menu_cardapio = @id_menu_cardapio;");
 
                 sqlConn.Command.ExecuteNonQuery();
-
-                #endregion
-
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao atualizar os dados do cardápio", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-
+                logDAO.Adicionar(new Log { IdLoja = cardapio.IdLoja, Mensagem = "Erro ao excluir o cardápio com id " + cardapio.Id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally

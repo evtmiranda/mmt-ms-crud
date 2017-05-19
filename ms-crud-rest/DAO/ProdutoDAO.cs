@@ -348,9 +348,9 @@ namespace ms_crud_rest.DAO
                                                 ON tpap.id_produto_adicional = tpa.id_produto_adicional
                                                 INNER JOIN tab_produto AS tp
                                                 ON tp.id_produto = tpap.id_produto
-                                                WHERE tp.bol_ativo = 1
+                                                WHERE tpap.bol_ativo = 1
                                                 AND tpa.bol_ativo = 1
-                                                AND tpap.bol_ativo = 1;";
+                                                AND tp.bol_ativo = 1;";
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 

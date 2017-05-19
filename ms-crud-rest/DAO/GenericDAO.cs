@@ -24,7 +24,7 @@ namespace ms_crud_rest.DAO
 
         public virtual List<T> Listar(int id) { return null; }
 
-        public virtual T BuscarPorId(int id) { return default(T); }
+        public virtual T BuscarPorId(int id, int idLoja) { return default(T); }
 
         public virtual void Atualizar(T t) { }
 

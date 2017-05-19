@@ -17,7 +17,6 @@ namespace ms_crud_rest.DAO
         /// 3 - insere as formas de pagamento do pedido
         /// </summary>
         /// <param name="pedido">objeto com as informações do pedido</param>
-        /// <returns>id do pedido cadastrado</returns>
         public int AdicionarPedido(Pedido pedido)
         {
             try
@@ -47,7 +46,7 @@ namespace ms_crud_rest.DAO
 
                 //verifica se o retorno foi positivo
                 if (idPedido == 0)
-                    throw new PedidoNaoCadastradoClienteException();
+                    throw new PedidoNaoCadastradoClienteException("Erro ao inserir os dados na tab_pedido");
 
                 //2 - insere o status do pedido
                 sqlConn.Command.Parameters.Clear();
@@ -59,6 +58,7 @@ namespace ms_crud_rest.DAO
 
                 //parametros do pedido
                 sqlConn.Command.Parameters.AddWithValue("@id_pedido", idPedido);
+
                 //status "na fila"
                 sqlConn.Command.Parameters.AddWithValue("@id_status", 0);
 
@@ -83,7 +83,7 @@ namespace ms_crud_rest.DAO
 
                     //verifica se o retorno foi positivo
                     if (idProdutoPedido == 0)
-                        throw new PedidoNaoCadastradoClienteException();
+                        throw new PedidoNaoCadastradoClienteException("Erro ao inserir os dados na tab_produto_pedido");
 
                     //insere os itens adicionais dos produtos do pedido
                     foreach (var adicionaisProduto in produto.Produto.DadosAdicionaisProdutos)
@@ -120,15 +120,16 @@ namespace ms_crud_rest.DAO
                 //retorna o id do pedido
                 return idPedido;
             }
-            catch (PedidoNaoCadastradoClienteException)
+            catch (PedidoNaoCadastradoClienteException pedEx)
             {
                 sqlConn.Rollback();
+                logDAO.Adicionar(new Log { IdLoja = pedido.Parceiro.IdLoja, Mensagem = "Erro ao finalizar o pedido. Cliente: " + pedido.Cliente.Id, Descricao = pedEx.Message ?? "", StackTrace = pedEx.StackTrace ?? "" });
                 throw;
             }
             catch (Exception ex)
             {
                 sqlConn.Rollback();
-                logDAO.Adicionar(new Log { Mensagem = "erro ao finalizar o pedido", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+                logDAO.Adicionar(new Log { IdLoja = pedido.Parceiro.IdLoja, Mensagem = "Erro ao finalizar o pedido. Cliente: " + pedido.Cliente.Id, Descricao = pedEx.Message ?? "", StackTrace = pedEx.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -137,13 +138,12 @@ namespace ms_crud_rest.DAO
             }
         }
 
-
         /// <summary>
         /// Busca todos os pedidos de um determinado cliente
         /// </summary>
         /// <param name="idUsuarioParceiro"></param>
         /// <returns></returns>
-        public List<Pedido> ConsultarPedidosCliente(int idUsuarioParceiro)
+        public List<Pedido> ConsultarPedidosCliente(int idUsuarioParceiro, int idLoja)
         {
             List<Pedido> listaPedidos = new List<Pedido>();
 
@@ -151,12 +151,14 @@ namespace ms_crud_rest.DAO
             {
                 listaPedidos = ConsultarPedidos(idUsuarioParceiro);
             }
-            catch (ClienteNuncaFezPedidosException)
+            catch (KeyNotFoundException keyEx)
             {
-                throw;
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Nenhum pedido encontrado para o cliente: " + idUsuarioParceiro, Descricao = keyEx.Message ?? "", StackTrace = keyEx.StackTrace ?? "" });
+                throw keyEx;
             }
             catch (Exception ex)
             {
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao consultar os pedidos para o cliente: " + idUsuarioParceiro, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
 
@@ -168,47 +170,36 @@ namespace ms_crud_rest.DAO
         /// </summary>
         /// <param name="idLoja">Id da loja</param>
         /// <param name="ehDoDia">Diz se quer buscar os pedidos do dia</param>
-        /// <param name="ehPedidoFila">Diz se quer buscar os pedidos que estão na fila de entrega</param>
-        /// <param name="ehPedidoAndamento">Diz se quer buscar os pedidos que estão em andamento</param>
-        /// <param name="ehPedidoEntregue">Diz se quer buscar os pedidos que já foram entregues</param>
+        /// <param name="estadoPedido">Estado do pedido que deseja buscar. Na fila, em andamento ou entregue</param>
         /// <returns></returns>
-        public List<Pedido> ConsultarPedidosLoja(int idLoja, bool ehDoDia, bool ehPedidoFila = false, bool ehPedidoAndamento = false, bool ehPedidoEntregue = false)
+        public List<Pedido> ConsultarPedidosLoja(int idLoja, bool ehDoDia, EstadoPedido estadoPedido)
         {
-            //valida o tipo de pedido
-            if ((ehPedidoFila && ehPedidoAndamento) || (ehPedidoFila && ehPedidoEntregue) || (ehPedidoAndamento && ehPedidoEntregue))
-                throw new Exception("apenas uma tipo de pedido pode ser consultado por vez");
-
-            if (idLoja == 0)
-                throw new Exception("insira o id da loja para a qual quer consultar os pedidos");
-
             List<Pedido> listaPedidos = new List<Pedido>();
 
             try
             {
-                //busca todos os pedidos da loja
                 listaPedidos = ConsultarPedidos(0, idLoja, ehDoDia);
 
-                if (ehPedidoFila)
+                if (estadoPedido == EstadoPedido.Fila)
                     listaPedidos = listaPedidos.FindAll(p => p.PedidoStatus.IdStatus == 0);
 
-                if (ehPedidoAndamento)
+                if (estadoPedido == EstadoPedido.EmAndamento)
                     listaPedidos = listaPedidos.FindAll(p => p.PedidoStatus.IdStatus == 1);
 
-                if (ehPedidoEntregue)
+                if (estadoPedido == EstadoPedido.Entregue)
                     listaPedidos = listaPedidos.FindAll(p => p.PedidoStatus.IdStatus == 2);
             }
-            catch (LojaNaoPossuiPedidosException)
+            catch (KeyNotFoundException)
             {
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
 
             return listaPedidos;
         }
-
 
         /// <summary>
         /// Monta uma lista com todos os pedidos de um determinado cliente ou loja
@@ -216,16 +207,8 @@ namespace ms_crud_rest.DAO
         /// </summary>
         /// <param name="idUsuarioParceiro">Id do usuário parceiro (cliente)</param>
         /// <param name="idLoja">id da loja</param>
-        /// <returns></returns>
         private List<Pedido> ConsultarPedidos(int idUsuarioParceiro = 0, int idLoja = 0, bool ehDoDia = false)
         {
-            if (idUsuarioParceiro == 0 && idLoja == 0)
-                throw new Exception("É necessário informar o idUsuarioParceiro ou o idLoja");
-
-            if (idUsuarioParceiro > 0 && idLoja > 0)
-                throw new Exception("Informe apenas o idUsuarioParceiro ou o idLoja. Não é permitido informar os 2");
-
-
             List<Pedido> listaPedidos = new List<Pedido>();
             List<PedidoEntidade> listaPedidosEntidade = new List<PedidoEntidade>();
 
@@ -258,7 +241,6 @@ namespace ms_crud_rest.DAO
 
             List<FormaDePagamento> listaFormaPagamento = new List<FormaDePagamento>();
             List<FormaDePagamentoEntidade> listaFormaPagamentoEntidade = new List<FormaDePagamentoEntidade>();
-
 
             sqlConn.StartConnection();
 
@@ -321,12 +303,9 @@ namespace ms_crud_rest.DAO
                 //fecha o reader
                 sqlConn.Reader.Close();
 
-                //verifica se o retorno foi positivo
+                //verifica se algum pedido foi encontrado
                 if (listaPedidosEntidade.Count == 0)
-                    if (idUsuarioParceiro > 0)
-                        throw new ClienteNuncaFezPedidosException();
-                    else
-                        throw new LojaNaoPossuiPedidosException();
+                    throw new KeyNotFoundException("Nenhum pedido encontrado.");
 
                 foreach (var pedidoEnt in listaPedidosEntidade)
                 {
@@ -371,7 +350,6 @@ namespace ms_crud_rest.DAO
                     pedido.PedidoStatus = listaPedidoStatus.Where(p => p.Ativo == 1).FirstOrDefault();
 
                     #endregion
-
 
                     #region 1.1 - preenche o "UsuarioParceiro" do pedido
 
@@ -708,6 +686,7 @@ namespace ms_crud_rest.DAO
                     }
 
                     listaFormaPagamento = new List<FormaDePagamento>();
+
                     foreach (var formaPagamentoEntidade in listaFormaPagamentoEntidade)
                     {
                         listaFormaPagamento.Add(formaPagamentoEntidade.ToFormaPagamento());
@@ -725,26 +704,24 @@ namespace ms_crud_rest.DAO
                 //retorna a lista de pedidos
                 return listaPedidos;
             }
-            catch (ClienteNuncaFezPedidosException)
+            catch (KeyNotFoundException keyEx)
             {
-                throw;
-            }
-            catch (LojaNaoPossuiPedidosException)
-            {
-                throw;
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Nenhum pedido encontrado para a loja ou usuário parceiro. Usuário parceiro: " + idUsuarioParceiro, Descricao = keyEx.Message ?? "", StackTrace = keyEx.StackTrace ?? "" });
+                throw keyEx;
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "erro ao consultar os pedidos", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao buscar os pedidos para a loja ou usuário parceiro. Usuário parceiro: " + idUsuarioParceiro, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
             {
                 sqlConn.CloseConnection();
+                sqlConn.Reader.Close();
             }
         }
 
-        public override Pedido BuscarPorId(int idPedido)
+        public override Pedido BuscarPorId(int idPedido, int idLoja)
         {
             PedidoEntidade pedidoEntidade = new PedidoEntidade();
             Pedido pedido = new Pedido();
@@ -752,7 +729,6 @@ namespace ms_crud_rest.DAO
             try
             {
                 sqlConn.StartConnection();
-
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
 
                 sqlConn.Command.CommandText = string.Format(@"SELECT
@@ -779,18 +755,19 @@ namespace ms_crud_rest.DAO
                 sqlConn.Reader.Close();
 
                 if (pedido == null)
-                    throw new PedidoNaoEncontradoException();
+                    throw new KeyNotFoundException();
 
                 return pedido;
 
             }
-            catch (PedidoNaoEncontradoException)
+            catch (KeyNotFoundException keyEx)
             {
-                throw;
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Pedido nao encontrado com id " + idPedido, Descricao = keyEx.Message ?? "", StackTrace = keyEx.StackTrace ?? "" });
+                throw keyEx;
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "erro ao consultar o pedido", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao buscar o pedido com id " + idPedido, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
         }
@@ -845,8 +822,7 @@ namespace ms_crud_rest.DAO
             catch (Exception ex)
             {
                 sqlConn.Rollback();
-
-                logDAO.Adicionar(new Log { Mensagem = "erro ao consultar o pedido", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+                logDAO.Adicionar(new Log { IdLoja = p.Parceiro.IdLoja, Mensagem = "Erro ao atualizar o pedido com id " + p.Id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
         }

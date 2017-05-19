@@ -33,26 +33,23 @@ namespace ms_crud_rest.Controllers
 
                 return response;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string mensagem = string.Format("nao foi possivel cadastrar o horário de entrega. erro: {0}", ex);
+                string mensagem = "Não foi possível cadastrar o horário de entrega. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
 
         [HttpGet]
-        [Route("api/HorarioEntrega/{id}")]
-        public HttpResponseMessage Buscar(int id)
+        [Route("api/HorarioEntrega/{id}/{idLoja}")]
+        public HttpResponseMessage Buscar(int id, int idLoja)
         {
             try
             {
                 HorarioEntrega horarioEntrega = new HorarioEntrega();
 
-                horarioEntrega = horarioEntregaDAO.BuscarPorId(id);
-
-                if (horarioEntrega == null)
-                    throw new KeyNotFoundException();
+                horarioEntrega = horarioEntregaDAO.BuscarPorId(id, idLoja);
 
                 return Request.CreateResponse(HttpStatusCode.OK, horarioEntrega);
             }
@@ -62,7 +59,7 @@ namespace ms_crud_rest.Controllers
             }
             catch (Exception)
             {
-                string mensagem = "Não foi possível consultar o horário de entrega. Por favor, tente novamente ou entre em contato com o administrador do sistema";
+                string mensagem = "Não foi possível consultar o horário de entrega. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
 
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
@@ -81,7 +78,7 @@ namespace ms_crud_rest.Controllers
             }
             catch (Exception)
             {
-                string mensagem = "Não foi possível atualizar o horário de entrega. Por favor, tente novamente ou entre em contato com o administrador do sistema";
+                string mensagem = "Não foi possível atualizar o horário de entrega. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
 
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
@@ -95,23 +92,17 @@ namespace ms_crud_rest.Controllers
             try
             {
                 horarioEntregaDAO.Excluir(horarioEntrega);
-
                 return Request.CreateResponse(HttpStatusCode.OK, horarioEntrega);
             }
             catch (Exception)
             {
-                string mensagem = "Não foi possível excluir o horário de entrega. Por favor, tente novamente ou entre em contato com o administrador do sistema";
+                string mensagem = "Não foi possível excluir o horário de entrega. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
 
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
 
-        /// <summary>
-        /// Retorna os horários de entrega de uma determinada loja
-        /// </summary>
-        /// <param name="idLoja"></param>
-        /// <returns></returns>
         [HttpGet]
         [Route("api/HorarioEntrega/Listar/{idLoja}")]
         public HttpResponseMessage ListarHorarios(int idLoja)
@@ -121,35 +112,29 @@ namespace ms_crud_rest.Controllers
                 DadosHorarioEntrega horariosEntrega = horarioEntregaDAO.ListarHorariosEntrega(idLoja);
                 return Request.CreateResponse(HttpStatusCode.OK, horariosEntrega);
             }
-            catch (HorarioNaoEncontradoException hreEx)
+            catch (KeyNotFoundException)
             {
-                string mensagem = hreEx.Message;
-                HttpError error = new HttpError(mensagem);
-                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+                return Request.CreateResponse(HttpStatusCode.NoContent);
             }
             catch (Exception)
             {
-                string mensagem = string.Format("ocorreu um problema ao buscar os horários de entrega. por favor, tente atualizar a página ou acessar dentro de alguns minutos...");
+                string mensagem = "Não foi possível consultar os horários de entrega. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
 
-
         #region tempo antecedencia
 
         [HttpGet]
-        [Route("api/HorarioEntrega/TempoAntecedencia/{id}")]
-        public HttpResponseMessage BuscarTempoAntecedencia(int id)
+        [Route("api/HorarioEntrega/TempoAntecedencia/{id}/{idLoja}")]
+        public HttpResponseMessage BuscarTempoAntecedencia(int id, int idLoja)
         {
             try
             {
                 TempoAntecedenciaEntrega tempoAntecedenciaEntrega = new TempoAntecedenciaEntrega();
 
-                tempoAntecedenciaEntrega = horarioEntregaDAO.BuscarTempoAntecedencia(id);
-
-                if (tempoAntecedenciaEntrega == null)
-                    throw new KeyNotFoundException();
+                tempoAntecedenciaEntrega = horarioEntregaDAO.BuscarTempoAntecedencia(id, idLoja);
 
                 return Request.CreateResponse(HttpStatusCode.OK, tempoAntecedenciaEntrega);
             }
@@ -159,7 +144,7 @@ namespace ms_crud_rest.Controllers
             }
             catch (Exception)
             {
-                string mensagem = "Não foi possível consultar o tempo de antecedencia. Por favor, tente novamente ou entre em contato com o administrador do sistema";
+                string mensagem = "Não foi possível consultar o tempo de antecedência. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
 
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
@@ -178,7 +163,7 @@ namespace ms_crud_rest.Controllers
             }
             catch (Exception)
             {
-                string mensagem = "Não foi possível atualizar o tempo de antecedência. Por favor, tente novamente ou entre em contato com o administrador do sistema";
+                string mensagem = "Não foi possível atualizar o tempo de antecedência. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
 
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);

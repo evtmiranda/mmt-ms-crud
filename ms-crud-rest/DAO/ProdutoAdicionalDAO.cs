@@ -88,7 +88,8 @@ namespace ms_crud_rest.DAO
                                                                 0 AS nr_ordem_exibicao,
 	                                                            bol_ativo
                                                             FROM tab_produto_adicional
-                                                            WHERE id_loja = @id_loja;");
+                                                            WHERE id_loja = @id_loja
+                                                            AND bol_ativo = 1;");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
@@ -117,7 +118,8 @@ namespace ms_crud_rest.DAO
 	                                                nm_descricao_item,
                                                     vlr_adicional_item,
 	                                                bol_ativo
-                                                FROM tab_produto_adicional_item;";
+                                                FROM tab_produto_adicional_item
+                                                WHERE bol_ativo = 1;";
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 

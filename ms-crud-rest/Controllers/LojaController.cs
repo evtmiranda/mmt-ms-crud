@@ -1,7 +1,7 @@
 ﻿using ClassesMarmitex;
 using ms_crud_rest.DAO;
-using ms_crud_rest.Exceptions;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -20,11 +20,6 @@ namespace ms_crud_rest.Controllers
             this.logDAO = logDAO;
         }
 
-        /// <summary>
-        /// Busca uma loja pelo dominio da url
-        /// </summary>
-        /// <param name="dominio">dominio da url</param>
-        /// <returns></returns>
         [HttpGet]
         [Route("api/Loja/BuscarLoja/{dominio}")]
         public HttpResponseMessage BuscarLoja(string dominio)
@@ -33,21 +28,18 @@ namespace ms_crud_rest.Controllers
             {
                 Loja loja = lojaDAO.BuscarLoja(dominio);
 
-                if (loja == null)
-                    throw new LojaNaoEncontradaException();
-
                 return Request.CreateResponse(HttpStatusCode.OK, loja);
             }
-            catch (LojaNaoEncontradaException)
+            catch (KeyNotFoundException)
             {
-                string mensagem = string.Format("nenhuma loja encontrada para o dominio {0}", dominio);
+                string mensagem = "Nenhuma loja encontrada para este dominio. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
 
-                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
-            catch(Exception ex)
+            catch (Exception)
             {
-                string mensagem = string.Format("ocorreu um erro ao buscar a loja. Erro: {0}", string.IsNullOrEmpty(ex.Message) ? "a exception não retornou mensagem" : ex.Message);
+                string mensagem = "Não foi possível buscar a loja. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
 
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);

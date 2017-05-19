@@ -9,12 +9,7 @@ namespace ms_crud_rest.DAO
     {
         public FormaPagamentoDAO(SqlServer sqlConn, LogDAO logDAO) : base(sqlConn, logDAO) { }
 
-        /// <summary>
-        /// Faz a busca de uma forma de pagamento
-        /// </summary>
-        /// <param name="idParceiro">id da forma de pagamento</param>
-        /// <returns></returns>
-        public override FormaDePagamento BuscarPorId(int id)
+        public override FormaDePagamento BuscarPorId(int id, int idLoja)
         {
             FormaDePagamento pagamento;
             List<FormaDePagamentoEntidade> listaPagamentoEntidade;
@@ -43,14 +38,16 @@ namespace ms_crud_rest.DAO
 
                 pagamento = listaPagamentoEntidade[0].ToFormaPagamento();
 
-                //fecha o reader
-                sqlConn.Reader.Close();
-
                 return pagamento;
+            }
+            catch (KeyNotFoundException keyEx)
+            {
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Forma de pagamento nao encontrada com id " + id, Descricao = keyEx.Message ?? "", StackTrace = keyEx.StackTrace ?? "" });
+                throw keyEx;
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao buscar a forma de pagamento", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao buscar a forma de pagamento com id " + id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -76,7 +73,8 @@ namespace ms_crud_rest.DAO
 	                                                            nm_forma_pagamento,
 	                                                            bol_ativo
                                                             FROM tab_forma_pagamento
-                                                            WHERE id_loja = @id_loja");
+                                                            WHERE id_loja = @id_loja
+                                                            AND bol_ativo = 1;");
 
 
                 sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
@@ -91,19 +89,17 @@ namespace ms_crud_rest.DAO
 
                 //verifica se o retorno foi positivo
                 if (listaPagamento.Count == 0)
-                    throw new PagamentoNaoEncontradoException();
-
+                    throw new KeyNotFoundException();
 
                 return listaPagamento;
             }
-            catch (PagamentoNaoEncontradoException)
+            catch (KeyNotFoundException)
             {
                 throw;
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "erro ao buscar as formas de pagamento", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao listar as formas de pagamento para a loja: " + idLoja, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -113,69 +109,6 @@ namespace ms_crud_rest.DAO
             }
         }
 
-        public FormaDePagamento BuscarPorNome(string nomeFormaPagamento, int idParceiro)
-        {
-            List<FormaDePagamentoEntidade> listaPagamentoEntidade = new List<FormaDePagamentoEntidade>();
-            List<FormaDePagamento> listaPagamento = new List<FormaDePagamento>();
-
-            try
-            {
-                sqlConn.StartConnection();
-
-                sqlConn.Command.CommandType = System.Data.CommandType.Text;
-                sqlConn.Command.CommandText = string.Format(@"SELECT
-	                                                            tfp.id_forma_pagamento,
-	                                                            tfp.id_loja,
-	                                                            tfp.nm_forma_pagamento,
-	                                                            tfp.bol_ativo
-                                                            FROM tab_forma_pagamento AS tfp
-                                                            INNER JOIN tab_parceiro AS tp
-                                                            ON tp.id_loja = tfp.id_loja
-                                                            WHERE tp.id_parceiro = @id_parceiro
-                                                            AND tfp.nm_forma_pagamento = @nm_forma_pagamento
-                                                            AND tfp.bol_ativo = 1;");
-
-                sqlConn.Command.Parameters.AddWithValue("@id_parceiro", idParceiro);
-                sqlConn.Command.Parameters.AddWithValue("@nm_forma_pagamento", nomeFormaPagamento);
-
-                sqlConn.Reader = sqlConn.Command.ExecuteReader();
-
-                listaPagamentoEntidade = new ModuloClasse().PreencheClassePorDataReader<FormaDePagamentoEntidade>(sqlConn.Reader);
-
-                //transforma a entidade em objeto
-                foreach (var pagamento in listaPagamentoEntidade)
-                    listaPagamento.Add(pagamento.ToFormaPagamento());
-
-                //verifica se o retorno foi positivo
-                if (listaPagamento.Count == 0)
-                    throw new PagamentoNaoEncontradoException();
-
-
-                return listaPagamento[0];
-            }
-            catch (PagamentoNaoEncontradoException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                logDAO.Adicionar(new Log { Mensagem = "erro ao buscar os cardápios", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-
-                throw ex;
-            }
-            finally
-            {
-                sqlConn.CloseConnection();
-                sqlConn.Reader.Close();
-                sqlConn.Command.Parameters.Clear();
-            }
-        }
-
-        /// <summary>
-        /// Faz o cadastro de uma forma de pagamento
-        /// </summary>
-        /// <param name="formaPagamento">dados</param>
-        /// <returns></returns>
         public override void Adicionar(FormaDePagamento formaPagamento)
         {
             try
@@ -194,7 +127,7 @@ namespace ms_crud_rest.DAO
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao cadastrar a forma de pagamento", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+                logDAO.Adicionar(new Log { IdLoja = formaPagamento.IdLoja, Mensagem = "Erro ao cadastrar a forma de pagamento", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -203,11 +136,6 @@ namespace ms_crud_rest.DAO
             }
         }
 
-        /// <summary>
-        /// Atualiza os dados de uma forma de pagametno
-        /// </summary>
-        /// <param name="formaPagamento">formaPagamento que será atualizada</param>
-        /// <returns></returns>
         public override void Atualizar(FormaDePagamento formaPagamento)
         {
             try
@@ -229,8 +157,7 @@ namespace ms_crud_rest.DAO
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao atualizar a forma de pagamento", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-
+                logDAO.Adicionar(new Log { IdLoja = formaPagamento.IdLoja, Mensagem = "Erro ao atualizar a forma de pagamento", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -239,17 +166,11 @@ namespace ms_crud_rest.DAO
             }
         }
 
-        /// <summary>
-        /// Seta uma forma de pagamento como inativo
-        /// </summary>
-        /// <param name="formaPagamento">formaPagamento que será inativada</param>
-        /// <returns></returns>
         public override void Excluir(FormaDePagamento formaPagamento)
         {
             try
             {
                 sqlConn.StartConnection();
-
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
 
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", formaPagamento.Ativo);
@@ -260,12 +181,10 @@ namespace ms_crud_rest.DAO
                                                             WHERE id_forma_pagamento = @id_forma_pagamento;");
 
                 sqlConn.Command.ExecuteNonQuery();
-
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao atualizar a forma de pagamento", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-
+                logDAO.Adicionar(new Log { IdLoja = formaPagamento.IdLoja, Mensagem = "Erro ao excluir a forma de pagamento", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
