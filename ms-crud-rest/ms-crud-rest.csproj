@@ -217,6 +217,7 @@
     <Compile Include="DAO\UsuarioDAO.cs" />
     <Compile Include="Exceptions\EnderecoNaoCadastradoException.cs" />
     <Compile Include="Exceptions\PedidoNaoCadastradoClienteException.cs" />
+    <Compile Include="Exceptions\UsuarioJaExisteException.cs" />
     <Compile Include="Exceptions\UsuarioNaoAutenticadoException.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

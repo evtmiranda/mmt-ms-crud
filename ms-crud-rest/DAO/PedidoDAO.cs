@@ -129,7 +129,7 @@ namespace ms_crud_rest.DAO
             catch (Exception ex)
             {
                 sqlConn.Rollback();
-                logDAO.Adicionar(new Log { IdLoja = pedido.Parceiro.IdLoja, Mensagem = "Erro ao finalizar o pedido. Cliente: " + pedido.Cliente.Id, Descricao = pedEx.Message ?? "", StackTrace = pedEx.StackTrace ?? "" });
+                logDAO.Adicionar(new Log { IdLoja = pedido.Parceiro.IdLoja, Mensagem = "Erro ao finalizar o pedido. Cliente: " + pedido.Cliente.Id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally

@@ -28,22 +28,19 @@ namespace ms_crud_rest.Controllers
         /// </summary>
         /// <param name="id">id do produto adicional</param>
         /// <returns></returns>
-        [Route("api/ProdutoAdicional/{id}")]
-        public HttpResponseMessage Get(int id)
+        [Route("api/ProdutoAdicional/{id}/{idLoja}")]
+        public HttpResponseMessage Get(int id, int idLoja)
         {
             try
             {
-                DadosProdutoAdicional produtoAdicional = produtoAdicionalDAO.BuscarPorId(id);
-                if (produtoAdicional == null)
-                    throw new KeyNotFoundException();
-
+                DadosProdutoAdicional produtoAdicional = produtoAdicionalDAO.BuscarPorId(id, idLoja);
                 return Request.CreateResponse(HttpStatusCode.OK, produtoAdicional);
             }
-            catch (KeyNotFoundException)
+            catch (Exception)
             {
-                string mensagem = string.Format("O produto adicional {0} não foi encontrado", id);
+                string mensagem = "Não foi possível buscar o produto adicional. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
-                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
 
@@ -63,9 +60,9 @@ namespace ms_crud_rest.Controllers
             }
             catch (Exception)
             {
-                string mensagem = string.Format("ocorreu um problema ao buscar os produtos adicionais. por favor, tente atualizar a página ou acessar dentro de alguns minutos...");
+                string mensagem = "Não foi possível buscar os produtos adicionais. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
-                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
 
@@ -82,9 +79,9 @@ namespace ms_crud_rest.Controllers
 
                 return response;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string mensagem = string.Format("nao foi possivel cadastrar o produto adicional. erro: {0}", ex);
+                string mensagem = "Não foi possível adicionar o produto adicional. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
@@ -107,9 +104,8 @@ namespace ms_crud_rest.Controllers
             }
             catch (Exception)
             {
-                string mensagem = "Não foi possível excluir o produto adicional. Por favor, tente novamente ou entre em contato com o administrador do sistema";
+                string mensagem = "Não foi possível excluir o produto adicional. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
-
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
@@ -131,9 +127,8 @@ namespace ms_crud_rest.Controllers
             }
             catch (Exception)
             {
-                string mensagem = "Não foi possível atualizar o produto adicional. Por favor, tente novamente ou entre em contato com o administrador do sistema";
+                string mensagem = "Não foi possível atualizar o produto adicional. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
-
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
@@ -151,9 +146,9 @@ namespace ms_crud_rest.Controllers
 
                 return response;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string mensagem = string.Format("nao foi possivel cadastrar o item. erro: {0}", ex);
+                string mensagem = "Não foi possível adicionar o item para o produto adicional. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
@@ -171,30 +166,31 @@ namespace ms_crud_rest.Controllers
             }
             catch (Exception)
             {
-                string mensagem = "Não foi possível excluir o item. Por favor, tente novamente ou entre em contato com o administrador do sistema";
+                string mensagem = "Não foi possível excluir o item. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
-
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
 
         [HttpGet]
-        [Route("api/ProdutoAdicional/Item/{id}")]
-        public HttpResponseMessage BuscarItem(int id)
+        [Route("api/ProdutoAdicional/Item/{id}/{idLoja}")]
+        public HttpResponseMessage BuscarItem(int id, int idLoja)
         {
             try
             {
-                DadosProdutoAdicionalItem item = produtoAdicionalDAO.BuscarItemPorId(id);
-                if (item == null)
-                    throw new KeyNotFoundException();
+                DadosProdutoAdicionalItem item = produtoAdicionalDAO.BuscarItemPorId(id, idLoja);
 
                 return Request.CreateResponse(HttpStatusCode.OK, item);
             }
             catch (KeyNotFoundException)
             {
-                string mensagem = string.Format("O item {0} não foi encontrado", id);
+                return Request.CreateResponse(HttpStatusCode.NoContent);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível buscar o item. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
-                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
 
@@ -210,9 +206,8 @@ namespace ms_crud_rest.Controllers
             }
             catch (Exception)
             {
-                string mensagem = "Não foi possível atualizar o item. Por favor, tente novamente ou entre em contato com o administrador do sistema";
+                string mensagem = "Não foi possível atualizar o item. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
-
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }

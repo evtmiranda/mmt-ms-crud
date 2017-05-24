@@ -28,6 +28,7 @@
             try
             {
                 Usuario usuario = null;
+
                 if (usuario == null)
                     throw new KeyNotFoundException();
 
@@ -35,11 +36,6 @@
             }
             catch (KeyNotFoundException)
             {
-                //string mensagem = string.Format("O usuario {0} não foi encontrado", id);
-                //HttpError error = new HttpError(mensagem);
-
-                //return Request.CreateResponse(HttpStatusCode.NoContent, error);
-
                 return Request.CreateResponse(HttpStatusCode.NoContent);
             }
         }
@@ -112,12 +108,6 @@
 
                 return response;
             }
-            catch (EmpresaNaoEncontradaException eneEx)
-            {
-                string mensagem = eneEx.Message;
-                HttpError error = new HttpError(mensagem);
-                return Request.CreateResponse(HttpStatusCode.NotFound, error);
-            }
             catch (UsuarioJaExisteException eneEx)
             {
                 string mensagem = eneEx.Message;
@@ -126,7 +116,7 @@
             }
             catch (Exception ex)
             {
-                string mensagem = string.Format("nao foi possivel cadastrar o usuario. erro: {0}", ex);
+                string mensagem = string.Format("Não foi possivel cadastrar o usuario. erro: {0}", ex);
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
@@ -137,7 +127,7 @@
         {
             try
             {
-                usuarioDAO.ExcluirPorId(id);
+                //usuarioDAO.ExcluirPorId(id);
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -154,7 +144,7 @@
         {
             try
             {
-                Usuario usuarioAtual = usuarioDAO.BuscarPorId(id);
+                Usuario usuarioAtual = usuarioDAO.BuscarPorId(id, usuario.IdLoja);
 
                 if (usuarioAtual == null)
                     return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -166,7 +156,7 @@
             }
             catch (Exception ex)
             {
-                string mensagem = string.Format("nao foi possivel atualizar o usuario. erro: {0}", ex);
+                string mensagem = string.Format("Não foi possivel atualizar o usuario. erro: {0}", ex);
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
@@ -174,12 +164,12 @@
 
         //retorna todos os usuários existentes
         [HttpGet]
-        [Route("api/usuario/listar")]
-        public HttpResponseMessage ListarUsuarios(TipoUsuario tipoUsuario)
+        [Route("api/usuario/listar/{idLoja}")]
+        public HttpResponseMessage ListarUsuarios(TipoUsuario tipoUsuario, [FromUri] int idLoja)
         {
             try
             {
-                IList<Usuario> usuarios = usuarioDAO.Listar();
+                IList<Usuario> usuarios = usuarioDAO.Listar(idLoja);
                 return Request.CreateResponse(HttpStatusCode.OK, usuarios);
             }
             catch (KeyNotFoundException)
@@ -217,11 +207,8 @@
             //se ocorrer algum erro no processamento
             catch (Exception ex)
             {
-                //grava log do erro
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao autenticar usuário", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-
                 //retorna mensagem de erro e status de erro
-                string mensagem = string.Format("nao foi possivel autenticar o usuario. erro: {0}", ex);
+                string mensagem = string.Format("Não foi possivel autenticar o usuario. erro: {0}", ex);
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }

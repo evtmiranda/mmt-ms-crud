@@ -9,7 +9,7 @@ namespace ms_crud_rest.DAO
     {
         public ProdutoAdicionalDAO(SqlServer sqlConn, LogDAO logDAO) : base(sqlConn, logDAO) { }
 
-        public override DadosProdutoAdicional BuscarPorId(int id)
+        public override DadosProdutoAdicional BuscarPorId(int id, int idLoja)
         {
             List<DadosProdutoAdicionalEntidade> listaProdutoAdicionalEntidade = new List<DadosProdutoAdicionalEntidade>();
             List<DadosProdutoAdicional> listaProdutoAdicional = new List<DadosProdutoAdicional>();
@@ -39,7 +39,12 @@ namespace ms_crud_rest.DAO
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
                 //transforma a entidade em objeto
-                listaProdutoAdicionalEntidade = new ModuloClasse().PreencheClassePorDataReader<DadosProdutoAdicionalEntidade>(sqlConn.Reader);
+                if(sqlConn.Reader.HasRows)
+                    listaProdutoAdicionalEntidade = new ModuloClasse().PreencheClassePorDataReader<DadosProdutoAdicionalEntidade>(sqlConn.Reader);
+
+                if (listaProdutoAdicionalEntidade.Count == 0)
+                    throw new KeyNotFoundException();
+
                 foreach (var produtoAdicionalEntidade in listaProdutoAdicionalEntidade)
                 {
                     listaProdutoAdicional.Add(produtoAdicionalEntidade.ToProdutoAdicional());
@@ -51,14 +56,13 @@ namespace ms_crud_rest.DAO
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "erro ao buscar o produto adicional", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao buscar produto adicional com id " + id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
             {
-                sqlConn.Command.Parameters.Clear();
                 sqlConn.CloseConnection();
+                sqlConn.Reader.Close();
             }
         }
 
@@ -96,7 +100,12 @@ namespace ms_crud_rest.DAO
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
                 //transforma a entidade em objeto
-                listaProdutoAdicionalEntidade = new ModuloClasse().PreencheClassePorDataReader<DadosProdutoAdicionalEntidade>(sqlConn.Reader);
+                if (sqlConn.Reader.HasRows) 
+                    listaProdutoAdicionalEntidade = new ModuloClasse().PreencheClassePorDataReader<DadosProdutoAdicionalEntidade>(sqlConn.Reader);
+
+                if (listaProdutoAdicionalEntidade.Count == 0)
+                    throw new KeyNotFoundException("Nenhum produto adicional encontrado.");
+
                 foreach (var produtoAdicionalEntidade in listaProdutoAdicionalEntidade)
                 {
                     listaProdutoAdicional.Add(produtoAdicionalEntidade.ToProdutoAdicional());
@@ -149,8 +158,7 @@ namespace ms_crud_rest.DAO
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "erro ao buscar os produtos adicionais", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao buscar os produtos adicionais para a loja com id " + idLoja, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -179,9 +187,10 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.ExecuteNonQuery();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                logDAO.Adicionar(new Log { IdLoja = produtoAdicional.IdLoja, Mensagem = "Erro ao adicionar produto adicional" + produtoAdicional.IdLoja, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
             }
             finally
             {
@@ -214,8 +223,7 @@ namespace ms_crud_rest.DAO
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao atualizar os dados do produto adicional", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-
+                logDAO.Adicionar(new Log { IdLoja = produtoAdicional.IdLoja, Mensagem = "Erro ao excluir produto adicional" + produtoAdicional.IdLoja, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -252,9 +260,8 @@ namespace ms_crud_rest.DAO
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao atualizar os dados do produto adicional", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-
                 sqlConn.Rollback();
+                logDAO.Adicionar(new Log { IdLoja = produtoAdicional.IdLoja, Mensagem = "Erro ao atualizar os dados do produto adicional" + produtoAdicional.IdLoja, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
 
                 throw ex;
             }
@@ -286,9 +293,10 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.ExecuteNonQuery();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                logDAO.Adicionar(new Log { IdLoja = item.IdLoja, Mensagem = "Erro ao adicionar item para o produto adicional" + item.IdLoja, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
             }
             finally
             {
@@ -321,8 +329,7 @@ namespace ms_crud_rest.DAO
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao atualizar o item", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-
+                logDAO.Adicionar(new Log { IdLoja = item.IdLoja, Mensagem = "Erro ao excluir item para o produto adicional" + item.IdLoja, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -331,7 +338,7 @@ namespace ms_crud_rest.DAO
             }
         }
 
-        public DadosProdutoAdicionalItem BuscarItemPorId(int id)
+        public DadosProdutoAdicionalItem BuscarItemPorId(int id, int idLoja)
         {
             List<DadosProdutoAdicionalItemEntidade> listaItemEntidade = new List<DadosProdutoAdicionalItemEntidade>();
             List<DadosProdutoAdicionalItem> listaItem = new List<DadosProdutoAdicionalItem>();
@@ -359,7 +366,12 @@ namespace ms_crud_rest.DAO
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
                 //transforma a entidade em objeto
-                listaItemEntidade = new ModuloClasse().PreencheClassePorDataReader<DadosProdutoAdicionalItemEntidade>(sqlConn.Reader);
+                if(sqlConn.Reader.HasRows)
+                    listaItemEntidade = new ModuloClasse().PreencheClassePorDataReader<DadosProdutoAdicionalItemEntidade>(sqlConn.Reader);
+
+                if (listaItemEntidade.Count == 0)
+                    throw new KeyNotFoundException();
+
                 foreach (var itemEntidade in listaItemEntidade)
                 {
                     listaItem.Add(itemEntidade.ToProdutoAdicionalItem());
@@ -369,10 +381,14 @@ namespace ms_crud_rest.DAO
 
                 return listaItem.FirstOrDefault();
             }
+            catch (KeyNotFoundException keyEx)
+            {
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Item adicional nao encontrado com id " + id, Descricao = keyEx.Message ?? "", StackTrace = keyEx.StackTrace ?? "" });
+                throw keyEx;
+            }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "erro ao buscar o item", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao buscar item adicional com id:" + id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -412,10 +428,7 @@ namespace ms_crud_rest.DAO
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao atualizar o item", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
-
-                sqlConn.Rollback();
-
+                logDAO.Adicionar(new Log { IdLoja = item.IdLoja, Mensagem = "Erro ao atualizar item adicional com id:" + item.Id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally

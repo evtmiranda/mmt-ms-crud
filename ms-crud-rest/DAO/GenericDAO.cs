@@ -20,9 +20,9 @@ namespace ms_crud_rest.DAO
 
         //public virtual int AdicionarPedido(T t) { return 0; }
 
-        public virtual List<T> Listar() { return null; }
+        public virtual List<T> Listar(int idLoja) { return null; }
 
-        public virtual List<T> Listar(int id) { return null; }
+        public virtual List<T> Listar(int id, int idLoja) { return null; }
 
         public virtual T BuscarPorId(int id, int idLoja) { return default(T); }
 
@@ -30,6 +30,6 @@ namespace ms_crud_rest.DAO
 
         public virtual void Excluir(T t) { }
 
-        public virtual void ExcluirPorId(int id) { }
+        public virtual void ExcluirPorId(int id, int idLoja) { }
     }
 }

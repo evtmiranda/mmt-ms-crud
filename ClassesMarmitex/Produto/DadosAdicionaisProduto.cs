@@ -57,6 +57,7 @@ namespace ClassesMarmitex
     {
         public int Id { get; set; }
         public int IdProdutoAdicional { get; set; }
+        public int IdLoja { get; set; }
         public string Nome { get; set; }
         public string Descricao { get; set; }
         public decimal Valor { get; set; }
@@ -95,6 +96,7 @@ namespace ClassesMarmitex
     {
         public int Id { get; set; }
         public int IdProduto { get; set; }
+        public int IdLoja { get; set; }
         public string NomeProduto { get; set; }
         public int IdProdutoAdicional { get; set; }
         public string NomeProdutoAdicional { get; set; }

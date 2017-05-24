@@ -138,7 +138,7 @@ namespace ms_crud_rest.Controllers
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 string mensagem = "Não foi possível atualizar o pedido. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);

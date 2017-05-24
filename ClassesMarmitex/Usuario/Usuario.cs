@@ -18,6 +18,8 @@ namespace ClassesMarmitex
         [StringLength(200, ErrorMessage = "o tamanho máximo aceito para o nome é 200 caracteres")]
         public string Nome { get; set; }
 
+        public int IdLoja { get; set; }
+
         [StringLength(200, ErrorMessage = "o tamanho máximo aceito para o apelido é 200 caracteres")]
         public string Apelido { get; set; }
 

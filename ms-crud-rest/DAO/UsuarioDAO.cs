@@ -23,7 +23,7 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
                 sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_usuario_loja(id_parceiro, nm_nome, nm_apelido, nm_email, nm_senha)
-                                                            VALUES(@id_parceiro, @nm_nome, @nm_apelido, @nm_email, @nm_senha); SELECT @@IDENTITY;");
+                                                            VALUES(@id_parceiro, @nm_nome, @nm_apelido, @nm_email, @nm_senha);");
 
 
                 //sqlCommand.Parameters.AddWithValue("@id_parceiro", usuario.IdParceiro);
@@ -36,16 +36,7 @@ namespace ms_crud_rest.DAO
 
                 retorno = Convert.ToInt32(varRetorno);
 
-                //verifica se o retorno foi positivo
-                if (retorno == 0)
-                    throw new CadastroNaoRealizadoClienteException();
-
-
                 return retorno;
-            }
-            catch (CadastroNaoRealizadoClienteException)
-            {
-                throw;
             }
             catch (Exception ex)
             {
@@ -87,15 +78,7 @@ namespace ms_crud_rest.DAO
 
                 retorno = Convert.ToInt32(varRetorno);
 
-                //verifica se o retorno foi positivo
-                if (retorno == 0)
-                    throw new CadastroNaoRealizadoClienteException();
-
                 return retorno;
-            }
-            catch (CadastroNaoRealizadoClienteException)
-            {
-                throw;
             }
             catch (Exception ex)
             {
@@ -151,7 +134,7 @@ namespace ms_crud_rest.DAO
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao autenticar usuário", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+                logDAO.Adicionar(new Log { IdLoja = usuario.IdLoja, Mensagem = "Erro ao autenticar usuário", Descricao = ex.Message, StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -201,7 +184,7 @@ namespace ms_crud_rest.DAO
             }
             catch (System.Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "Erro ao autenticar usuário", Descricao = ex.Message, StackTrace = ex.StackTrace == null ? "" : ex.StackTrace });
+                logDAO.Adicionar(new Log { IdLoja = usuario.IdLoja, Mensagem = "Erro ao autenticar usuário", Descricao = ex.Message, StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -328,24 +311,11 @@ namespace ms_crud_rest.DAO
 
                 retorno = Convert.ToInt32(sqlConn.Command.ExecuteScalar());
 
-                //se não encontrar uma empresa com o código digitado
-                if (retorno == 0)
-                    throw new EmpresaNaoEncontradaException();
-
                 return retorno;
-            }
-            catch (EmpresaNaoEncontradaException)
-            {
-                throw;
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log
-                {
-                    Mensagem = "erro ao consultar a empresa",
-                    Descricao = ex.Message,
-                    StackTrace = ex.StackTrace == null ? "" : ex.StackTrace
-                });
+                logDAO.Adicionar(new Log { IdLoja = 0, Mensagem = "Erro ao consultar empresa", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
 
                 throw ex;
             }

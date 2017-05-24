@@ -8,6 +8,7 @@
     {
         public int Id { get; set; }
         public int IdMenuCardapio { get; set; }
+        public int IdLoja { get; set; }
         public string Nome { get; set; }
         public string Descricao { get; set; }
         public decimal Valor { get; set; }
