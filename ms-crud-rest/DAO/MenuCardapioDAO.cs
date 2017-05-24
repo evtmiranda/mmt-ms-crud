@@ -111,7 +111,7 @@ namespace ms_crud_rest.DAO
                 //adiciona os produtos ao cardápio
                 foreach (var menuCardapio in listaMenuCardapio)
                 {
-                    menuCardapio.Produtos = produtoDAO.Listar(menuCardapio.Id);
+                    menuCardapio.Produtos = produtoDAO.Listar(menuCardapio.Id, idLoja);
                 }
 
                 return listaMenuCardapio;
@@ -133,7 +133,7 @@ namespace ms_crud_rest.DAO
             }
         }
 
-        public void AdicionarCardapio(int idLoja, MenuCardapio cardapio)
+        public void AdicionarCardapio(MenuCardapio cardapio)
         {
             try
             {
@@ -143,7 +143,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_menu_cardapio(id_loja, nm_cardapio, nr_ordem_exibicao, bol_ativo)
                                                               VALUES(@id_loja, @nm_cardapio, @nr_ordem_exibicao, @bol_ativo);");
 
-                sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
+                sqlConn.Command.Parameters.AddWithValue("@id_loja", cardapio.IdLoja);
                 sqlConn.Command.Parameters.AddWithValue("@nm_cardapio", cardapio.Nome);
                 sqlConn.Command.Parameters.AddWithValue("@nr_ordem_exibicao", cardapio.OrdemExibicao);
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", cardapio.Ativo);
@@ -152,7 +152,7 @@ namespace ms_crud_rest.DAO
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao cadastrar o cardápio com id " + cardapio.Id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                logDAO.Adicionar(new Log { IdLoja = cardapio.IdLoja, Mensagem = "Erro ao cadastrar o cardápio com id " + cardapio.Id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally

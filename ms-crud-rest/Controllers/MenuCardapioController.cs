@@ -45,12 +45,12 @@ namespace ms_crud_rest.Controllers
             }
         }
 
-        [Route("api/MenuCardapio/Cadastrar/{idLoja}")]
-        public HttpResponseMessage Post([FromUri] int idLoja, [FromBody] MenuCardapio cardapio)
+        [Route("api/MenuCardapio/Cadastrar")]
+        public HttpResponseMessage Post([FromBody] MenuCardapio cardapio)
         {
             try
             {
-                cardapioDAO.AdicionarCardapio(idLoja, cardapio);
+                cardapioDAO.AdicionarCardapio(cardapio);
                 return Request.CreateResponse(HttpStatusCode.Created);
             }
             catch (Exception)

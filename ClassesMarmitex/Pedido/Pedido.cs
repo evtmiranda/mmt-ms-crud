@@ -122,6 +122,7 @@
     {
         Fila,
         EmAndamento,
-        Entregue
+        Entregue,
+        Todos
     }
 }

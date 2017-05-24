@@ -67,7 +67,7 @@ namespace ms_crud_rest.Controllers
         /// <param name="estadoPedido">Estado do pedido que deseja buscar. Na fila, em andamento ou entregue</param>
         [HttpGet]
         [Route("api/Pedido/BuscarPedidos/{idLoja}/{ehDoDia}")]
-        public HttpResponseMessage BuscarPedidos(int idLoja, bool ehDoDia, EstadoPedido estadoPedido)
+        public HttpResponseMessage BuscarPedidos(int idLoja, bool ehDoDia, EstadoPedido estadoPedido = EstadoPedido.Todos)
         {
             List<Pedido> listaPedidosCliente = new List<Pedido>();
 

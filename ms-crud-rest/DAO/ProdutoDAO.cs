@@ -228,6 +228,10 @@ namespace ms_crud_rest.DAO
             {
                 sqlConn.StartConnection();
 
+                //limpa os dados da execução anterior
+                sqlConn.Command.CommandText = "";
+                if (sqlConn.Reader != null)
+                    sqlConn.Reader.Close();
 
                 #region Produtos
                 //busca os produtos
@@ -407,6 +411,7 @@ namespace ms_crud_rest.DAO
             {
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.CloseConnection();
+                sqlConn.Reader.Close();
             }
         }
 

@@ -188,6 +188,7 @@ namespace ms_crud_rest.DAO
 
                 if (estadoPedido == EstadoPedido.Entregue)
                     listaPedidos = listaPedidos.FindAll(p => p.PedidoStatus.IdStatus == 2);
+
             }
             catch (KeyNotFoundException)
             {
