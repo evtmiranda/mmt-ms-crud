@@ -57,6 +57,57 @@ namespace ms_crud_rest.DAO
             }
         }
 
+        public FormaDePagamento BuscarPorNome(string nome, int idLoja)
+        {
+            FormaDePagamento pagamento;
+            List<FormaDePagamentoEntidade> listaPagamentoEntidade;
+
+            try
+            {
+                sqlConn.StartConnection();
+
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+                sqlConn.Command.CommandText = string.Format(@"SELECT
+	                                                            id_forma_pagamento,
+	                                                            id_loja,
+	                                                            nm_forma_pagamento,
+	                                                            bol_ativo
+                                                            FROM tab_forma_pagamento
+                                                            WHERE nm_forma_pagamento = @nm_forma_pagamento
+                                                            AND id_loja = @id_loja");
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@nm_forma_pagamento", nome);
+                sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
+
+                sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                listaPagamentoEntidade = new ModuloClasse().PreencheClassePorDataReader<FormaDePagamentoEntidade>(sqlConn.Reader);
+
+                if (listaPagamentoEntidade.Count == 0)
+                    throw new KeyNotFoundException();
+
+                pagamento = listaPagamentoEntidade[0].ToFormaPagamento();
+
+                return pagamento;
+            }
+            catch (KeyNotFoundException keyEx)
+            {
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Forma de pagamento nao encontrada com nome " + nome, Descricao = keyEx.Message ?? "", StackTrace = keyEx.StackTrace ?? "" });
+                throw keyEx;
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao buscar a forma de pagamento com nome " + nome, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+                sqlConn.Reader.Close();
+            }
+        }
+
         public override List<FormaDePagamento> Listar(int idLoja)
         {
             List<FormaDePagamentoEntidade> listaPagamentoEntidade = new List<FormaDePagamentoEntidade>();

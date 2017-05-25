@@ -34,7 +34,7 @@ namespace ms_crud_rest.Controllers
                     if (pedido.ListaFormaPagamento[i].Nome == null)
                         continue;
 
-                    pedido.ListaFormaPagamento[i] = pagamentoDAO.BuscarPorId(pedido.ListaFormaPagamento[i].Id, pedido.Cliente.IdParceiro);
+                    pedido.ListaFormaPagamento[i] = pagamentoDAO.BuscarPorNome(pedido.ListaFormaPagamento[i].Nome, pedido.Cliente.IdLoja);
                 }
 
                 //remove as formas de pagamento com id = 0

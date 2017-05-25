@@ -97,6 +97,9 @@ namespace ClassesMarmitex
         [Column("id_parceiro")]
         public int IdParceiro { get; set; }
 
+        [Column("id_loja")]
+        public int IdLoja { get; set; }
+
         [Column("nm_usuario")]
         public string Nome { get; set; }
 
@@ -117,7 +120,7 @@ namespace ClassesMarmitex
 
         public UsuarioParceiro ToUsuarioParceiro()
         {
-            return new UsuarioParceiro { Id = this.Id, IdParceiro = this.IdParceiro, Nome = this.Nome, Apelido = this.Apelido, Email = this.Email, NumeroCelular = this.NumeroCelular, Senha = this.Senha, Ativo = this.Ativo };
+            return new UsuarioParceiro { Id = this.Id, IdLoja = this.IdLoja, IdParceiro = this.IdParceiro, Nome = this.Nome, Apelido = this.Apelido, Email = this.Email, NumeroCelular = this.NumeroCelular, Senha = this.Senha, Ativo = this.Ativo };
         }
     }
 }
