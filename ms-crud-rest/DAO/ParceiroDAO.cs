@@ -264,7 +264,6 @@ namespace ms_crud_rest.DAO
             finally
             {
                 sqlConn.CloseConnection();
-                sqlConn.Reader.Close();
             }
         }
 

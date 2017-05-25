@@ -39,7 +39,7 @@ namespace ms_crud_rest.Controllers
         }
 
         [HttpGet]
-        [Route("api/Parceiro/BuscarParceiro/{id}")]
+        [Route("api/Parceiro/BuscarParceiro/{id}/{idLoja}")]
         public HttpResponseMessage BuscarParceiro(int id, int idLoja)
         {
             try
