@@ -182,7 +182,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_loja", produtoAdicional.IdLoja);
                 sqlConn.Command.Parameters.AddWithValue("@nm_adicional", produtoAdicional.Nome);
-                sqlConn.Command.Parameters.AddWithValue("@nm_descricao", produtoAdicional.Descricao);
+                sqlConn.Command.Parameters.AddWithValue("@nm_descricao", produtoAdicional.Descricao ?? "");
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", produtoAdicional.Ativo);
 
                 sqlConn.Command.ExecuteNonQuery();

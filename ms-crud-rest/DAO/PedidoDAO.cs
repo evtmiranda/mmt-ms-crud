@@ -358,16 +358,19 @@ namespace ms_crud_rest.DAO
                     sqlConn.Command.CommandText = "";
 
                     sqlConn.Command.CommandText = @"SELECT
-                                                        id_usuario_parceiro,
-                                                        id_parceiro,
-                                                        nm_usuario,
-                                                        nm_apelido,
-                                                        nm_email,
-                                                        nm_celular,
-                                                        nm_senha,
-                                                        bol_ativo
-                                                    FROM tab_usuario_parceiro
-                                                    WHERE id_usuario_parceiro = @id_usuario_parceiro;";
+                                                        tup.id_usuario_parceiro,
+                                                        tup.id_parceiro,
+                                                        tp.id_loja,
+                                                        tup.nm_usuario,
+                                                        tup.nm_apelido,
+                                                        tup.nm_email,
+                                                        tup.nm_celular,
+                                                        tup.nm_senha,
+                                                        tup.bol_ativo
+                                                    FROM tab_usuario_parceiro AS tup
+                                                    INNER JOIN tab_parceiro AS tp
+                                                    ON tup.id_parceiro = tp.id_parceiro
+                                                    WHERE tup.id_usuario_parceiro = @id_usuario_parceiro;";
 
                     sqlConn.Command.Parameters.AddWithValue("@id_usuario_parceiro", pedido.Cliente.Id);
 

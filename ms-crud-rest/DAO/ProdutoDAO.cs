@@ -390,8 +390,11 @@ namespace ms_crud_rest.DAO
                     List<DadosProdutoAdicional> listaProdutoAdicionalFiltrada = new List<DadosProdutoAdicional>();
                     foreach (var produtoAdicional in listaIdProdutosAdicionais)
                     {
+                        var produtoAdicionalFiltrado = listaProdutoAdicional.Where(p => p.Id == produtoAdicional.IdProdutoAdicional 
+                                                            && p.OrdemExibicao == produtoAdicional.OrdemExibicao
+                                                            && p.QtdMin == produtoAdicional.QtdMin
+                                                            && p.QtdMax == produtoAdicional.QtdMax).ToList();
 
-                        var produtoAdicionalFiltrado = listaProdutoAdicional.Where(p => p.Id == produtoAdicional.IdProdutoAdicional).ToList();
                         listaProdutoAdicionalFiltrada.Add((DadosProdutoAdicional)produtoAdicionalFiltrado.FirstOrDefault());
                     }
 

@@ -137,6 +137,21 @@ namespace ms_crud_rest.DAO
 
                 #endregion
 
+                //ativa ou não um horário de entrega, de acordo com o tempo mínimo de antecedência ao pedido
+                DateTime dtAntecedencia = new DateTime();
+                dtAntecedencia = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd HH:mm"));
+
+                foreach (var horarioEntrega in dadosHorarioEntrega.HorariosEntrega)
+                {
+                    DateTime dtHorarioEntrega = new DateTime();
+                    dtHorarioEntrega = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd " + horarioEntrega.Horario));
+
+                    if ((dtHorarioEntrega - dtAntecedencia).TotalMinutes > dadosHorarioEntrega.TempoAntecedenciaEntrega.MinutosAntecedencia)
+                    {
+                        horarioEntrega.HorarioDisponivel = true;
+                    }
+                }
+
                 return dadosHorarioEntrega;
             }
             catch (KeyNotFoundException keyEx)
