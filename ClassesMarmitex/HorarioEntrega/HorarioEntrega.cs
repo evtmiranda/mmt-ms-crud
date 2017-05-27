@@ -8,6 +8,7 @@ namespace ClassesMarmitex
     {
         public List<HorarioEntrega> HorariosEntrega { get; set; }
         public TempoAntecedenciaEntrega TempoAntecedenciaEntrega { get; set; }
+        public List<DiasDeFuncionamento> DiasDeFuncionamento { get; set; }
     }
 
     public class HorarioEntrega
@@ -69,4 +70,43 @@ namespace ClassesMarmitex
         }
     }
 
+    public class DiasDeFuncionamento
+    {
+        public int Id { get; set; }
+        public int IdLoja { get; set; }
+        public int CodDiaDaSemana { get; set; }
+        public string DiaDaSemana { get; set; }
+        public bool DiaDisponivel { get; set; }
+        public bool Ativo { get; set; }
+    }
+
+    [Table("tab_dias_funcionamento")]
+    public class DiasDeFuncionamentoEntidade
+    {
+        [Column("id_dia_funcionamento")]
+        public int Id { get; set; }
+
+        [Column("id_loja")]
+        public int IdLoja { get; set; }
+
+        /// <summary>
+        /// Domingo: 0
+        /// Segunda-feira: 1
+        /// ...
+        /// Sábado: 6
+        /// </summary>
+        [Column("cod_dia_semana")]
+        public int CodDiaDaSemana { get; set; }
+
+        [Column("nm_dia_semana")]
+        public string DiaDaSemana { get; set; }
+
+        [Column("bol_ativo")]
+        public bool Ativo { get; set; }
+
+        public DiasDeFuncionamento ToDiasDeFuncionamento()
+        {
+            return new DiasDeFuncionamento { Id = this.Id, IdLoja = this.IdLoja, CodDiaDaSemana = this.CodDiaDaSemana, DiaDaSemana = this.DiaDaSemana, Ativo = this.Ativo };
+        }
+    }
 }

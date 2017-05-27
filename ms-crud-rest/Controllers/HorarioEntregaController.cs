@@ -171,5 +171,45 @@ namespace ms_crud_rest.Controllers
         }
 
         #endregion
+
+        #region dias de funcionamento
+
+        [HttpPost]
+        [Route("api/HorarioEntrega/DiaFuncionamento/Excluir")]
+        public HttpResponseMessage ExcluirDiaFuncionamento([FromBody] DiasDeFuncionamento diaFuncionamento)
+        {
+            try
+            {
+                horarioEntregaDAO.AtualizarDiaFuncionamento(diaFuncionamento);
+                return Request.CreateResponse(HttpStatusCode.OK, diaFuncionamento);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível excluir o dia de funcionamento. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/HorarioEntrega/DiaFuncionamento/Ativar")]
+        public HttpResponseMessage AtivarDiaFuncionamento([FromBody] DiasDeFuncionamento diaFuncionamento)
+        {
+            try
+            {
+                horarioEntregaDAO.AtualizarDiaFuncionamento(diaFuncionamento);
+                return Request.CreateResponse(HttpStatusCode.OK, diaFuncionamento);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível ativar o dia de funcionamento. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        #endregion
     }
 }

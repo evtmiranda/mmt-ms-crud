@@ -14,7 +14,8 @@
         public DateTime DataEntrega { get; set; }
         public string HorarioEntrega { get; set; }
         public List<FormaDePagamento> ListaFormaPagamento { get; set; }
-        public string Troco { get; set; }
+        public decimal Troco { get; set; }
+        public decimal ValorTotalPedido { get; set; }
         public string Observacao { get; set; }
         public PedidoStatus PedidoStatus { get; set; }
     }
@@ -37,6 +38,9 @@
         [Column("vlr_troco")]
         public decimal Troco { get; set; }
 
+        [Column("vlr_total_pedido")]
+        public decimal ValorTotalPedido { get; set; }
+
         [Column("nm_observacao")]
         public string Observacao { get; set; }
 
@@ -48,7 +52,8 @@
                 Cliente = new UsuarioParceiro { Id = IdCliente },
                 DataPedido = DataPedido,
                 DataEntrega = DataEntrega,
-                Troco = Troco.ToString(),
+                Troco = Troco,
+                ValorTotalPedido = ValorTotalPedido,
                 Observacao = Observacao
             };
 

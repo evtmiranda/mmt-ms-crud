@@ -41,8 +41,8 @@ namespace ms_crud_rest.Controllers
                 pedido.ListaFormaPagamento.RemoveAll(p => p.Id == 0);
 
                 //formata o campo troco para decimal
-                if (string.IsNullOrEmpty(pedido.Troco))
-                    pedido.Troco = "0.00";
+                if (string.IsNullOrEmpty(pedido.Troco.ToString()))
+                    pedido.Troco = 0;
 
                 //adiciona o pedido
                 pedido.Id = pedidoDAO.AdicionarPedido(pedido);

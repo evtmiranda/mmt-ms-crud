@@ -67,6 +67,9 @@ namespace ms_crud_rest.DAO
             TempoAntecedenciaEntrega tempoAntecedencia = new TempoAntecedenciaEntrega();
             List<TempoAntecedenciaEntregaEntidade> listaTempoAntecedenciaEntidade = new List<TempoAntecedenciaEntregaEntidade>();
 
+            List<DiasDeFuncionamento> listaDiasFuncionamento = new List<DiasDeFuncionamento>();
+            List<DiasDeFuncionamentoEntidade> listaDiasFuncionamentoEntidade = new List<DiasDeFuncionamentoEntidade>();
+
             try
             {
                 sqlConn.StartConnection();
@@ -124,15 +127,42 @@ namespace ms_crud_rest.DAO
 
                 tempoAntecedencia = listaTempoAntecedenciaEntidade.FirstOrDefault().ToTempoAntecedenciaEntrega();
 
+                sqlConn.Reader.Close();
+
                 #endregion
 
+                #region dias de funcionamento
 
-                #region monta o objeto com a lista de horários e o tempo de antecedência de entrega
+                sqlConn.Command.CommandText = string.Format(@"SELECT
+                                                                id_dia_funcionamento,
+	                                                            id_loja,
+	                                                            cod_dia_semana,
+	                                                            nm_dia_semana,
+	                                                            bol_ativo
+                                                            FROM tab_dias_funcionamento
+                                                            WHERE id_loja = @id_loja
+                                                            ORDER BY cod_dia_semana;");
+
+                sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                listaDiasFuncionamentoEntidade = new ModuloClasse().PreencheClassePorDataReader<DiasDeFuncionamentoEntidade>(sqlConn.Reader);
+
+                //transforma a entidade em objeto
+                foreach (var diaSemana in listaDiasFuncionamentoEntidade)
+                    listaDiasFuncionamento.Add(diaSemana.ToDiasDeFuncionamento());
+
+                //fecha o reader
+                sqlConn.Reader.Close();
+
+                #endregion
+
+                #region monta o objeto com a lista de horários, tempo de antecedência de entrega e dias de funcionamento
 
                 DadosHorarioEntrega dadosHorarioEntrega = new DadosHorarioEntrega()
                 {
                     HorariosEntrega = listaHorarios,
-                    TempoAntecedenciaEntrega = tempoAntecedencia
+                    TempoAntecedenciaEntrega = tempoAntecedencia,
+                    DiasDeFuncionamento = listaDiasFuncionamento
                 };
 
                 #endregion
@@ -150,6 +180,17 @@ namespace ms_crud_rest.DAO
                     {
                         horarioEntrega.HorarioDisponivel = true;
                     }
+                }
+
+                //ativa o dia atual
+                foreach (var diaFuncionamento in dadosHorarioEntrega.DiasDeFuncionamento)
+                {
+                    //inativa o dia
+                    diaFuncionamento.DiaDisponivel = false;
+
+                    //verifica se o dia é o dia atual e se está ativo. Se sim, ativa o dia de funcionamento
+                    if (diaFuncionamento.CodDiaDaSemana == System.DateTime.Now.DayOfWeek.GetHashCode() && diaFuncionamento.Ativo)
+                        diaFuncionamento.DiaDisponivel = true;
                 }
 
                 return dadosHorarioEntrega;
@@ -329,6 +370,39 @@ namespace ms_crud_rest.DAO
             catch (Exception ex)
             {
                 logDAO.Adicionar(new Log { IdLoja = tempoAntecedenciaEntrega.IdLoja, Mensagem = "Erro ao atualizar o tempo de antecedência", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
+        }
+
+        #endregion
+
+        #region dias de funcionamento
+
+        public void AtualizarDiaFuncionamento(DiasDeFuncionamento diaFuncionamento)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", diaFuncionamento.Ativo);
+                sqlConn.Command.Parameters.AddWithValue("@id_dia_funcionamento", diaFuncionamento.Id);
+
+                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_dias_funcionamento
+	                                                            SET bol_ativo = @bol_ativo
+                                                            WHERE id_dia_funcionamento = @id_dia_funcionamento;");
+
+                sqlConn.Command.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = diaFuncionamento.IdLoja, Mensagem = "Erro ao atualizar o dia de funcionamento", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally

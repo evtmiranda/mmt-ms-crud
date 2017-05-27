@@ -29,8 +29,8 @@ namespace ms_crud_rest.DAO
 
                 //1 - insere o pedido
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
-                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_pedido(id_usuario_parceiro, dt_entrega, vlr_troco, nm_observacao)
-                                                              VALUES(@id_usuario_parceiro, @dt_entrega, @vlr_troco, @nm_observacao); SELECT @@IDENTITY;");
+                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_pedido(id_usuario_parceiro, dt_entrega, vlr_troco, vlr_total_pedido, nm_observacao)
+                                                              VALUES(@id_usuario_parceiro, @dt_entrega, @vlr_troco, @vlr_total_pedido, @nm_observacao); SELECT @@IDENTITY;");
 
                 pedido.DataPedido = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd " + pedido.HorarioEntrega));
 
@@ -38,6 +38,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.AddWithValue("@id_usuario_parceiro", pedido.Cliente.Id);
                 sqlConn.Command.Parameters.AddWithValue("@dt_entrega", pedido.DataPedido);
                 sqlConn.Command.Parameters.AddWithValue("@vlr_troco", pedido.Troco);
+                sqlConn.Command.Parameters.AddWithValue("@vlr_total_pedido", pedido.ValorTotalPedido);
                 sqlConn.Command.Parameters.AddWithValue("@nm_observacao", pedido.Observacao);
 
                 var varRetornoPedido = sqlConn.Command.ExecuteScalar();
@@ -259,6 +260,7 @@ namespace ms_crud_rest.DAO
                                                                     dt_pedido,
                                                                     dt_entrega,
                                                                     vlr_troco,
+                                                                    vlr_total_pedido,
                                                                     nm_observacao
                                                                 FROM tab_pedido
                                                                 WHERE 1 = 1");
@@ -281,6 +283,7 @@ namespace ms_crud_rest.DAO
                                                                     tp.dt_pedido,
                                                                     tp.dt_entrega,
                                                                     tp.vlr_troco,
+                                                                    tp.vlr_total_pedido,
                                                                     tp.nm_observacao
                                                                 FROM tab_pedido AS tp
                                                                 INNER JOIN tab_usuario_parceiro AS tup
@@ -369,7 +372,8 @@ namespace ms_crud_rest.DAO
                                                         tup.nm_celular,
                                                         tup.nm_senha,
                                                         tup.bol_ativo,
-	                                                    concat(nm_logradouro, ', ', nm_numero_endereco, ' - ', nm_bairro, ', ', nm_cidade) AS endereco
+	                                                    concat(nm_logradouro, ', ', nm_numero_endereco, ' - ', nm_bairro, ', ', nm_cidade) AS endereco,
+                                                        tp.vlr_taxa_entrega
                                                     FROM tab_usuario_parceiro AS tup
                                                     INNER JOIN tab_parceiro AS tp
                                                     ON tup.id_parceiro = tp.id_parceiro
@@ -407,6 +411,7 @@ namespace ms_crud_rest.DAO
                                                         nm_descricao,
                                                         id_endereco,
                                                         nm_codigo,
+                                                        vlr_taxa_entrega,
                                                         bol_ativo
                                                     FROM tab_parceiro
                                                     WHERE id_parceiro = @id_parceiro;";
@@ -746,6 +751,7 @@ namespace ms_crud_rest.DAO
                                                                     dt_pedido,
                                                                     dt_entrega,
                                                                     vlr_troco,
+                                                                    vlr_total_pedido,
                                                                     nm_observacao
                                                                 FROM tab_pedido
                                                                 WHERE 1 = 1");

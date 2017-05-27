@@ -31,6 +31,7 @@ namespace ms_crud_rest.DAO
 	                                                            nm_descricao,
 	                                                            id_endereco,
 	                                                            nm_codigo,
+                                                                vlr_taxa_entrega,
 	                                                            bol_ativo
                                                             FROM tab_parceiro
                                                             WHERE id_parceiro = @id_parceiro;");
@@ -118,6 +119,7 @@ namespace ms_crud_rest.DAO
 	                                                            nm_descricao,
 	                                                            id_endereco,
 	                                                            nm_codigo,
+                                                                vlr_taxa_entrega,
 	                                                            bol_ativo
                                                             FROM tab_parceiro
                                                             WHERE id_loja = @id_loja
@@ -216,6 +218,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_endereco(nm_cep, nm_uf, nm_cidade, nm_bairro, nm_logradouro, nm_numero_endereco, nm_complemento_endereco)
                                                               VALUES(@nm_cep, @nm_uf, @nm_cidade, @nm_bairro, @nm_logradouro, @nm_numero_endereco, @nm_complemento_endereco); SELECT @@identity");
 
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@nm_cep", parceiro.Endereco.Cep);
                 sqlConn.Command.Parameters.AddWithValue("@nm_uf", parceiro.Endereco.UF);
                 sqlConn.Command.Parameters.AddWithValue("@nm_cidade", parceiro.Endereco.Cidade);
@@ -235,14 +238,16 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.Parameters.Clear();
 
-                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_parceiro(id_loja, nm_parceiro, nm_descricao, id_endereco, nm_codigo)
-                                                              VALUES(@id_loja, @nm_parceiro, @nm_descricao, @id_endereco, @nm_codigo)");
+                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_parceiro(id_loja, nm_parceiro, nm_descricao, id_endereco, nm_codigo, vlr_taxa_entrega)
+                                                              VALUES(@id_loja, @nm_parceiro, @nm_descricao, @id_endereco, @nm_codigo, @vlr_taxa_entrega)");
 
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
                 sqlConn.Command.Parameters.AddWithValue("@nm_parceiro", parceiro.Nome);
                 sqlConn.Command.Parameters.AddWithValue("@nm_descricao", parceiro.Descricao ?? "");
                 sqlConn.Command.Parameters.AddWithValue("@id_endereco", idEndereco);
                 sqlConn.Command.Parameters.AddWithValue("@nm_codigo", parceiro.Codigo);
+                sqlConn.Command.Parameters.AddWithValue("@vlr_taxa_entrega", parceiro.TaxaEntrega);
 
                 sqlConn.Command.ExecuteNonQuery();
 
@@ -278,14 +283,18 @@ namespace ms_crud_rest.DAO
 
                 #region atualiza os dados do parceiro
 
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@nm_parceiro", parceiro.Nome);
                 sqlConn.Command.Parameters.AddWithValue("@nm_descricao", parceiro.Descricao);
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", parceiro.Ativo);
                 sqlConn.Command.Parameters.AddWithValue("@id_parceiro", parceiro.Id);
+                sqlConn.Command.Parameters.AddWithValue("@vlr_taxa_entrega", parceiro.TaxaEntrega);
+                
 
                 sqlConn.Command.CommandText = string.Format(@"UPDATE tab_parceiro
 	                                                            SET nm_parceiro = @nm_parceiro,
 		                                                            nm_descricao = @nm_descricao,
+                                                                    vlr_taxa_entrega = @vlr_taxa_entrega,
 		                                                            bol_ativo = @bol_ativo
                                                             WHERE id_parceiro = @id_parceiro;");
 

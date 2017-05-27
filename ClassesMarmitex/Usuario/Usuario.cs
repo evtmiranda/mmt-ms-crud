@@ -94,6 +94,8 @@ namespace ClassesMarmitex
         public string NumeroCelular { get; set; }
 
         public string Endereco { get; set; }
+
+        public decimal TaxaEntrega { get; set; }
     }
 
     [Table("tab_usuario_parceiro")]
@@ -132,9 +134,15 @@ namespace ClassesMarmitex
         [Column("endereco")]
         public string Endereco { get; set; }
 
+        /// <summary>
+        /// O valor da taxa vem da tab_parceiro
+        /// </summary>
+        [Column("vlr_taxa_entrega")]
+        public decimal TaxaEntrega { get; set; }
+
         public UsuarioParceiro ToUsuarioParceiro()
         {
-            return new UsuarioParceiro { Id = this.Id, IdLoja = this.IdLoja, IdParceiro = this.IdParceiro, Nome = this.Nome, Apelido = this.Apelido, Email = this.Email, NumeroCelular = this.NumeroCelular, Senha = this.Senha, Ativo = this.Ativo, Endereco = this.Endereco };
+            return new UsuarioParceiro { Id = this.Id, IdLoja = this.IdLoja, IdParceiro = this.IdParceiro, Nome = this.Nome, Apelido = this.Apelido, Email = this.Email, NumeroCelular = this.NumeroCelular, Senha = this.Senha, Ativo = this.Ativo, Endereco = this.Endereco, TaxaEntrega = this.TaxaEntrega };
         }
     }
 }

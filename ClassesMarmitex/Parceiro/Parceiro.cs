@@ -20,6 +20,7 @@ namespace ClassesMarmitex
 
         public List<Beneficio> Beneficios { get; set; }
         public string Codigo { get; set; }
+        public decimal TaxaEntrega { get; set; }
         public bool Ativo { get; set; }
     }
 
@@ -44,6 +45,9 @@ namespace ClassesMarmitex
         [Column("nm_codigo")]
         public string Codigo { get; set; }
 
+        [Column("vlr_taxa_entrega")]
+        public decimal TaxaEntrega { get; set; }
+
         [Column("bol_ativo")]
         public bool Ativo { get; set; }
 
@@ -57,6 +61,7 @@ namespace ClassesMarmitex
                 Descricao = Descricao,
                 Endereco = new Endereco { Id = IdEndereco },
                 Codigo = Codigo,
+                TaxaEntrega = TaxaEntrega,
                 Ativo = Ativo
             };
 
@@ -108,6 +113,7 @@ namespace ClassesMarmitex
 
         public List<Beneficio> Beneficios { get; set; }
         public string Codigo { get; set; }
+        public decimal TaxaEntrega { get; set; }
         public bool Ativo { get; set; }
     }
 }
