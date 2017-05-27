@@ -28,9 +28,9 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.ExecuteNonQuery();
             }
-            catch (System.Exception ex)
+            catch (System.Exception)
             {
-
+                //lascou
             }
             finally
             {

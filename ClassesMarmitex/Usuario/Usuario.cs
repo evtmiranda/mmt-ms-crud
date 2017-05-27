@@ -37,9 +37,9 @@ namespace ClassesMarmitex
     }
     public class UsuarioLoja : Usuario
     {
-        public int IdLoja { get; set; }
         public int NivelPermissao { get; set; }
         public string UrlLoja { get; set; }
+        public string Imagem { get; set; }
     }
 
     [Table("tab_usuario_loja")]
@@ -69,9 +69,15 @@ namespace ClassesMarmitex
         [Column("bol_ativo")]
         public bool Ativo { get; set; }
 
+        /// <summary>
+        /// a imagem vem da tab_loja
+        /// </summary>
+        [Column("url_imagem")]
+        public string Imagem { get; set; }
+
         public UsuarioLoja ToUsuarioLoja()
         {
-            return new UsuarioLoja { Id = this.Id, IdLoja = this.IdLoja, Nome = this.Nome, Apelido = this.Apelido, Email = this.Email, Senha = this.Senha, NivelPermissao = this.NivelPermissao, Ativo = this.Ativo };
+            return new UsuarioLoja { Id = this.Id, IdLoja = this.IdLoja, Nome = this.Nome, Apelido = this.Apelido, Email = this.Email, Senha = this.Senha, NivelPermissao = this.NivelPermissao, Ativo = this.Ativo, Imagem = this.Imagem };
         }
     }
 
@@ -86,6 +92,8 @@ namespace ClassesMarmitex
         [Required(ErrorMessage = "o preenchimento do telefone celular é obrigatório")]
         [StringLength(15, ErrorMessage = "por favor, verifique o número de celular digitado")]
         public string NumeroCelular { get; set; }
+
+        public string Endereco { get; set; }
     }
 
     [Table("tab_usuario_parceiro")]
@@ -118,9 +126,15 @@ namespace ClassesMarmitex
         [Column("bol_ativo")]
         public bool Ativo { get; set; }
 
+        /// <summary>
+        /// o endereco vem da tab_parceiro e tab_endereco
+        /// </summary>
+        [Column("endereco")]
+        public string Endereco { get; set; }
+
         public UsuarioParceiro ToUsuarioParceiro()
         {
-            return new UsuarioParceiro { Id = this.Id, IdLoja = this.IdLoja, IdParceiro = this.IdParceiro, Nome = this.Nome, Apelido = this.Apelido, Email = this.Email, NumeroCelular = this.NumeroCelular, Senha = this.Senha, Ativo = this.Ativo };
+            return new UsuarioParceiro { Id = this.Id, IdLoja = this.IdLoja, IdParceiro = this.IdParceiro, Nome = this.Nome, Apelido = this.Apelido, Email = this.Email, NumeroCelular = this.NumeroCelular, Senha = this.Senha, Ativo = this.Ativo, Endereco = this.Endereco };
         }
     }
 }

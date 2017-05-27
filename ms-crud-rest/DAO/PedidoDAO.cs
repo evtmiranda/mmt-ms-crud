@@ -339,6 +339,8 @@ namespace ms_crud_rest.DAO
                     if (sqlConn.Reader.HasRows)
                         listaPedidoStatusEntidade = new ModuloClasse().PreencheClassePorDataReader<PedidoStatusEntidade>(sqlConn.Reader);
 
+                    listaPedidoStatus = new List<PedidoStatus>();
+
                     foreach (var statusEntidade in listaPedidoStatusEntidade)
                     {
                         listaPedidoStatus.Add(statusEntidade.ToPedidoStatus());
@@ -366,10 +368,13 @@ namespace ms_crud_rest.DAO
                                                         tup.nm_email,
                                                         tup.nm_celular,
                                                         tup.nm_senha,
-                                                        tup.bol_ativo
+                                                        tup.bol_ativo,
+	                                                    concat(nm_logradouro, ', ', nm_numero_endereco, ' - ', nm_bairro, ', ', nm_cidade) AS endereco
                                                     FROM tab_usuario_parceiro AS tup
                                                     INNER JOIN tab_parceiro AS tp
                                                     ON tup.id_parceiro = tp.id_parceiro
+                                                    INNER JOIN tab_endereco AS te
+                                                    ON te.id_endereco = tp.id_endereco
                                                     WHERE tup.id_usuario_parceiro = @id_usuario_parceiro;";
 
                     sqlConn.Command.Parameters.AddWithValue("@id_usuario_parceiro", pedido.Cliente.Id);
@@ -785,8 +790,8 @@ namespace ms_crud_rest.DAO
             try
             {
                 //abre o begin transaction
-                sqlConn.BeginTransaction();
                 sqlConn.StartConnection();
+                sqlConn.BeginTransaction();
 
                 //monta os parâmetros que serão utilizados
                 sqlConn.Command.Parameters.Clear();

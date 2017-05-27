@@ -209,15 +209,18 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
                 sqlConn.Command.CommandText = string.Format(@"SELECT
-                                                                id_usuario_loja,	
-                                                                id_loja,
-                                                                nm_usuario,
-                                                                nm_apelido,
-                                                                nm_email,
-                                                                nm_senha,
-                                                                nr_nivel_permissao,
-                                                                bol_ativo  
-                                                            FROM tab_usuario_loja
+                                                                tul.id_usuario_loja,	
+                                                                tul.id_loja,
+                                                                tul.nm_usuario,
+                                                                tul.nm_apelido,
+                                                                tul.nm_email,
+                                                                tul.nm_senha,
+                                                                tul.nr_nivel_permissao,
+                                                                tul.bol_ativo,
+                                                                tl.url_imagem
+                                                            FROM tab_usuario_loja AS tul
+                                                            INNER JOIN tab_loja AS tl
+                                                            ON tul.id_loja = tl.id_loja
                                                             WHERE nm_email = @email");
 
                 sqlConn.Command.Parameters.AddWithValue("@email", email);
@@ -266,10 +269,13 @@ namespace ms_crud_rest.DAO
 	                                                            nm_email,
 	                                                            nm_celular,
 	                                                            nm_senha,
-	                                                            tup.bol_ativo  
+	                                                            tup.bol_ativo,
+	                                                            concat(nm_logradouro, ', ', nm_numero_endereco, ' - ', nm_bairro, ', ', nm_cidade) AS endereco
                                                             FROM tab_usuario_parceiro AS tup
                                                             INNER JOIN tab_parceiro AS tp
                                                             ON tup.id_parceiro = tp.id_parceiro
+                                                            INNER JOIN tab_endereco AS te
+                                                            ON te.id_endereco = tp.id_endereco
                                                             WHERE nm_email = @email");
 
                 sqlConn.Command.Parameters.AddWithValue("@email", email);

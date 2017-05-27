@@ -285,7 +285,8 @@ namespace ms_crud_rest.DAO
                                                             WHERE tpap.bol_ativo = 1
                                                             AND tpa.bol_ativo = 1
                                                             AND tp.bol_ativo = 1
-                                                            AND tp.id_menu_cardapio = @id_menu_cardapio;");
+                                                            AND tp.id_menu_cardapio = @id_menu_cardapio
+                                                            ORDER BY tpap.nr_ordem_exibicao ASC;");
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
@@ -353,7 +354,8 @@ namespace ms_crud_rest.DAO
                                                 ON tp.id_produto = tpap.id_produto
                                                 WHERE tpap.bol_ativo = 1
                                                 AND tpa.bol_ativo = 1
-                                                AND tp.bol_ativo = 1;";
+                                                AND tp.bol_ativo = 1
+                                                ORDER BY tpap.nr_ordem_exibicao ASC;";
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
