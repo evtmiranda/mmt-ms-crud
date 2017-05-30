@@ -90,6 +90,92 @@ namespace ms_crud_rest.DAO
             }
         }
 
+        public override void Atualizar(HorarioEntrega horarioEntrega)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@nm_horario", horarioEntrega.Horario);
+                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", horarioEntrega.Ativo);
+                sqlConn.Command.Parameters.AddWithValue("@id_horario_entrega", horarioEntrega.Id);
+
+                sqlConn.Command.CommandText = @"UPDATE tab_horario_entrega
+	                                                SET nm_horario = @nm_horario,
+		                                                bol_ativo = @bol_ativo
+                                                WHERE id_horario_entrega = @id_horario_entrega";
+
+                sqlConn.Command.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = horarioEntrega.IdLoja, Mensagem = "Erro ao atualizar o horário de entrega", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
+        }
+
+        public override void Excluir(HorarioEntrega horarioEntrega)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@id_horario_entrega", horarioEntrega.Id);
+
+                sqlConn.Command.CommandText = @"DELETE FROM tab_horario_entrega
+                                                WHERE id_horario_entrega = @id_horario_entrega";
+
+                sqlConn.Command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = horarioEntrega.IdLoja, Mensagem = "Erro ao excluir o horário de entrega", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
+        }
+
+        public override void Desativar(HorarioEntrega horarioEntrega)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", horarioEntrega.Ativo);
+                sqlConn.Command.Parameters.AddWithValue("@id_horario_entrega", horarioEntrega.Id);
+
+                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_horario_entrega
+	                                                            SET bol_ativo = @bol_ativo
+                                                            WHERE id_horario_entrega = @id_horario_entrega;");
+
+                sqlConn.Command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = horarioEntrega.IdLoja, Mensagem = "Erro ao desativar o horário de entrega", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
+        }
+
         public DadosHorarioEntrega ListarHorariosEntrega(int idLoja)
         {
             List<HorarioEntregaEntidade> listaHorariosEntidade = new List<HorarioEntregaEntidade>();
@@ -246,92 +332,7 @@ namespace ms_crud_rest.DAO
             }
         }
 
-        public override void Atualizar(HorarioEntrega horarioEntrega)
-        {
-            try
-            {
-                sqlConn.StartConnection();
-                sqlConn.Command.CommandType = System.Data.CommandType.Text;
-
-                sqlConn.Command.Parameters.Clear();
-                sqlConn.Command.Parameters.AddWithValue("@nm_horario", horarioEntrega.Horario);
-                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", horarioEntrega.Ativo);
-                sqlConn.Command.Parameters.AddWithValue("@id_horario_entrega", horarioEntrega.Id);
-
-                sqlConn.Command.CommandText = @"UPDATE tab_horario_entrega
-	                                                SET nm_horario = @nm_horario,
-		                                                bol_ativo = @bol_ativo
-                                                WHERE id_horario_entrega = @id_horario_entrega";
-
-                sqlConn.Command.ExecuteNonQuery();
-
-            }
-            catch (Exception ex)
-            {
-                logDAO.Adicionar(new Log { IdLoja = horarioEntrega.IdLoja, Mensagem = "Erro ao atualizar o horário de entrega", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
-                throw ex;
-            }
-            finally
-            {
-                sqlConn.CloseConnection();
-            }
-        }
-
-        public override void Excluir(HorarioEntrega horarioEntrega)
-        {
-            try
-            {
-                sqlConn.StartConnection();
-
-                sqlConn.Command.CommandType = System.Data.CommandType.Text;
-
-                sqlConn.Command.Parameters.Clear();
-                sqlConn.Command.Parameters.AddWithValue("@id_horario_entrega", horarioEntrega.Id);
-
-                sqlConn.Command.CommandText = @"DELETE FROM tab_horario_entrega
-                                                WHERE id_horario_entrega = @id_horario_entrega";
-
-                sqlConn.Command.ExecuteNonQuery();
-            }
-            catch (Exception ex)
-            {
-                logDAO.Adicionar(new Log { IdLoja = horarioEntrega.IdLoja, Mensagem = "Erro ao excluir o horário de entrega", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
-                throw ex;
-            }
-            finally
-            {
-                sqlConn.CloseConnection();
-            }
-        }
-
-        public override void Desativar(HorarioEntrega horarioEntrega)
-        {
-            try
-            {
-                sqlConn.StartConnection();
-                sqlConn.Command.CommandType = System.Data.CommandType.Text;
-
-                sqlConn.Command.Parameters.Clear();
-                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", horarioEntrega.Ativo);
-                sqlConn.Command.Parameters.AddWithValue("@id_horario_entrega", horarioEntrega.Id);
-
-                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_horario_entrega
-	                                                            SET bol_ativo = @bol_ativo
-                                                            WHERE id_horario_entrega = @id_horario_entrega;");
-
-                sqlConn.Command.ExecuteNonQuery();
-            }
-            catch (Exception ex)
-            {
-                logDAO.Adicionar(new Log { IdLoja = horarioEntrega.IdLoja, Mensagem = "Erro ao excluir o horário de entrega", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
-                throw ex;
-            }
-            finally
-            {
-                sqlConn.CloseConnection();
-            }
-        }
-
+        
         #region tempo antecedencia
 
         public TempoAntecedenciaEntrega BuscarTempoAntecedencia(int id, int idLoja)
@@ -390,17 +391,17 @@ namespace ms_crud_rest.DAO
                 sqlConn.StartConnection();
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
 
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@nr_minutos_antecedencia", tempoAntecedenciaEntrega.MinutosAntecedencia);
                 sqlConn.Command.Parameters.AddWithValue("@id_loja", tempoAntecedenciaEntrega.IdLoja);
                 sqlConn.Command.Parameters.AddWithValue("@id_tempo_antecedencia", tempoAntecedenciaEntrega.Id);
 
-                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_horario_entrega_tempo_anteced_pedido
-	                                                            SET nr_minutos_antecedencia = @nr_minutos_antecedencia
-                                                            WHERE id_tempo_antecedencia = @id_tempo_antecedencia
-                                                            AND id_loja = @id_loja;");
+                sqlConn.Command.CommandText = @"UPDATE tab_horario_entrega_tempo_anteced_pedido
+	                                                SET nr_minutos_antecedencia = @nr_minutos_antecedencia
+                                                WHERE id_tempo_antecedencia = @id_tempo_antecedencia
+                                                AND id_loja = @id_loja";
 
                 sqlConn.Command.ExecuteNonQuery();
-
             }
             catch (Exception ex)
             {
@@ -425,15 +426,15 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
 
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", diaFuncionamento.Ativo);
                 sqlConn.Command.Parameters.AddWithValue("@id_dia_funcionamento", diaFuncionamento.Id);
 
-                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_dias_funcionamento
-	                                                            SET bol_ativo = @bol_ativo
-                                                            WHERE id_dia_funcionamento = @id_dia_funcionamento;");
+                sqlConn.Command.CommandText = @"UPDATE tab_dias_funcionamento
+	                                                SET bol_ativo = @bol_ativo
+                                                WHERE id_dia_funcionamento = @id_dia_funcionamento";
 
                 sqlConn.Command.ExecuteNonQuery();
-
             }
             catch (Exception ex)
             {

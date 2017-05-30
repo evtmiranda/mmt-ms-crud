@@ -28,18 +28,16 @@ namespace ms_crud_rest.DAO
 	                                                id_endereco,
 	                                                bol_ativo
                                                 FROM tab_loja
-                                                WHERE nm_dominio_loja = @nm_dominio_loja
-                                                AND bol_ativo = 1";
+                                                WHERE nm_dominio_loja = @nm_dominio_loja";
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@nm_dominio_loja", dominio);
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
-                listaLojaEntidade = new ModuloClasse().PreencheClassePorDataReader<LojaEntidade>(sqlConn.Reader);
-
-                //verifica se alguma loja foi encontrada
-                if (listaLojaEntidade.Count == 0)
+                if(sqlConn.Reader.HasRows)
+                    listaLojaEntidade = new ModuloClasse().PreencheClassePorDataReader<LojaEntidade>(sqlConn.Reader);
+                else
                     throw new KeyNotFoundException();
 
                 loja = listaLojaEntidade[0].ToLoja();
@@ -59,7 +57,9 @@ namespace ms_crud_rest.DAO
             finally
             {
                 sqlConn.CloseConnection();
-                sqlConn.Reader.Close();
+
+                if(sqlConn.Reader != null)
+                    sqlConn.Reader.Close();
             }
         }
 

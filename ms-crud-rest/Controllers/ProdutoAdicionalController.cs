@@ -88,9 +88,9 @@ namespace ms_crud_rest.Controllers
         }
 
         /// <summary>
-        /// Inativa um produto adicional
+        /// Exclui um produto adicional
         /// </summary>
-        /// <param name="produtoAdicional">produto adicional que será atualizado</param>
+        /// <param name="produtoAdicional">produto adicional que será excluido</param>
         /// <returns></returns>
         [HttpPost]
         [Route("api/ProdutoAdicional/Excluir")]
@@ -105,6 +105,29 @@ namespace ms_crud_rest.Controllers
             catch (Exception)
             {
                 string mensagem = "Não foi possível excluir o produto adicional. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        /// <summary>
+        /// Desativa um produto adicional
+        /// </summary>
+        /// <param name="produtoAdicional">produto adicional que será desativado</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/ProdutoAdicional/Desativar")]
+        public HttpResponseMessage Desativar([FromBody] DadosProdutoAdicional produtoAdicional)
+        {
+            try
+            {
+                produtoAdicionalDAO.Desativar(produtoAdicional);
+
+                return Request.CreateResponse(HttpStatusCode.OK, produtoAdicional);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível desativar o produto adicional. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
@@ -167,6 +190,24 @@ namespace ms_crud_rest.Controllers
             catch (Exception)
             {
                 string mensagem = "Não foi possível excluir o item. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/ProdutoAdicional/DesativarItem")]
+        public HttpResponseMessage DesativarItem([FromBody] DadosProdutoAdicionalItem item)
+        {
+            try
+            {
+                produtoAdicionalDAO.DesativarItem(item);
+
+                return Request.CreateResponse(HttpStatusCode.OK, item);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível desativar o item. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }

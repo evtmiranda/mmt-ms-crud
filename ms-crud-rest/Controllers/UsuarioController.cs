@@ -52,6 +52,7 @@
             try
             {
                 UsuarioLoja usuarioLoja = new UsuarioLoja();
+
                 //verifica se já existe algum usuário com este e-mail
                 usuarioLoja = usuarioDAO.BuscarUsuarioLojaPorEmail(usuario.Email);
 
@@ -60,12 +61,7 @@
 
                 int idUsuarioCadastrado = usuarioDAO.CadastrarUsuarioLoja(usuario);
 
-                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created);
-
-                string location = Url.Link("DefaultApi", new { controller = "Usuario", id = idUsuarioCadastrado });
-                response.Headers.Location = new Uri(location);
-
-                return response;
+                return Request.CreateResponse(HttpStatusCode.Created);
             }
             catch (UsuarioJaExisteException eneEx)
             {
@@ -75,7 +71,7 @@
             }
             catch (Exception ex)
             {
-                string mensagem = string.Format("nao foi possivel cadastrar o usuario. erro: {0}", ex);
+                string mensagem = string.Format("Não foi possivel cadastrar o usuario. erro: {0}", ex);
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
@@ -101,12 +97,7 @@
 
                 int idUsuarioCadastrado = usuarioDAO.CadastrarUsuarioParceiro(usuario);
 
-                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created);
-
-                string location = Url.Link("DefaultApi", new { controller = "Usuario", id = idUsuarioCadastrado });
-                response.Headers.Location = new Uri(location);
-
-                return response;
+                return Request.CreateResponse(HttpStatusCode.Created);
             }
             catch (UsuarioJaExisteException eneEx)
             {

@@ -25,8 +25,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_usuario_loja(id_parceiro, nm_nome, nm_apelido, nm_email, nm_senha)
                                                             VALUES(@id_parceiro, @nm_nome, @nm_apelido, @nm_email, @nm_senha);");
 
-
-                //sqlCommand.Parameters.AddWithValue("@id_parceiro", usuario.IdParceiro);
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@nm_nome", usuario.Nome);
                 sqlConn.Command.Parameters.AddWithValue("@nm_apelido", usuario.Apelido);
                 sqlConn.Command.Parameters.AddWithValue("@nm_email", usuario.Email);
@@ -40,7 +39,7 @@ namespace ms_crud_rest.DAO
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "erro ao cadastrar usuário", Descricao = ex.Message, StackTrace = ex.StackTrace ?? "" });
+                logDAO.Adicionar(new Log { IdLoja = usuario.IdLoja, Mensagem = "Erro ao cadastrar usuário", Descricao = ex.Message, StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -66,7 +65,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_usuario_parceiro(id_parceiro, nm_usuario, nm_apelido, nm_email, nm_celular, nm_senha)
                                                             VALUES(@id_parceiro, @nm_usuario, @nm_apelido, @nm_email, @nm_celular, @nm_senha); SELECT @@IDENTITY;");
 
-
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_parceiro", usuario.IdParceiro);
                 sqlConn.Command.Parameters.AddWithValue("@nm_usuario", usuario.Nome);
                 sqlConn.Command.Parameters.AddWithValue("@nm_apelido", usuario.Apelido);
@@ -82,7 +81,7 @@ namespace ms_crud_rest.DAO
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { Mensagem = "erro ao cadastrar usuário", Descricao = ex.Message, StackTrace = ex.StackTrace ?? "" });
+                logDAO.Adicionar(new Log { IdLoja = usuario.IdLoja, Mensagem = "erro ao cadastrar usuário", Descricao = ex.Message, StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -117,14 +116,13 @@ namespace ms_crud_rest.DAO
                                                                 AND tl.nm_dominio_loja = @nm_dominio_loja
                                                                 AND tup.bol_ativo = 1");
 
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@email", usuario.Email);
                 sqlConn.Command.Parameters.AddWithValue("@senha", usuario.Senha);
                 sqlConn.Command.Parameters.AddWithValue("@nm_dominio_loja", dominio.Replace("'", ""));
 
                 qtdUsuario = Convert.ToInt32(sqlConn.Command.ExecuteScalar());
 
-
-                //verifica se o retorno foi positivo
                 if (qtdUsuario == 0)
                     throw new UsuarioNaoAutenticadoException();
             }
@@ -167,14 +165,13 @@ namespace ms_crud_rest.DAO
                                                              AND tl.nm_dominio_loja = @nm_dominio_loja
                                                              AND tul.bol_ativo = 1");
 
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@email", usuario.Email);
                 sqlConn.Command.Parameters.AddWithValue("@senha", usuario.Senha);
                 sqlConn.Command.Parameters.AddWithValue("@nm_dominio_loja", dominioLoja.Replace("'", ""));
 
                 qtdUsuario = Convert.ToInt32(sqlConn.Command.ExecuteScalar());
 
-
-                //verifica se o retorno foi positivo
                 if (qtdUsuario == 0)
                     throw new UsuarioNaoAutenticadoException();
             }
@@ -223,6 +220,7 @@ namespace ms_crud_rest.DAO
                                                             ON tul.id_loja = tl.id_loja
                                                             WHERE nm_email = @email");
 
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@email", email);
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
@@ -241,7 +239,9 @@ namespace ms_crud_rest.DAO
             finally
             {
                 sqlConn.CloseConnection();
-                sqlConn.Reader.Close();
+
+                if(sqlConn.Reader != null)
+                    sqlConn.Reader.Close();
             }
         }
 
@@ -279,6 +279,7 @@ namespace ms_crud_rest.DAO
                                                             ON te.id_endereco = tp.id_endereco
                                                             WHERE nm_email = @email");
 
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@email", email);
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
@@ -298,7 +299,9 @@ namespace ms_crud_rest.DAO
             finally
             {
                 sqlConn.CloseConnection();
-                sqlConn.Reader.Close();
+
+                if(sqlConn.Reader != null)
+                    sqlConn.Reader.Close();
             }
         }
 
@@ -316,7 +319,7 @@ namespace ms_crud_rest.DAO
                                                             FROM tab_parceiro
                                                             WHERE nm_codigo = @codigoParceiro");
 
-
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@codigoParceiro", sCodigoParceiro);
 
                 retorno = Convert.ToInt32(sqlConn.Command.ExecuteScalar());

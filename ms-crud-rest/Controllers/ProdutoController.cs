@@ -32,9 +32,6 @@ namespace ms_crud_rest.Controllers
             try
             {
                 Produto produto = produtoDAO.BuscarPorId(id, idLoja);
-                if (produto == null)
-                    throw new KeyNotFoundException();
-
                 return Request.CreateResponse(HttpStatusCode.OK, produto);
             }
             catch (Exception)
@@ -51,10 +48,7 @@ namespace ms_crud_rest.Controllers
             try
             {
                 produtoDAO.Adicionar(produto);
-
-                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created);
-
-                return response;
+                return Request.CreateResponse(HttpStatusCode.Created);
             }
             catch (Exception)
             {
@@ -76,12 +70,33 @@ namespace ms_crud_rest.Controllers
             try
             {
                 produtoDAO.Excluir(produto);
-
                 return Request.CreateResponse(HttpStatusCode.OK, produto);
             }
             catch (Exception)
             {
                 string mensagem = "Não foi possível excluir o produto. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        /// <summary>
+        /// Desativa um produto
+        /// </summary>
+        /// <param name="produto">produto que será atualizado</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/Produto/Desativar")]
+        public HttpResponseMessage DesativarProduto([FromBody] Produto produto)
+        {
+            try
+            {
+                produtoDAO.Desativar(produto);
+                return Request.CreateResponse(HttpStatusCode.OK, produto);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível desativar o produto. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
@@ -141,10 +156,7 @@ namespace ms_crud_rest.Controllers
             try
             {
                 produtoDAO.AdicionarProdutoAdicional(produtoAdicionalProduto);
-
-                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created);
-
-                return response;
+                return Request.CreateResponse(HttpStatusCode.Created);
             }
             catch (Exception)
             {
@@ -211,7 +223,6 @@ namespace ms_crud_rest.Controllers
             try
             {
                 produtoDAO.ExcluirProdutoAdicional(produtoAdicional);
-
                 return Request.CreateResponse(HttpStatusCode.OK, produtoAdicional);
             }
             catch (Exception)
@@ -234,7 +245,6 @@ namespace ms_crud_rest.Controllers
             try
             {
                 produtoDAO.AtualizarProdutoAdicionalProduto(dadosProdutoAdicionalProduto);
-
                 return Request.CreateResponse(HttpStatusCode.OK, dadosProdutoAdicionalProduto);
             }
             catch (Exception)

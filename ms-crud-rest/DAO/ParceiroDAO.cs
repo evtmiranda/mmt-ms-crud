@@ -122,9 +122,9 @@ namespace ms_crud_rest.DAO
                                                                 vlr_taxa_entrega,
 	                                                            bol_ativo
                                                             FROM tab_parceiro
-                                                            WHERE id_loja = @id_loja
-                                                            AND bol_ativo = 1;");
+                                                            WHERE id_loja = @id_loja");
 
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
@@ -198,7 +198,9 @@ namespace ms_crud_rest.DAO
             finally
             {
                 sqlConn.CloseConnection();
-                sqlConn.Reader.Close();
+
+                if (sqlConn.Reader != null)
+                    sqlConn.Reader.Close();
             }
         }
 
@@ -305,7 +307,6 @@ namespace ms_crud_rest.DAO
                 #region atualiza o endereço do parceiro
 
                 sqlConn.Command.Parameters.Clear();
-
                 sqlConn.Command.Parameters.AddWithValue("@id_endereco", parceiro.Endereco.Id);
                 sqlConn.Command.Parameters.AddWithValue("@nm_cep", parceiro.Endereco.Cep);
                 sqlConn.Command.Parameters.AddWithValue("@nm_uf", parceiro.Endereco.UF);
@@ -351,6 +352,34 @@ namespace ms_crud_rest.DAO
                 sqlConn.StartConnection();
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
 
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", parceiro.Ativo);
+                sqlConn.Command.Parameters.AddWithValue("@id_parceiro", parceiro.Id);
+
+                sqlConn.Command.CommandText = string.Format(@"DELETE tab_parceiro
+                                                            WHERE id_parceiro = @id_parceiro;");
+
+                sqlConn.Command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = parceiro.IdLoja, Mensagem = "Erro ao excluir o parceiro: " + parceiro.Id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
+        }
+
+        public override void Desativar(Parceiro parceiro)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", parceiro.Ativo);
                 sqlConn.Command.Parameters.AddWithValue("@id_parceiro", parceiro.Id);
 
@@ -362,7 +391,7 @@ namespace ms_crud_rest.DAO
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { IdLoja = parceiro.IdLoja, Mensagem = "Erro ao excluir o parceiro: " + parceiro.Id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                logDAO.Adicionar(new Log { IdLoja = parceiro.IdLoja, Mensagem = "Erro ao desativar o parceiro: " + parceiro.Id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally

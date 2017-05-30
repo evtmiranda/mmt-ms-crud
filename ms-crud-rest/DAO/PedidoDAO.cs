@@ -35,6 +35,7 @@ namespace ms_crud_rest.DAO
                 pedido.DataPedido = Convert.ToDateTime(DateTime.Now.ToString("yyyy-MM-dd " + pedido.HorarioEntrega));
 
                 //parametros do pedido
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_usuario_parceiro", pedido.Cliente.Id);
                 sqlConn.Command.Parameters.AddWithValue("@dt_entrega", pedido.DataPedido);
                 sqlConn.Command.Parameters.AddWithValue("@vlr_troco", pedido.Troco);
@@ -678,8 +679,6 @@ namespace ms_crud_rest.DAO
                     #region 1.5 - preenche a lista de "Forma de pagamento"
 
                     sqlConn.Command.Parameters.Clear();
-                    sqlConn.Command.CommandText = "";
-
                     sqlConn.Command.CommandText = @"SELECT
                                                         tfp.id_forma_pagamento,
                                                         tfp.id_loja,
@@ -731,7 +730,9 @@ namespace ms_crud_rest.DAO
             finally
             {
                 sqlConn.CloseConnection();
-                sqlConn.Reader.Close();
+
+                if(sqlConn.Reader != null)
+                    sqlConn.Reader.Close();
             }
         }
 
@@ -759,6 +760,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.CommandText += " AND id_pedido = @id_pedido";
 
                 //parametros do pedido
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_pedido", idPedido);
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
@@ -839,6 +841,10 @@ namespace ms_crud_rest.DAO
                 sqlConn.Rollback();
                 logDAO.Adicionar(new Log { IdLoja = p.Parceiro.IdLoja, Mensagem = "Erro ao atualizar o pedido com id " + p.Id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
             }
         }
 

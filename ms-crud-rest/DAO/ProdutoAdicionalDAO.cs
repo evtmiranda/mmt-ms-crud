@@ -41,8 +41,7 @@ namespace ms_crud_rest.DAO
                 //transforma a entidade em objeto
                 if(sqlConn.Reader.HasRows)
                     listaProdutoAdicionalEntidade = new ModuloClasse().PreencheClassePorDataReader<DadosProdutoAdicionalEntidade>(sqlConn.Reader);
-
-                if (listaProdutoAdicionalEntidade.Count == 0)
+                else
                     throw new KeyNotFoundException();
 
                 foreach (var produtoAdicionalEntidade in listaProdutoAdicionalEntidade)
@@ -62,7 +61,9 @@ namespace ms_crud_rest.DAO
             finally
             {
                 sqlConn.CloseConnection();
-                sqlConn.Reader.Close();
+
+                if (sqlConn.Reader != null)
+                    sqlConn.Reader.Close();
             }
         }
 
@@ -92,8 +93,7 @@ namespace ms_crud_rest.DAO
                                                                 0 AS nr_ordem_exibicao,
 	                                                            bol_ativo
                                                             FROM tab_produto_adicional
-                                                            WHERE id_loja = @id_loja
-                                                            AND bol_ativo = 1;");
+                                                            WHERE id_loja = @id_loja");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
@@ -102,8 +102,7 @@ namespace ms_crud_rest.DAO
                 //transforma a entidade em objeto
                 if (sqlConn.Reader.HasRows) 
                     listaProdutoAdicionalEntidade = new ModuloClasse().PreencheClassePorDataReader<DadosProdutoAdicionalEntidade>(sqlConn.Reader);
-
-                if (listaProdutoAdicionalEntidade.Count == 0)
+                else
                     throw new KeyNotFoundException("Nenhum produto adicional encontrado.");
 
                 foreach (var produtoAdicionalEntidade in listaProdutoAdicionalEntidade)
@@ -127,13 +126,12 @@ namespace ms_crud_rest.DAO
 	                                                nm_descricao_item,
                                                     vlr_adicional_item,
 	                                                bol_ativo
-                                                FROM tab_produto_adicional_item
-                                                WHERE bol_ativo = 1;";
+                                                FROM tab_produto_adicional_item";
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
-                //transforma a entidade em objeto
-                listaProdutoAdicionalItemEntidade = new ModuloClasse().PreencheClassePorDataReader<DadosProdutoAdicionalItemEntidade>(sqlConn.Reader);
+                if(sqlConn.Reader != null)
+                    listaProdutoAdicionalItemEntidade = new ModuloClasse().PreencheClassePorDataReader<DadosProdutoAdicionalItemEntidade>(sqlConn.Reader);
 
                 foreach (var itemAdicional in listaProdutoAdicionalItemEntidade)
                 {
@@ -163,8 +161,9 @@ namespace ms_crud_rest.DAO
             }
             finally
             {
-                sqlConn.Command.Parameters.Clear();
                 sqlConn.CloseConnection();
+                if (sqlConn.Reader != null)
+                    sqlConn.Reader.Close();
             }
         }
 
@@ -174,7 +173,6 @@ namespace ms_crud_rest.DAO
             {
                 sqlConn.StartConnection();
 
-                //busca o produtos
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
                 sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_produto_adicional(id_loja, nm_adicional, nm_descricao, bol_ativo)
                                                               VALUES(@id_loja, @nm_adicional, @nm_descricao, @bol_ativo);");
@@ -204,26 +202,47 @@ namespace ms_crud_rest.DAO
             try
             {
                 sqlConn.StartConnection();
-
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
 
-                #region atualiza os dados do parceiro
-
-                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", produtoAdicional.Ativo);
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_produto_adicional", produtoAdicional.Id);
 
-                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_produto_adicional
-	                                                            SET bol_ativo = @bol_ativo
+                sqlConn.Command.CommandText = string.Format(@"DELETE tab_produto_adicional
                                                             WHERE id_produto_adicional = @id_produto_adicional;");
 
                 sqlConn.Command.ExecuteNonQuery();
-
-                #endregion
-
             }
             catch (Exception ex)
             {
                 logDAO.Adicionar(new Log { IdLoja = produtoAdicional.IdLoja, Mensagem = "Erro ao excluir produto adicional" + produtoAdicional.IdLoja, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
+        }
+
+        public override void Desativar(DadosProdutoAdicional produtoAdicional)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", produtoAdicional.Ativo);
+                sqlConn.Command.Parameters.AddWithValue("@id_produto_adicional", produtoAdicional.Id);
+
+                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_produto_adicional
+                                                                SET bol_ativo = @bol_ativo
+                                                            WHERE id_produto_adicional = @id_produto_adicional;");
+
+                sqlConn.Command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = produtoAdicional.IdLoja, Mensagem = "Erro ao desativar produto adicional" + produtoAdicional.IdLoja, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally
@@ -237,10 +256,7 @@ namespace ms_crud_rest.DAO
             try
             {
                 sqlConn.StartConnection();
-
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
-
-                #region atualiza os dados do produto
 
                 sqlConn.Command.Parameters.AddWithValue("@id_produto_adicional", produtoAdicional.Id);
                 sqlConn.Command.Parameters.AddWithValue("@nm_adicional", produtoAdicional.Nome);
@@ -254,9 +270,6 @@ namespace ms_crud_rest.DAO
                                                             WHERE id_produto_adicional = @id_produto_adicional");
 
                 sqlConn.Command.ExecuteNonQuery();
-
-                #endregion
-
             }
             catch (Exception ex)
             {
@@ -313,8 +326,34 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
 
-                #region atualiza os dados do parceiro
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@id_produto_adicional_item", item.Id);
 
+                sqlConn.Command.CommandText = string.Format(@"DELETE tab_produto_adicional_item
+                                                            WHERE id_produto_adicional_item = @id_produto_adicional_item;");
+
+                sqlConn.Command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = item.IdLoja, Mensagem = "Erro ao excluir item para o produto adicional" + item.IdLoja, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
+        }
+
+        public void DesativarItem(DadosProdutoAdicionalItem item)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", item.Ativo);
                 sqlConn.Command.Parameters.AddWithValue("@id_produto_adicional_item", item.Id);
 
@@ -323,13 +362,10 @@ namespace ms_crud_rest.DAO
                                                             WHERE id_produto_adicional_item = @id_produto_adicional_item;");
 
                 sqlConn.Command.ExecuteNonQuery();
-
-                #endregion
-
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { IdLoja = item.IdLoja, Mensagem = "Erro ao excluir item para o produto adicional" + item.IdLoja, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                logDAO.Adicionar(new Log { IdLoja = item.IdLoja, Mensagem = "Erro ao desativar item para o produto adicional" + item.IdLoja, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally

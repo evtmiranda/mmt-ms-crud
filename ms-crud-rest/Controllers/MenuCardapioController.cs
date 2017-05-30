@@ -95,6 +95,23 @@ namespace ms_crud_rest.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("api/MenuCardapio/Desativar")]
+        public HttpResponseMessage DesativarCardapio([FromBody] MenuCardapio cardapio)
+        {
+            try
+            {
+                cardapioDAO.Excluir(cardapio);
+                return Request.CreateResponse(HttpStatusCode.OK, cardapio);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível desativar o cardápio. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
         [HttpGet]
         [Route("api/menucardapio/listar/{idLoja}")]
         public HttpResponseMessage ListarCardapios(int idLoja)

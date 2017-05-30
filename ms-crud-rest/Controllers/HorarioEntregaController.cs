@@ -69,7 +69,6 @@ namespace ms_crud_rest.Controllers
             try
             {
                 horarioEntregaDAO.Atualizar(horarioEntrega);
-
                 return Request.CreateResponse(HttpStatusCode.OK, horarioEntrega);
             }
             catch (Exception)
@@ -93,6 +92,24 @@ namespace ms_crud_rest.Controllers
             catch (Exception)
             {
                 string mensagem = "Não foi possível excluir o horário de entrega. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/HorarioEntrega/Desativar")]
+        public HttpResponseMessage Desativar([FromBody] HorarioEntrega horarioEntrega)
+        {
+            try
+            {
+                horarioEntregaDAO.Desativar(horarioEntrega);
+                return Request.CreateResponse(HttpStatusCode.OK, horarioEntrega);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível desativar o horário de entrega. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
 
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
@@ -171,8 +188,8 @@ namespace ms_crud_rest.Controllers
         #region dias de funcionamento
 
         [HttpPost]
-        [Route("api/HorarioEntrega/DiaFuncionamento/Excluir")]
-        public HttpResponseMessage ExcluirDiaFuncionamento([FromBody] DiasDeFuncionamento diaFuncionamento)
+        [Route("api/HorarioEntrega/DiaFuncionamento/Desativar")]
+        public HttpResponseMessage DesativarDiaFuncionamento([FromBody] DiasDeFuncionamento diaFuncionamento)
         {
             try
             {

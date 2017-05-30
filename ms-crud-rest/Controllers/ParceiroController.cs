@@ -27,8 +27,7 @@ namespace ms_crud_rest.Controllers
             try
             {
                 parceiroDAO.AdicionarParceiro(idLoja, parceiro);
-                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created);
-                return response;
+                return Request.CreateResponse(HttpStatusCode.Created);
             }
             catch (Exception)
             {
@@ -56,7 +55,7 @@ namespace ms_crud_rest.Controllers
             }
             catch (Exception)
             {
-                string mensagem = "Não foi possível encontrar o parceiro. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                string mensagem = "Não foi consultar o parceiro. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
@@ -113,6 +112,23 @@ namespace ms_crud_rest.Controllers
             catch (Exception)
             {
                 string mensagem = "Não foi possível excluir o parceiro. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/Parceiro/Desativar")]
+        public HttpResponseMessage Desativar([FromBody] Parceiro parceiro)
+        {
+            try
+            {
+                parceiroDAO.Desativar(parceiro);
+                return Request.CreateResponse(HttpStatusCode.OK, parceiro);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível desativar o parceiro. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
