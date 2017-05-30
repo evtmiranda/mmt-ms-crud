@@ -10,6 +10,33 @@ namespace ms_crud_rest.DAO
     {
         public HorarioEntregaDAO(SqlServer sqlConn, LogDAO logDAO) : base(sqlConn, logDAO) { }
 
+        public override void Adicionar(HorarioEntrega horarioEntrega)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                sqlConn.Command.CommandText = @"INSERT INTO tab_horario_entrega(id_loja, nm_horario)
+                                                VALUES(@id_loja, @nm_horario)";
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@id_loja", horarioEntrega.IdLoja);
+                sqlConn.Command.Parameters.AddWithValue("@nm_horario", horarioEntrega.Horario);
+
+                sqlConn.Command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = horarioEntrega.IdLoja, Mensagem = "Erro ao cadastrar o horário de entrega", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
+        }
+
         public override HorarioEntrega BuscarPorId(int id, int idLoja)
         {
             HorarioEntrega horarioEntrega;
@@ -20,28 +47,30 @@ namespace ms_crud_rest.DAO
                 sqlConn.StartConnection();
 
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
-                sqlConn.Command.CommandText = string.Format(@"SELECT
-	                                                            id_horario_entrega,
-	                                                            id_loja,
-	                                                            nm_horario,
-	                                                            bol_ativo
-                                                            FROM tab_horario_entrega
-                                                            WHERE id_horario_entrega = @id_horario_entrega
-                                                            AND bol_ativo = 1;");
+                sqlConn.Command.CommandText = @"SELECT
+	                                                id_horario_entrega,
+	                                                id_loja,
+	                                                nm_horario,
+	                                                bol_ativo
+                                                FROM tab_horario_entrega
+                                                WHERE id_horario_entrega = @id_horario_entrega";
 
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_horario_entrega", id);
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
-                listahorarioEntregaEntidade = new ModuloClasse().PreencheClassePorDataReader<HorarioEntregaEntidade>(sqlConn.Reader);
-
-                if (listahorarioEntregaEntidade.Count == 0)
+                if (sqlConn.Reader.HasRows)
+                    listahorarioEntregaEntidade = new ModuloClasse().PreencheClassePorDataReader<HorarioEntregaEntidade>(sqlConn.Reader);
+                else
                     throw new KeyNotFoundException();
 
                 horarioEntrega = listahorarioEntregaEntidade[0].ToHorarioEntrega();
 
                 return horarioEntrega;
             }
+            //sempre que for realizado uma busca por id, é necessário que o recurso exista. se o recurso não existir, é um erro interno, por este motivo
+            //o log é gravado
             catch (KeyNotFoundException keyEx)
             {
                 logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Horario de entrega nao encontrado com id " + id, Descricao = keyEx.Message ?? "", StackTrace = keyEx.StackTrace ?? "" });
@@ -55,7 +84,9 @@ namespace ms_crud_rest.DAO
             finally
             {
                 sqlConn.CloseConnection();
-                sqlConn.Reader.Close();
+
+                if(sqlConn.Reader != null)
+                    sqlConn.Reader.Close();
             }
         }
 
@@ -77,29 +108,28 @@ namespace ms_crud_rest.DAO
 
                 #region horário de entrega
 
-                sqlConn.Command.CommandText = string.Format(@"SELECT
-	                                                            id_horario_entrega,
-	                                                            id_loja,
-	                                                            nm_horario,
-	                                                            bol_ativo
-                                                            FROM tab_horario_entrega
-                                                            WHERE id_loja = @id_loja
-                                                            AND bol_ativo = 1
-                                                            ORDER BY nm_horario;");
+                sqlConn.Command.CommandText = @"SELECT
+	                                                id_horario_entrega,
+	                                                id_loja,
+	                                                nm_horario,
+	                                                bol_ativo
+                                                FROM tab_horario_entrega
+                                                WHERE id_loja = @id_loja
+                                                ORDER BY nm_horario";
 
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
-                listaHorariosEntidade = new ModuloClasse().PreencheClassePorDataReader<HorarioEntregaEntidade>(sqlConn.Reader);
+                if (sqlConn.Reader.HasRows)
+                    listaHorariosEntidade = new ModuloClasse().PreencheClassePorDataReader<HorarioEntregaEntidade>(sqlConn.Reader);
+                else
+                    throw new KeyNotFoundException("Não foram encontrados horários de entrega");
 
                 //transforma a entidade em objeto
                 foreach (var horario in listaHorariosEntidade)
                     listaHorarios.Add(horario.ToHorarioEntrega());
-
-                //verifica se existem horários de entrega
-                if (listaHorarios.Count == 0)
-                    throw new KeyNotFoundException("Não foram encontrados horários de entrega");
 
                 //fecha o reader
                 sqlConn.Reader.Close();
@@ -109,20 +139,19 @@ namespace ms_crud_rest.DAO
                 #region tempo de antecedencia
 
                 //habilita ou não um horário de entrega de acordo com o tempo mínimo de atecedência definido
-                sqlConn.Command.CommandText = string.Format(@"SELECT
-	                                                            id_tempo_antecedencia,
-	                                                            id_loja,
-	                                                            nr_minutos_antecedencia,
-	                                                            bol_ativo
-                                                            FROM tab_horario_entrega_tempo_anteced_pedido
-                                                            WHERE id_loja = @id_loja
-                                                            AND bol_ativo = 1;");
+                sqlConn.Command.CommandText = @"SELECT
+	                                                id_tempo_antecedencia,
+	                                                id_loja,
+	                                                nr_minutos_antecedencia,
+	                                                bol_ativo
+                                                FROM tab_horario_entrega_tempo_anteced_pedido
+                                                WHERE id_loja = @id_loja";
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
-                listaTempoAntecedenciaEntidade = new ModuloClasse().PreencheClassePorDataReader<TempoAntecedenciaEntregaEntidade>(sqlConn.Reader);
-
-                if (listaTempoAntecedenciaEntidade.Count == 0)
+                if (sqlConn.Reader.HasRows)
+                    listaTempoAntecedenciaEntidade = new ModuloClasse().PreencheClassePorDataReader<TempoAntecedenciaEntregaEntidade>(sqlConn.Reader);
+                else
                     throw new KeyNotFoundException("Não foi encontrado o tempo mínimo de antecedência ao pedido");
 
                 tempoAntecedencia = listaTempoAntecedenciaEntidade.FirstOrDefault().ToTempoAntecedenciaEntrega();
@@ -133,19 +162,22 @@ namespace ms_crud_rest.DAO
 
                 #region dias de funcionamento
 
-                sqlConn.Command.CommandText = string.Format(@"SELECT
-                                                                id_dia_funcionamento,
-	                                                            id_loja,
-	                                                            cod_dia_semana,
-	                                                            nm_dia_semana,
-	                                                            bol_ativo
-                                                            FROM tab_dias_funcionamento
-                                                            WHERE id_loja = @id_loja
-                                                            ORDER BY cod_dia_semana;");
+                sqlConn.Command.CommandText = @"SELECT
+                                                    id_dia_funcionamento,
+	                                                id_loja,
+	                                                cod_dia_semana,
+	                                                nm_dia_semana,
+	                                                bol_ativo
+                                                FROM tab_dias_funcionamento
+                                                WHERE id_loja = @id_loja
+                                                ORDER BY cod_dia_semana";
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
-                listaDiasFuncionamentoEntidade = new ModuloClasse().PreencheClassePorDataReader<DiasDeFuncionamentoEntidade>(sqlConn.Reader);
+                if (sqlConn.Reader.HasRows)
+                    listaDiasFuncionamentoEntidade = new ModuloClasse().PreencheClassePorDataReader<DiasDeFuncionamentoEntidade>(sqlConn.Reader);
+                else
+                    throw new KeyNotFoundException("Não foi possível listar os dias de funcionamento");
 
                 //transforma a entidade em objeto
                 foreach (var diaSemana in listaDiasFuncionamentoEntidade)
@@ -197,7 +229,7 @@ namespace ms_crud_rest.DAO
             }
             catch (KeyNotFoundException keyEx)
             {
-                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Não foram encontrados horários de entrega ou o tempo mínimo de antecedência ao pedido.", Descricao = keyEx.Message ?? "", StackTrace = keyEx.StackTrace ?? "" });
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Não foram encontrados horários de entrega, tempo mínimo de antecedência ao pedido ou os dias de funcionamento.", Descricao = keyEx.Message ?? "", StackTrace = keyEx.StackTrace ?? "" });
                 throw keyEx;
             }
             catch (Exception ex)
@@ -208,33 +240,9 @@ namespace ms_crud_rest.DAO
             finally
             {
                 sqlConn.CloseConnection();
-                sqlConn.Reader.Close();
-            }
-        }
 
-        public override void Adicionar(HorarioEntrega horarioEntrega)
-        {
-            try
-            {
-                sqlConn.StartConnection();
-                sqlConn.Command.CommandType = System.Data.CommandType.Text;
-
-                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_horario_entrega(id_loja, nm_horario)
-                                                                VALUES(@id_loja, @nm_horario);");
-
-                sqlConn.Command.Parameters.AddWithValue("@id_loja", horarioEntrega.IdLoja);
-                sqlConn.Command.Parameters.AddWithValue("@nm_horario", horarioEntrega.Horario);
-
-                sqlConn.Command.ExecuteNonQuery();
-            }
-            catch (Exception ex)
-            {
-                logDAO.Adicionar(new Log { IdLoja = horarioEntrega.IdLoja, Mensagem = "Erro ao cadastrar o horário de entrega", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
-                throw ex;
-            }
-            finally
-            {
-                sqlConn.CloseConnection();
+                if(sqlConn.Reader != null)
+                    sqlConn.Reader.Close();
             }
         }
 
@@ -245,14 +253,15 @@ namespace ms_crud_rest.DAO
                 sqlConn.StartConnection();
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
 
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@nm_horario", horarioEntrega.Horario);
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", horarioEntrega.Ativo);
                 sqlConn.Command.Parameters.AddWithValue("@id_horario_entrega", horarioEntrega.Id);
 
-                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_horario_entrega
-	                                                            SET nm_horario = @nm_horario,
-		                                                            bol_ativo = @bol_ativo
-                                                            WHERE id_horario_entrega = @id_horario_entrega;");
+                sqlConn.Command.CommandText = @"UPDATE tab_horario_entrega
+	                                                SET nm_horario = @nm_horario,
+		                                                bol_ativo = @bol_ativo
+                                                WHERE id_horario_entrega = @id_horario_entrega";
 
                 sqlConn.Command.ExecuteNonQuery();
 
@@ -276,6 +285,33 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
 
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@id_horario_entrega", horarioEntrega.Id);
+
+                sqlConn.Command.CommandText = @"DELETE FROM tab_horario_entrega
+                                                WHERE id_horario_entrega = @id_horario_entrega";
+
+                sqlConn.Command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = horarioEntrega.IdLoja, Mensagem = "Erro ao excluir o horário de entrega", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
+        }
+
+        public override void Desativar(HorarioEntrega horarioEntrega)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", horarioEntrega.Ativo);
                 sqlConn.Command.Parameters.AddWithValue("@id_horario_entrega", horarioEntrega.Id);
 
@@ -284,7 +320,6 @@ namespace ms_crud_rest.DAO
                                                             WHERE id_horario_entrega = @id_horario_entrega;");
 
                 sqlConn.Command.ExecuteNonQuery();
-
             }
             catch (Exception ex)
             {
@@ -315,9 +350,9 @@ namespace ms_crud_rest.DAO
 	                                                            nr_minutos_antecedencia,
 	                                                            bol_ativo
                                                             FROM tab_horario_entrega_tempo_anteced_pedido
-                                                            WHERE id_tempo_antecedencia = @id_tempo_antecedencia
-                                                            AND bol_ativo = 1;");
+                                                            WHERE id_tempo_antecedencia = @id_tempo_antecedencia");
 
+                sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_tempo_antecedencia", id);
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();

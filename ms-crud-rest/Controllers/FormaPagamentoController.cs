@@ -27,10 +27,7 @@ namespace ms_crud_rest.Controllers
             try
             {
                 formaPagamentoDAO.Adicionar(formaPagamento);
-
-                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created);
-
-                return response;
+                return Request.CreateResponse(HttpStatusCode.Created);
             }
             catch (Exception)
             {
@@ -51,13 +48,6 @@ namespace ms_crud_rest.Controllers
                 pagamento = formaPagamentoDAO.BuscarPorId(id, idLoja);
 
                 return Request.CreateResponse(HttpStatusCode.OK, pagamento);
-            }
-            catch (KeyNotFoundException)
-            {
-                string mensagem = "Não foi possível consultar a forma de pagamento. Por favor, tente novamente ou entre em contato com nosso suporte.";
-                HttpError error = new HttpError(mensagem);
-
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
             catch (Exception)
             {
@@ -89,7 +79,6 @@ namespace ms_crud_rest.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("api/FormaPagamento/Atualizar")]
         public HttpResponseMessage Atualizar([FromBody] FormaDePagamento formaPagamento)
@@ -97,7 +86,6 @@ namespace ms_crud_rest.Controllers
             try
             {
                 formaPagamentoDAO.Atualizar(formaPagamento);
-
                 return Request.CreateResponse(HttpStatusCode.OK, formaPagamento);
             }
             catch (Exception)
@@ -109,7 +97,6 @@ namespace ms_crud_rest.Controllers
             }
         }
 
-
         [HttpPost]
         [Route("api/FormaPagamento/Excluir")]
         public HttpResponseMessage Excluir([FromBody] FormaDePagamento formaPagamento)
@@ -117,12 +104,29 @@ namespace ms_crud_rest.Controllers
             try
             {
                 formaPagamentoDAO.Excluir(formaPagamento);
-
                 return Request.CreateResponse(HttpStatusCode.OK, formaPagamento);
             }
             catch (Exception)
             {
                 string mensagem = "Não foi possível excluir a forma de pagamento. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/FormaPagamento/Desativar")]
+        public HttpResponseMessage Desativar([FromBody] FormaDePagamento formaPagamento)
+        {
+            try
+            {
+                formaPagamentoDAO.Desativar(formaPagamento);
+                return Request.CreateResponse(HttpStatusCode.OK, formaPagamento);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível desativar a forma de pagamento. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
 
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);

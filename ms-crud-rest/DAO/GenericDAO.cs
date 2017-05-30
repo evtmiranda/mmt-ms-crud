@@ -31,5 +31,9 @@ namespace ms_crud_rest.DAO
         public virtual void Excluir(T t) { }
 
         public virtual void ExcluirPorId(int id, int idLoja) { }
+
+        public virtual void Desativar(T t) { }
+
+        public virtual void DesativarPorId(int id, int idLoja) { }
     }
 }

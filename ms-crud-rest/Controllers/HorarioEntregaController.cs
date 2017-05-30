@@ -1,6 +1,5 @@
 ﻿using ClassesMarmitex;
 using ms_crud_rest.DAO;
-using ms_crud_rest.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -28,10 +27,7 @@ namespace ms_crud_rest.Controllers
             try
             {
                 horarioEntregaDAO.Adicionar(horarioEntrega);
-
-                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.Created);
-
-                return response;
+                return Request.CreateResponse(HttpStatusCode.Created);
             }
             catch (Exception)
             {
