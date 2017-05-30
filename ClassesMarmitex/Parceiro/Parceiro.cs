@@ -18,7 +18,7 @@ namespace ClassesMarmitex
         [Required]
         public Endereco Endereco { get; set; }
 
-        public List<Beneficio> Beneficios { get; set; }
+        public List<Brinde> Brindes { get; set; }
         public string Codigo { get; set; }
         public decimal TaxaEntrega { get; set; }
         public bool Ativo { get; set; }
@@ -111,7 +111,7 @@ namespace ClassesMarmitex
 
         public string ComplementoEndereco { get; set; }
 
-        public List<Beneficio> Beneficios { get; set; }
+        public List<Brinde> Brindes { get; set; }
         public string Codigo { get; set; }
         public decimal TaxaEntrega { get; set; }
         public bool Ativo { get; set; }
