@@ -57,7 +57,7 @@ namespace ms_crud_rest
                         //c.BasicAuth("basic")
                         //    .Description("Basic HTTP Authentication");
                         //
-                        // NOTE: You must also configure 'EnableApiKeySupport' below in the SwaggerUI section
+						// NOTE: You must also configure 'EnableApiKeySupport' below in the SwaggerUI section
                         //c.ApiKey("apiKey")
                         //    .Description("API Key Authentication")
                         //    .Name("apiKey")
@@ -66,8 +66,8 @@ namespace ms_crud_rest
                         //c.OAuth2("oauth2")
                         //    .Description("OAuth2 Implicit Grant")
                         //    .Flow("implicit")
-                        //    .AuthorizationUrl("http://localhost:29783/Authorize")
-                        //    .TokenUrl("http://localhost:29783/Token")
+                        //    .AuthorizationUrl("http://petstore.swagger.wordnik.com/api/oauth/dialog")
+                        //    //.TokenUrl("https://tempuri.org/token")
                         //    .Scopes(scopes =>
                         //    {
                         //        scopes.Add("read", "Read access to protected resources");
@@ -172,9 +172,9 @@ namespace ms_crud_rest
                         // alternative implementation for ISwaggerProvider with the CustomProvider option.
                         //
                         //c.CustomProvider((defaultProvider) => new CachingSwaggerProvider(defaultProvider));
-                        //    })
-                        //.EnableSwaggerUi(c =>
-                        //    {
+                    })
+                .EnableSwaggerUi(c =>
+                    {
                         // Use the "InjectStylesheet" option to enrich the UI with one or more additional CSS stylesheets.
                         // The file must be included in your project as an "Embedded Resource", and then the resource's
                         // "Logical Name" is passed to the method as shown below.
@@ -233,13 +233,13 @@ namespace ms_crud_rest
                         //    clientSecret: null,
                         //    realm: "test-realm",
                         //    appName: "Swagger UI"
-                        //additionalQueryStringParams: new Dictionary<string, string>() { { "foo", "bar" } }
+                        //    //additionalQueryStringParams: new Dictionary<string, string>() { { "foo", "bar" } }
                         //);
 
-                        //If your API supports ApiKey, you can override the default values.
-                        //     "apiKeyIn" can either be "query" or "header"                                                
-
-                        //    c.EnableApiKeySupport("apiKey", "header");
+                        // If your API supports ApiKey, you can override the default values.
+                        // "apiKeyIn" can either be "query" or "header"                                                
+                        //
+                        //c.EnableApiKeySupport("apiKey", "header");
                     });
         }
     }
