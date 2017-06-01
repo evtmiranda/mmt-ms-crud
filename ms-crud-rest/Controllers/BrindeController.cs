@@ -20,6 +20,8 @@ namespace ms_crud_rest.Controllers
             this.logDAO = logDAO;
         }
 
+        #region brindes
+
         [HttpPost]
         [Route("api/Brinde/Adicionar")]
         public HttpResponseMessage Adicionar([FromBody] Brinde brinde)
@@ -65,27 +67,6 @@ namespace ms_crud_rest.Controllers
             try
             {
                 IList<Brinde> brindes = brindeDAO.Listar(idLoja);
-                return Request.CreateResponse(HttpStatusCode.OK, brindes);
-            }
-            catch (KeyNotFoundException)
-            {
-                return Request.CreateResponse(HttpStatusCode.NoContent);
-            }
-            catch (Exception)
-            {
-                string mensagem = "Não foi possível consultar os brindes. Por favor, tente novamente ou entre em contato com nosso suporte.";
-                HttpError error = new HttpError(mensagem);
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
-            }
-        }
-
-        [HttpGet]
-        [Route("api/Brinde/ListarPorParceiro/{idParceiro}/{idLoja}")]
-        public HttpResponseMessage ListarBrindesPorParceiro(int idParceiro, int idLoja)
-        {
-            try
-            {
-                IList<Brinde> brindes = brindeDAO.ListarPorParceiro(idParceiro, idLoja);
                 return Request.CreateResponse(HttpStatusCode.OK, brindes);
             }
             catch (KeyNotFoundException)
@@ -153,5 +134,85 @@ namespace ms_crud_rest.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
+
+        #endregion
+
+        #region brindes parceiros
+
+        [HttpPost]
+        [Route("api/BrindeParceiro/Adicionar")]
+        public HttpResponseMessage AdicionarBrindeParceiro([FromBody] BrindeParceiro brinde)
+        {
+            try
+            {
+                brindeDAO.AdicionarBrindeParceiro(brinde);
+                return Request.CreateResponse(HttpStatusCode.Created);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível cadastrar o brinde para o parceiro. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/BrindeParceiro/Excluir")]
+        public HttpResponseMessage ExcluirBrindeParceiro([FromBody] BrindeParceiro brinde)
+        {
+            try
+            {
+                brindeDAO.ExcluirBrindeParceiro(brinde);
+                return Request.CreateResponse(HttpStatusCode.OK, brinde);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível excluir o brinde do parceiro. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/BrindeParceiro/Desativar")]
+        public HttpResponseMessage DesativarBrindeParceiro([FromBody] BrindeParceiro brinde)
+        {
+            try
+            {
+                brindeDAO.DesativarBrindeParceiro(brinde);
+                return Request.CreateResponse(HttpStatusCode.OK, brinde);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível desativar o brinde do parceiro. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/BrindeParceiro/ListarPorParceiro/{idParceiro}/{idLoja}")]
+        public HttpResponseMessage ListarBrindesPorParceiro(int idParceiro, int idLoja)
+        {
+            try
+            {
+                IList<BrindeParceiro> brindes = brindeDAO.ListarPorParceiro(idParceiro, idLoja);
+                return Request.CreateResponse(HttpStatusCode.OK, brindes);
+            }
+            catch (KeyNotFoundException)
+            {
+                return Request.CreateResponse(HttpStatusCode.NoContent);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível consultar os brindes do parceiro. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        #endregion
     }
 }

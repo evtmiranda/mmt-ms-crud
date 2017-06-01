@@ -8,6 +8,8 @@ namespace ms_crud_rest.DAO
     {
         public BrindeDAO(SqlServer sqlConn, LogDAO logDAO) : base(sqlConn, logDAO) { }
 
+        #region brindes
+
         public override void Adicionar(Brinde brinde)
         {
             try
@@ -15,11 +17,11 @@ namespace ms_crud_rest.DAO
                 sqlConn.StartConnection();
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
 
-                sqlConn.Command.CommandText = @"INSERT INTO tab_brinde(id_parceiro, nm_brinde, nm_descricao, url_imagem, bol_ativo)
-                                                VALUES(@id_parceiro, @nm_brinde, @nm_descricao, @url_imagem, @bol_ativo)";
+                sqlConn.Command.CommandText = @"INSERT INTO tab_brinde(id_loja, nm_brinde, nm_descricao, url_imagem, bol_ativo)
+                                                VALUES(@id_loja, @nm_brinde, @nm_descricao, @url_imagem, @bol_ativo)";
 
                 sqlConn.Command.Parameters.Clear();
-                sqlConn.Command.Parameters.AddWithValue("@id_parceiro", brinde.IdParceiro);
+                sqlConn.Command.Parameters.AddWithValue("@id_loja", brinde.IdLoja);
                 sqlConn.Command.Parameters.AddWithValue("@nm_brinde", brinde.Nome);
                 sqlConn.Command.Parameters.AddWithValue("@nm_descricao", brinde.Descricao);
                 sqlConn.Command.Parameters.AddWithValue("@url_imagem", brinde.Imagem);
@@ -50,7 +52,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
                 sqlConn.Command.CommandText = @"SELECT
 	                                                id_brinde,
-	                                                id_parceiro,
+                                                    id_loja,
 	                                                nm_brinde,
 	                                                nm_descricao,
 	                                                url_imagem,
@@ -104,15 +106,13 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
                 sqlConn.Command.CommandText = @"SELECT
-	                                                tb.id_brinde,
-	                                                tb.id_parceiro,
-	                                                tb.nm_brinde,
-	                                                tb.nm_descricao,
-	                                                tb.url_imagem,
-	                                                tb.bol_ativo
-                                                FROM tab_brinde AS tb
-                                                INNER JOIN tab_parceiro AS tp
-                                                ON tp.id_parceiro = tb.id_parceiro
+	                                                id_brinde,
+                                                    id_loja,
+	                                                nm_brinde,
+	                                                nm_descricao,
+	                                                url_imagem,
+	                                                bol_ativo
+                                                FROM tab_brinde
                                                 WHERE id_loja = @id_loja";
 
                 sqlConn.Command.Parameters.Clear();
@@ -149,60 +149,6 @@ namespace ms_crud_rest.DAO
             }
         }
 
-        public List<Brinde> ListarPorParceiro(int idParceiro, int idLoja)
-        {
-            List<BrindeEntidade> listaBrindeEntidade = new List<BrindeEntidade>();
-            List<Brinde> listaBrinde = new List<Brinde>();
-
-            try
-            {
-                sqlConn.StartConnection();
-
-                sqlConn.Command.CommandType = System.Data.CommandType.Text;
-                sqlConn.Command.CommandText = @"SELECT
-	                                                id_brinde,
-	                                                id_parceiro,
-	                                                nm_brinde,
-	                                                nm_descricao,
-	                                                url_imagem,
-	                                                bol_ativo
-                                                FROM tab_brinde
-                                                WHERE id_parceiro = @id_parceiro";
-
-                sqlConn.Command.Parameters.Clear();
-                sqlConn.Command.Parameters.AddWithValue("@id_parceiro", idParceiro);
-
-                sqlConn.Reader = sqlConn.Command.ExecuteReader();
-
-                if (sqlConn.Reader.HasRows)
-                    listaBrindeEntidade = new ModuloClasse().PreencheClassePorDataReader<BrindeEntidade>(sqlConn.Reader);
-                else
-                    throw new KeyNotFoundException();
-
-                //transforma a entidade em objeto
-                foreach (var brinde in listaBrindeEntidade)
-                    listaBrinde.Add(brinde.ToBrinde());
-
-                return listaBrinde;
-            }
-            catch (KeyNotFoundException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao listar os brindes para o parceiro: " + idParceiro, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
-                throw ex;
-            }
-            finally
-            {
-                sqlConn.CloseConnection();
-
-                if (sqlConn.Reader != null)
-                    sqlConn.Reader.Close();
-            }
-        }
-
         public override void Atualizar(Brinde brinde)
         {
             try
@@ -211,11 +157,11 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
 
                 sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@id_brinde", brinde.Id);
                 sqlConn.Command.Parameters.AddWithValue("@nm_brinde", brinde.Nome);
                 sqlConn.Command.Parameters.AddWithValue("@nm_descricao", brinde.Descricao);
                 sqlConn.Command.Parameters.AddWithValue("@url_imagem", brinde.Imagem);
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", brinde.Ativo);
-                sqlConn.Command.Parameters.AddWithValue("@id_brinde", brinde.Id);
 
                 sqlConn.Command.CommandText = @"UPDATE tab_brinde
 	                                                SET nm_brinde = @nm_brinde,
@@ -242,18 +188,25 @@ namespace ms_crud_rest.DAO
             try
             {
                 sqlConn.StartConnection();
+                sqlConn.BeginTransaction();
+
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_brinde", brinde.Id);
 
-                sqlConn.Command.CommandText = @"DELETE FROM tab_brinde
+                sqlConn.Command.CommandText = @"DELETE FROM tab_brinde_parceiro
+                                                WHERE id_brinde = @id_brinde;
+
+                                                DELETE FROM tab_brinde
                                                 WHERE id_brinde = @id_brinde";
 
                 sqlConn.Command.ExecuteNonQuery();
+                sqlConn.Commit();
             }
             catch (Exception ex)
             {
+                sqlConn.Rollback();
                 logDAO.Adicionar(new Log { IdLoja = brinde.IdLoja, Mensagem = "Erro ao excluir o brinde", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
@@ -268,20 +221,28 @@ namespace ms_crud_rest.DAO
             try
             {
                 sqlConn.StartConnection();
+                sqlConn.BeginTransaction();
+
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", brinde.Ativo);
                 sqlConn.Command.Parameters.AddWithValue("@id_brinde", brinde.Id);
 
-                sqlConn.Command.CommandText = @"UPDATE tab_brinde
+                sqlConn.Command.CommandText = @"UPDATE tab_brinde_parceiro
 	                                                SET bol_ativo = @bol_ativo
-                                                WHERE id_brinde = @id_brinde";
+                                                WHERE id_brinde = @id_brinde;
+
+                                                UPDATE tab_brinde
+	                                                SET bol_ativo = @bol_ativo
+                                                WHERE id_brinde = @id_brinde;";
 
                 sqlConn.Command.ExecuteNonQuery();
+                sqlConn.Commit();
             }
             catch (Exception ex)
             {
+                sqlConn.Rollback();
                 logDAO.Adicionar(new Log { IdLoja = brinde.IdLoja, Mensagem = "Erro ao desativar o brinde", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
@@ -290,5 +251,147 @@ namespace ms_crud_rest.DAO
                 sqlConn.CloseConnection();
             }
         }
+
+        #endregion
+
+        #region brindes parceiros
+
+        public void AdicionarBrindeParceiro(BrindeParceiro brinde)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                sqlConn.Command.CommandText = @"INSERT INTO tab_brinde_parceiro(id_parceiro, id_brinde, bol_ativo)
+                                                VALUES(@id_parceiro, @id_brinde, @bol_ativo)";
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@id_parceiro", brinde.IdParceiro);
+                sqlConn.Command.Parameters.AddWithValue("@id_brinde", brinde.IdBrinde);
+                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", brinde.Ativo);
+
+                sqlConn.Command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = brinde.IdLoja, Mensagem = "Erro ao cadastrar o brinde parceiro", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
+        }
+
+        public void ExcluirBrindeParceiro(BrindeParceiro brinde)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@id_brinde", brinde.Id);
+
+                sqlConn.Command.CommandText = @"DELETE FROM tab_brinde_parceiro
+                                                WHERE id_brinde = @id_brinde";
+
+                sqlConn.Command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = brinde.IdLoja, Mensagem = "Erro ao excluir o brinde parceiro", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
+        }
+
+        public void DesativarBrindeParceiro(BrindeParceiro brinde)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", brinde.Ativo);
+                sqlConn.Command.Parameters.AddWithValue("@id_brinde", brinde.Id);
+
+                sqlConn.Command.CommandText = @"UPDATE tab_brinde_parceiro
+	                                                SET bol_ativo = @bol_ativo
+                                                WHERE id_brinde = @id_brinde";
+
+                sqlConn.Command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = brinde.IdLoja, Mensagem = "Erro ao desativar o brinde parceiro", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
+        }
+
+        public List<BrindeParceiro> ListarPorParceiro(int idParceiro, int idLoja)
+        {
+            List<BrindeParceiroEntidade> listaBrindeEntidade = new List<BrindeParceiroEntidade>();
+            List<BrindeParceiro> listaBrinde = new List<BrindeParceiro>();
+
+            try
+            {
+                sqlConn.StartConnection();
+
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+                sqlConn.Command.CommandText = @"SELECT
+	                                                tbp.id_brinde_parceiro,
+                                                    tbp.id_parceiro,
+	                                                tbp.id_brinde,
+	                                                tbp.bol_ativo
+                                                FROM tab_brinde_parceiro AS tbp
+                                                INNER JOIN tab_brinde AS tb
+                                                ON tb.id_brinde = tbp.id_brinde
+                                                WHERE tbp.id_parceiro = @id_parceiro";
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@id_parceiro", idParceiro);
+
+                sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                if (sqlConn.Reader.HasRows)
+                    listaBrindeEntidade = new ModuloClasse().PreencheClassePorDataReader<BrindeParceiroEntidade>(sqlConn.Reader);
+                else
+                    throw new KeyNotFoundException();
+
+                //transforma a entidade em objeto
+                foreach (var brinde in listaBrindeEntidade)
+                    listaBrinde.Add(brinde.ToBrindeParceiro());
+
+                return listaBrinde;
+            }
+            catch (KeyNotFoundException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao listar os brindes para o parceiro: " + idParceiro, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+
+                if (sqlConn.Reader != null)
+                    sqlConn.Reader.Close();
+            }
+        }
+
+        #endregion
     }
 }
