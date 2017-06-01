@@ -198,7 +198,7 @@ namespace ms_crud_rest.Controllers
         {
             try
             {
-                IList<BrindeParceiro> brindes = brindeDAO.ListarPorParceiro(idParceiro, idLoja);
+                IList<Brinde> brindes = brindeDAO.ListarPorParceiro(idParceiro, idLoja);
                 return Request.CreateResponse(HttpStatusCode.OK, brindes);
             }
             catch (KeyNotFoundException)

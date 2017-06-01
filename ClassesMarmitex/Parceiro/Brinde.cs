@@ -91,4 +91,10 @@ namespace ClassesMarmitex
             };
         }
     }
+
+    public class DadosBrindeParceiro
+    {
+        public List<Brinde> Brindes { get; set; }
+        public BrindeParceiro BrindeParceiro { get; set; }
+    }
 }

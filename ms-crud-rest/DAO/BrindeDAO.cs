@@ -226,15 +226,17 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
 
                 sqlConn.Command.Parameters.Clear();
-                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", brinde.Ativo);
                 sqlConn.Command.Parameters.AddWithValue("@id_brinde", brinde.Id);
 
-                sqlConn.Command.CommandText = @"UPDATE tab_brinde_parceiro
-	                                                SET bol_ativo = @bol_ativo
+                sqlConn.Command.CommandText = @"DECLARE @ativo INT;
+                                                SET @ativo = (SELECT bol_ativo FROM tab_brinde WHERE id_brinde = @id_brinde);
+
+                                                UPDATE tab_brinde_parceiro
+	                                                SET bol_ativo = CASE WHEN @ativo = 1 THEN 0 ELSE 0 END
                                                 WHERE id_brinde = @id_brinde;
 
                                                 UPDATE tab_brinde
-	                                                SET bol_ativo = @bol_ativo
+	                                                SET bol_ativo = CASE WHEN @ativo = 1 THEN 0 ELSE 1 END
                                                 WHERE id_brinde = @id_brinde;";
 
                 sqlConn.Command.ExecuteNonQuery();
@@ -319,11 +321,14 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", brinde.Ativo);
-                sqlConn.Command.Parameters.AddWithValue("@id_brinde", brinde.Id);
+                sqlConn.Command.Parameters.AddWithValue("@id_brinde_parceiro", brinde.Id);
 
-                sqlConn.Command.CommandText = @"UPDATE tab_brinde_parceiro
-	                                                SET bol_ativo = @bol_ativo
-                                                WHERE id_brinde = @id_brinde";
+                sqlConn.Command.CommandText = @"DECLARE @ativo INT;
+                                                SET @ativo = (SELECT bol_ativo FROM tab_brinde_parceiro WHERE id_brinde_parceiro = @id_brinde_parceiro);
+
+                                                UPDATE tab_brinde_parceiro
+	                                                SET bol_ativo = CASE WHEN @ativo = 1 THEN 0 ELSE 1 END
+                                                WHERE id_brinde_parceiro = @id_brinde_parceiro;";
 
                 sqlConn.Command.ExecuteNonQuery();
             }
@@ -338,10 +343,10 @@ namespace ms_crud_rest.DAO
             }
         }
 
-        public List<BrindeParceiro> ListarPorParceiro(int idParceiro, int idLoja)
+        public List<Brinde> ListarPorParceiro(int idParceiro, int idLoja)
         {
-            List<BrindeParceiroEntidade> listaBrindeEntidade = new List<BrindeParceiroEntidade>();
-            List<BrindeParceiro> listaBrinde = new List<BrindeParceiro>();
+            List<BrindeEntidade> listaBrindeEntidade = new List<BrindeEntidade>();
+            List<Brinde> listaBrinde = new List<Brinde>();
 
             try
             {
@@ -349,12 +354,14 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
                 sqlConn.Command.CommandText = @"SELECT
-	                                                tbp.id_brinde_parceiro,
-                                                    tbp.id_parceiro,
-	                                                tbp.id_brinde,
-	                                                tbp.bol_ativo
-                                                FROM tab_brinde_parceiro AS tbp
-                                                INNER JOIN tab_brinde AS tb
+	                                                tb.id_brinde,
+                                                    tb.id_loja,
+	                                                tb.nm_brinde,
+	                                                tb.nm_descricao,
+	                                                tb.url_imagem,
+	                                                tb.bol_ativo
+                                                FROM tab_brinde AS tb
+                                                INNER JOIN tab_brinde_parceiro AS tbp
                                                 ON tb.id_brinde = tbp.id_brinde
                                                 WHERE tbp.id_parceiro = @id_parceiro";
 
@@ -364,13 +371,13 @@ namespace ms_crud_rest.DAO
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
                 if (sqlConn.Reader.HasRows)
-                    listaBrindeEntidade = new ModuloClasse().PreencheClassePorDataReader<BrindeParceiroEntidade>(sqlConn.Reader);
+                    listaBrindeEntidade = new ModuloClasse().PreencheClassePorDataReader<BrindeEntidade>(sqlConn.Reader);
                 else
                     throw new KeyNotFoundException();
 
                 //transforma a entidade em objeto
                 foreach (var brinde in listaBrindeEntidade)
-                    listaBrinde.Add(brinde.ToBrindeParceiro());
+                    listaBrinde.Add(brinde.ToBrinde());
 
                 return listaBrinde;
             }
