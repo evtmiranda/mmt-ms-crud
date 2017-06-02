@@ -266,7 +266,26 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
 
                 sqlConn.Command.CommandText = @"INSERT INTO tab_brinde_parceiro(id_parceiro, id_brinde, bol_ativo)
-                                                VALUES(@id_parceiro, @id_brinde, @bol_ativo)";
+                                                VALUES(@id_parceiro, @id_brinde, @bol_ativo);
+
+                                                -- se o mesmo parceiro tiver o mesmo brinde duas vezes, um é excluido e o outro fica ativo
+                                                DECLARE @qtd INT;
+                                                SET @qtd = (SELECT COUNT(1) FROM tab_brinde_parceiro WHERE id_parceiro = @id_parceiro AND id_brinde = @id_brinde);
+
+                                                IF(@qtd > 1)
+	                                                BEGIN
+	
+	                                                DECLARE @min_id_brinde INT;
+	                                                SET @min_id_brinde = (SELECT MIN(id_brinde_parceiro) FROM tab_brinde_parceiro WHERE id_parceiro = @id_parceiro AND id_brinde = @id_brinde);
+
+	                                                DELETE FROM tab_brinde_parceiro
+	                                                WHERE id_brinde_parceiro = @min_id_brinde;
+
+	                                                UPDATE tab_brinde_parceiro
+	                                                SET bol_ativo = 1
+	                                                WHERE id_parceiro = @id_parceiro AND id_brinde = @id_brinde;
+
+	                                                END";
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_parceiro", brinde.IdParceiro);
