@@ -54,7 +54,7 @@ namespace ClassesMarmitex
         public int Id { get; set; }
         public int IdParceiro { get; set; }
         public int IdLoja { get; set; }
-        public string IdBrinde { get; set; }
+        public int IdBrinde { get; set; }
         public bool Ativo { get; set; }
     }
 
@@ -74,7 +74,7 @@ namespace ClassesMarmitex
         public int IdLoja { get; set; }
 
         [Column("id_brinde")]
-        public string IdBrinde { get; set; }
+        public int IdBrinde { get; set; }
 
         [Column("bol_ativo")]
         public bool Ativo { get; set; }
@@ -95,6 +95,10 @@ namespace ClassesMarmitex
     public class DadosBrindeParceiro
     {
         public List<Brinde> Brindes { get; set; }
-        public BrindeParceiro BrindeParceiro { get; set; }
+        //public BrindeParceiro BrindeParceiro { get; set; }
+        public int IdLoja { get; set; }
+        public int IdBrinde { get; set; }
+        public int IdParceiro { get; set; }
+        public bool Ativo { get; set; }
     }
 }

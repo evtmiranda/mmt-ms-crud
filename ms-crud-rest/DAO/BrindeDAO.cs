@@ -321,14 +321,14 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", brinde.Ativo);
-                sqlConn.Command.Parameters.AddWithValue("@id_brinde_parceiro", brinde.Id);
+                sqlConn.Command.Parameters.AddWithValue("@id_brinde", brinde.Id);
 
                 sqlConn.Command.CommandText = @"DECLARE @ativo INT;
-                                                SET @ativo = (SELECT bol_ativo FROM tab_brinde_parceiro WHERE id_brinde_parceiro = @id_brinde_parceiro);
+                                                SET @ativo = (SELECT bol_ativo FROM tab_brinde_parceiro WHERE id_brinde = @id_brinde);
 
                                                 UPDATE tab_brinde_parceiro
 	                                                SET bol_ativo = CASE WHEN @ativo = 1 THEN 0 ELSE 1 END
-                                                WHERE id_brinde_parceiro = @id_brinde_parceiro;";
+                                                WHERE id_brinde = @id_brinde;";
 
                 sqlConn.Command.ExecuteNonQuery();
             }
@@ -359,7 +359,7 @@ namespace ms_crud_rest.DAO
 	                                                tb.nm_brinde,
 	                                                tb.nm_descricao,
 	                                                tb.url_imagem,
-	                                                tb.bol_ativo
+	                                                tbp.bol_ativo
                                                 FROM tab_brinde AS tb
                                                 INNER JOIN tab_brinde_parceiro AS tbp
                                                 ON tb.id_brinde = tbp.id_brinde
