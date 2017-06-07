@@ -541,6 +541,13 @@ namespace ms_crud_rest.DAO
 	                                                            SET bol_ativo = @bol_ativo
                                                             WHERE id_produto = @id_produto;");
 
+                sqlConn.Command.CommandText = @"DECLARE @ativo INT;
+                                                SET @ativo = (SELECT bol_ativo FROM tab_produto WHERE id_produto = @id_produto);
+
+                                                UPDATE tab_produto
+	                                                SET bol_ativo = CASE WHEN @ativo = 1 THEN 0 ELSE 1 END
+                                                WHERE id_produto = @id_produto;";
+
                 sqlConn.Command.ExecuteNonQuery();
             }
             catch (Exception ex)

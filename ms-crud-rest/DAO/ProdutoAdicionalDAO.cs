@@ -234,9 +234,16 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", produtoAdicional.Ativo);
                 sqlConn.Command.Parameters.AddWithValue("@id_produto_adicional", produtoAdicional.Id);
 
-                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_produto_adicional
-                                                                SET bol_ativo = @bol_ativo
-                                                            WHERE id_produto_adicional = @id_produto_adicional;");
+                sqlConn.Command.CommandText = @"DECLARE @ativo INT;
+                                                SET @ativo = (SELECT bol_ativo FROM tab_produto_adicional WHERE id_produto_adicional = @id_produto_adicional);
+
+                                                UPDATE tab_produto_adicional_item
+	                                                SET bol_ativo = CASE WHEN @ativo = 1 THEN 0 ELSE 1 END
+                                                WHERE id_produto_adicional = @id_produto_adicional;
+
+                                                UPDATE tab_produto_adicional
+	                                                SET bol_ativo = CASE WHEN @ativo = 1 THEN 0 ELSE 1 END
+                                                WHERE id_produto_adicional = @id_produto_adicional;";
 
                 sqlConn.Command.ExecuteNonQuery();
             }
@@ -260,7 +267,7 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.Parameters.AddWithValue("@id_produto_adicional", produtoAdicional.Id);
                 sqlConn.Command.Parameters.AddWithValue("@nm_adicional", produtoAdicional.Nome);
-                sqlConn.Command.Parameters.AddWithValue("@nm_descricao", produtoAdicional.Descricao);
+                sqlConn.Command.Parameters.AddWithValue("@nm_descricao", produtoAdicional.Descricao ?? "");
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", produtoAdicional.Ativo);
 
                 sqlConn.Command.CommandText = string.Format(@"UPDATE tab_produto_adicional
@@ -357,9 +364,12 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", item.Ativo);
                 sqlConn.Command.Parameters.AddWithValue("@id_produto_adicional_item", item.Id);
 
-                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_produto_adicional_item
-	                                                            SET bol_ativo = @bol_ativo
-                                                            WHERE id_produto_adicional_item = @id_produto_adicional_item;");
+                sqlConn.Command.CommandText = @"DECLARE @ativo INT;
+                                                SET @ativo = (SELECT bol_ativo FROM tab_produto_adicional_item WHERE id_produto_adicional_item = @id_produto_adicional_item);
+
+                                                UPDATE tab_produto_adicional_item
+	                                                SET bol_ativo = CASE WHEN @ativo = 1 THEN 0 ELSE 1 END
+                                                WHERE id_produto_adicional_item = @id_produto_adicional_item;";
 
                 sqlConn.Command.ExecuteNonQuery();
             }
@@ -446,7 +456,7 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.Parameters.AddWithValue("@id_produto_adicional_item", item.Id);
                 sqlConn.Command.Parameters.AddWithValue("@nm_adicional_item", item.Nome);
-                sqlConn.Command.Parameters.AddWithValue("@nm_descricao_item", item.Descricao);
+                sqlConn.Command.Parameters.AddWithValue("@nm_descricao_item", item.Descricao ?? "");
                 sqlConn.Command.Parameters.AddWithValue("@vlr_adicional_item", item.Valor);
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", item.Ativo);
 
