@@ -129,7 +129,7 @@ namespace ms_crud_rest.DAO
                                                     vlr_adicional_item,
 	                                                bol_ativo
                                                 FROM tab_produto_adicional_item
-                                                AND bol_excluido = 0";
+                                                WHERE bol_excluido = 0";
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 

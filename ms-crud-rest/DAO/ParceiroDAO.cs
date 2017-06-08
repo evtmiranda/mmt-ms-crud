@@ -289,7 +289,7 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@nm_parceiro", parceiro.Nome);
-                sqlConn.Command.Parameters.AddWithValue("@nm_descricao", parceiro.Descricao);
+                sqlConn.Command.Parameters.AddWithValue("@nm_descricao", parceiro.Descricao ?? "");
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", parceiro.Ativo);
                 sqlConn.Command.Parameters.AddWithValue("@id_parceiro", parceiro.Id);
                 sqlConn.Command.Parameters.AddWithValue("@vlr_taxa_entrega", parceiro.TaxaEntrega);

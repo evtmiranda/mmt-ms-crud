@@ -350,8 +350,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.CommandText = string.Format(@"SELECT
 	                                                            id_tempo_antecedencia,
 	                                                            id_loja,
-	                                                            nr_minutos_antecedencia,
-	                                                            bol_ativo
+	                                                            nr_minutos_antecedencia
                                                             FROM tab_horario_entrega_tempo_anteced_pedido
                                                             WHERE id_tempo_antecedencia = @id_tempo_antecedencia");
 
