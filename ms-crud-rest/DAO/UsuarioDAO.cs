@@ -114,7 +114,12 @@ namespace ms_crud_rest.DAO
                                                                 WHERE tup.nm_email = @email 
                                                                 AND tup.nm_senha = @senha 
                                                                 AND tl.nm_dominio_loja = @nm_dominio_loja
-                                                                AND tup.bol_ativo = 1");
+                                                                AND tup.bol_excluido = 0
+                                                                AND tp.bol_excluido = 0
+                                                                AND tl.bol_excluido = 0
+                                                                AND tup.bol_ativo = 1
+                                                                AND tp.bol_ativo = 1
+                                                                AND tl.bol_ativo = 1");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@email", usuario.Email);
@@ -163,7 +168,10 @@ namespace ms_crud_rest.DAO
                                                              WHERE nm_email = @email 
                                                              AND nm_senha = @senha 
                                                              AND tl.nm_dominio_loja = @nm_dominio_loja
-                                                             AND tul.bol_ativo = 1");
+                                                             AND tul.bol_excluido = 0
+                                                             AND tl.bol_excluido = 0
+                                                             AND tul.bol_ativo = 1
+                                                             AND tl.bol_ativo = 1");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@email", usuario.Email);
@@ -219,7 +227,8 @@ namespace ms_crud_rest.DAO
                                                             INNER JOIN tab_loja AS tl
                                                             ON tul.id_loja = tl.id_loja
                                                             WHERE nm_email = @email
-                                                            AND bol_excluido = 0");
+                                                            AND tul.bol_excluido = 0
+                                                            AND tl.bol_excluido = 0");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@email", email);

@@ -241,7 +241,7 @@
 
                 return Request.CreateResponse(HttpStatusCode.NotFound, error);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 string mensagem = string.Format("Estamos com dificuldade em consultar os dados. Por favor, tente novamente");
                 HttpError error = new HttpError(mensagem);
