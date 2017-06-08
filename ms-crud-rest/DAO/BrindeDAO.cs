@@ -58,7 +58,8 @@ namespace ms_crud_rest.DAO
 	                                                url_imagem,
 	                                                bol_ativo
                                                 FROM tab_brinde
-                                                WHERE id_brinde = @id_brinde";
+                                                WHERE id_brinde = @id_brinde
+                                                AND bol_excluido = 0";
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_brinde", id);
@@ -113,7 +114,8 @@ namespace ms_crud_rest.DAO
 	                                                url_imagem,
 	                                                bol_ativo
                                                 FROM tab_brinde
-                                                WHERE id_loja = @id_loja";
+                                                WHERE id_loja = @id_loja
+                                                AND bol_excluido = 0";
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
@@ -195,10 +197,12 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_brinde", brinde.Id);
 
-                sqlConn.Command.CommandText = @"DELETE FROM tab_brinde_parceiro
+                sqlConn.Command.CommandText = @"UPDATE tab_brinde_parceiro
+                                                    SET bol_excluido = 1, bol_ativo = 0
                                                 WHERE id_brinde = @id_brinde;
 
-                                                DELETE FROM tab_brinde
+                                                UPDATE tab_brinde
+                                                    SET bol_excluido = 1, bol_ativo = 0
                                                 WHERE id_brinde = @id_brinde";
 
                 sqlConn.Command.ExecuteNonQuery();
@@ -315,7 +319,8 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_brinde", brinde.Id);
 
-                sqlConn.Command.CommandText = @"DELETE FROM tab_brinde_parceiro
+                sqlConn.Command.CommandText = @"UPDATE tab_brinde_parceiro
+                                                    SET bol_excluido = 1, bol_ativo = 0
                                                 WHERE id_brinde = @id_brinde";
 
                 sqlConn.Command.ExecuteNonQuery();
@@ -382,7 +387,8 @@ namespace ms_crud_rest.DAO
                                                 FROM tab_brinde AS tb
                                                 INNER JOIN tab_brinde_parceiro AS tbp
                                                 ON tb.id_brinde = tbp.id_brinde
-                                                WHERE tbp.id_parceiro = @id_parceiro";
+                                                WHERE tbp.id_parceiro = @id_parceiro
+                                                AND tb.bol_excluido = 0";
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_parceiro", idParceiro);

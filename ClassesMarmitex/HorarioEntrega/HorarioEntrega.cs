@@ -46,7 +46,7 @@ namespace ClassesMarmitex
         public int Id { get; set; }
         public int IdLoja { get; set; }
         public int MinutosAntecedencia { get; set; }
-        public bool Ativo { get; set; }
+        //public bool Ativo { get; set; }
     }
 
     [Table("tab_horario_entrega_tempo_anteced_pedido")]
@@ -61,12 +61,12 @@ namespace ClassesMarmitex
         [Column("nr_minutos_antecedencia")]
         public int MinutosAntecedencia { get; set; }
 
-        [Column("bol_ativo")]
-        public bool Ativo { get; set; }
+        //[Column("bol_ativo")]
+        //public bool Ativo { get; set; }
 
         public TempoAntecedenciaEntrega ToTempoAntecedenciaEntrega()
         {
-            return new TempoAntecedenciaEntrega { Id = this.Id, IdLoja = this.IdLoja, MinutosAntecedencia = this.MinutosAntecedencia, Ativo = this.Ativo };
+            return new TempoAntecedenciaEntrega { Id = this.Id, IdLoja = this.IdLoja, MinutosAntecedencia = this.MinutosAntecedencia/*, Ativo = this.Ativo */};
         }
     }
 

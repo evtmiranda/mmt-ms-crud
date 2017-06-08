@@ -42,7 +42,8 @@ namespace ms_crud_rest.DAO
 	                                                            url_imagem,
 	                                                            bol_ativo
                                                             FROM tab_produto
-                                                            WHERE id_produto = @id_produto");
+                                                            WHERE id_produto = @id_produto
+                                                            AND bol_excluido = 0");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_produto", id);
@@ -82,7 +83,10 @@ namespace ms_crud_rest.DAO
                                                             ON tpap.id_produto_adicional = tpa.id_produto_adicional
                                                             INNER JOIN tab_produto AS tp
                                                             ON tp.id_produto = tpap.id_produto
-                                                            AND tp.id_produto = @id_produto;");
+                                                            AND tp.id_produto = @id_produto
+                                                            AND tpap.bol_excluido = 0
+                                                            AND tpa.bol_excluido = 0
+                                                            AND tp.bol_excluido = 0;");
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
@@ -110,7 +114,8 @@ namespace ms_crud_rest.DAO
 	                                                nm_descricao_item,
 	                                                vlr_adicional_item,
 	                                                bol_ativo
-                                                FROM tab_produto_adicional_item";
+                                                FROM tab_produto_adicional_item
+                                                WHERE bol_excluido = 0";
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
@@ -146,7 +151,10 @@ namespace ms_crud_rest.DAO
                                                 INNER JOIN tab_produto_adicional AS tpa
                                                 ON tpap.id_produto_adicional = tpa.id_produto_adicional
                                                 INNER JOIN tab_produto AS tp
-                                                ON tp.id_produto = tpap.id_produto";
+                                                ON tp.id_produto = tpap.id_produto
+                                                WHERE tpap.bol_excluido = 0
+                                                AND tpa.bol_excluido = 0
+                                                AND tp.bol_excluido = 0";
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
@@ -248,7 +256,8 @@ namespace ms_crud_rest.DAO
 	                                                            url_imagem,
 	                                                            bol_ativo
                                                             FROM tab_produto
-                                                            WHERE id_menu_cardapio = @id_menu_cardapio");
+                                                            WHERE id_menu_cardapio = @id_menu_cardapio
+                                                            AND bol_excluido = 0");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_menu_cardapio", idMenuCardapio);
@@ -285,6 +294,9 @@ namespace ms_crud_rest.DAO
                                                             INNER JOIN tab_produto AS tp
                                                             ON tp.id_produto = tpap.id_produto
                                                             AND tp.id_menu_cardapio = @id_menu_cardapio
+                                                            WHERE tpap.bol_excluido = 0
+                                                            AND tpa.bol_excluido = 0
+                                                            AND tp.bol_excluido = 0
                                                             ORDER BY tpap.nr_ordem_exibicao ASC;");
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
@@ -313,7 +325,8 @@ namespace ms_crud_rest.DAO
 	                                                nm_descricao_item,
 	                                                vlr_adicional_item,
 	                                                bol_ativo
-                                                FROM tab_produto_adicional_item";
+                                                FROM tab_produto_adicional_item
+                                                WHERE bol_excluido = 0";
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
@@ -350,6 +363,9 @@ namespace ms_crud_rest.DAO
                                                 ON tpap.id_produto_adicional = tpa.id_produto_adicional
                                                 INNER JOIN tab_produto AS tp
                                                 ON tp.id_produto = tpap.id_produto
+                                                WHERE tpap.bol_excluido = 0
+                                                AND tpa.bol_excluido = 0
+                                                AND tp.bol_excluido = 0
                                                 ORDER BY tpap.nr_ordem_exibicao ASC;";
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
@@ -455,7 +471,8 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", 0);
                 sqlConn.Command.Parameters.AddWithValue("@id_produto", id);
 
-                sqlConn.Command.CommandText = string.Format(@"DELETE tab_produto
+                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_produto
+                                                                SET bol_excluido = 1, bol_ativo = 0
                                                             WHERE id_produto = @id_produto;");
 
                 sqlConn.Command.ExecuteNonQuery();
@@ -509,7 +526,8 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_produto", produto.Id);
 
-                sqlConn.Command.CommandText = string.Format(@"DELETE tab_produto
+                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_produto
+                                                                SET bol_excluido = 1, bol_ativo = 0
                                                             WHERE id_produto = @id_produto;");
 
                 sqlConn.Command.ExecuteNonQuery();
@@ -643,7 +661,10 @@ namespace ms_crud_rest.DAO
                                                             ON tpap.id_produto_adicional = tpa.id_produto_adicional
                                                             INNER JOIN tab_produto AS tp
                                                             ON tp.id_produto = tpap.id_produto
-                                                            WHERE tpap.id_produto = @id_produto");
+                                                            WHERE tpap.id_produto = @id_produto
+                                                            AND tpap.bol_excluido = 0
+                                                            AND tpa.bol_excluido = 0
+                                                            AND tp.bol_excluido = 0");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_produto", idProduto);
@@ -708,7 +729,10 @@ namespace ms_crud_rest.DAO
                                                             ON tpap.id_produto_adicional = tpa.id_produto_adicional
                                                             INNER JOIN tab_produto AS tp
                                                             ON tp.id_produto = tpap.id_produto
-                                                            WHERE tpap.id_produto_adicional_produto = @id_produto_adicional_produto");
+                                                            WHERE tpap.id_produto_adicional_produto = @id_produto_adicional_produto
+                                                            AND tpap.bol_excluido = 0
+                                                            AND tpa.bol_excluido = 0
+                                                            AND tp.bol_excluido = 0");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_produto_adicional_produto", idProdutoAdicionalProduto);
@@ -782,7 +806,8 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_produto_adicional_produto", produtoAdicional.Id);
 
-                sqlConn.Command.CommandText = string.Format(@"DELETE tab_produto_adicional_produto
+                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_produto_adicional_produto
+                                                                SET bol_excluido = 1, bol_ativo = 0
                                                             WHERE id_produto_adicional_produto = @id_produto_adicional_produto;");
 
                 sqlConn.Command.ExecuteNonQuery();

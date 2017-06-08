@@ -53,7 +53,8 @@ namespace ms_crud_rest.DAO
 	                                                nm_horario,
 	                                                bol_ativo
                                                 FROM tab_horario_entrega
-                                                WHERE id_horario_entrega = @id_horario_entrega";
+                                                WHERE id_horario_entrega = @id_horario_entrega
+                                                AND bol_excluido = 0";
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_horario_entrega", id);
@@ -132,7 +133,8 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_horario_entrega", horarioEntrega.Id);
 
-                sqlConn.Command.CommandText = @"DELETE FROM tab_horario_entrega
+                sqlConn.Command.CommandText = @"UPDATE tab_horario_entrega
+                                                    SET bol_excluido = 1, bol_ativo = 0
                                                 WHERE id_horario_entrega = @id_horario_entrega";
 
                 sqlConn.Command.ExecuteNonQuery();
@@ -201,6 +203,7 @@ namespace ms_crud_rest.DAO
 	                                                bol_ativo
                                                 FROM tab_horario_entrega
                                                 WHERE id_loja = @id_loja
+                                                AND bol_excluido = 0
                                                 ORDER BY nm_horario";
 
                 sqlConn.Command.Parameters.Clear();
@@ -228,8 +231,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.CommandText = @"SELECT
 	                                                id_tempo_antecedencia,
 	                                                id_loja,
-	                                                nr_minutos_antecedencia,
-	                                                bol_ativo
+	                                                nr_minutos_antecedencia
                                                 FROM tab_horario_entrega_tempo_anteced_pedido
                                                 WHERE id_loja = @id_loja";
 

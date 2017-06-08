@@ -34,7 +34,8 @@ namespace ms_crud_rest.DAO
 	                                                            nr_ordem_exibicao,
 	                                                            bol_ativo
                                                             FROM tab_menu_cardapio
-                                                            WHERE id_menu_cardapio = @id_menu_cardapio");
+                                                            WHERE id_menu_cardapio = @id_menu_cardapio
+                                                            AND bol_excluido = 0");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_menu_cardapio", idCardapio);
@@ -90,7 +91,8 @@ namespace ms_crud_rest.DAO
 	                                                            nr_ordem_exibicao,
 	                                                            bol_ativo
                                                             FROM tab_menu_cardapio
-                                                            WHERE id_loja = @id_loja");
+                                                            WHERE id_loja = @id_loja
+                                                            AND bol_excluido = 0");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
@@ -206,7 +208,8 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", cardapio.Ativo);
                 sqlConn.Command.Parameters.AddWithValue("@id_menu_cardapio", cardapio.Id);
 
-                sqlConn.Command.CommandText = string.Format(@"DELETE FROM tab_menu_cardapio
+                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_menu_cardapio
+                                                                SET bol_excluido = 1, bol_ativo = 0
                                                             WHERE id_menu_cardapio = @id_menu_cardapio;");
 
                 sqlConn.Command.ExecuteNonQuery();
@@ -233,9 +236,12 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", cardapio.Ativo);
                 sqlConn.Command.Parameters.AddWithValue("@id_menu_cardapio", cardapio.Id);
 
-                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_menu_cardapio
-	                                                            SET bol_ativo = @bol_ativo
-                                                            WHERE id_menu_cardapio = @id_menu_cardapio;");
+                sqlConn.Command.CommandText = @"DECLARE @ativo INT;
+                                                SET @ativo = (SELECT bol_ativo FROM tab_menu_cardapio WHERE id_menu_cardapio = @id_menu_cardapio);
+
+                                                UPDATE tab_menu_cardapio
+	                                                SET bol_ativo = CASE WHEN @ativo = 1 THEN 0 ELSE 1 END
+                                                WHERE id_menu_cardapio = @id_menu_cardapio;";
 
                 sqlConn.Command.ExecuteNonQuery();
             }

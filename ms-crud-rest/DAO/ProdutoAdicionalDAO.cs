@@ -32,7 +32,8 @@ namespace ms_crud_rest.DAO
                                                                 0 AS nr_ordem_exibicao,
 	                                                            bol_ativo
                                                             FROM tab_produto_adicional
-                                                            WHERE id_produto_adicional = @id_produto_adicional;");
+                                                            WHERE id_produto_adicional = @id_produto_adicional
+                                                            AND bol_excluido = 0;");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_produto_adicional", id);
@@ -93,7 +94,8 @@ namespace ms_crud_rest.DAO
                                                                 0 AS nr_ordem_exibicao,
 	                                                            bol_ativo
                                                             FROM tab_produto_adicional
-                                                            WHERE id_loja = @id_loja");
+                                                            WHERE id_loja = @id_loja
+                                                            AND bol_excluido = 0");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
@@ -126,7 +128,8 @@ namespace ms_crud_rest.DAO
 	                                                nm_descricao_item,
                                                     vlr_adicional_item,
 	                                                bol_ativo
-                                                FROM tab_produto_adicional_item";
+                                                FROM tab_produto_adicional_item
+                                                AND bol_excluido = 0";
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
@@ -207,7 +210,8 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_produto_adicional", produtoAdicional.Id);
 
-                sqlConn.Command.CommandText = string.Format(@"DELETE tab_produto_adicional
+                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_produto_adicional
+                                                                SET bol_excluido = 1, bol_ativo = 0
                                                             WHERE id_produto_adicional = @id_produto_adicional;");
 
                 sqlConn.Command.ExecuteNonQuery();
@@ -236,10 +240,6 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.CommandText = @"DECLARE @ativo INT;
                                                 SET @ativo = (SELECT bol_ativo FROM tab_produto_adicional WHERE id_produto_adicional = @id_produto_adicional);
-
-                                                UPDATE tab_produto_adicional_item
-	                                                SET bol_ativo = CASE WHEN @ativo = 1 THEN 0 ELSE 1 END
-                                                WHERE id_produto_adicional = @id_produto_adicional;
 
                                                 UPDATE tab_produto_adicional
 	                                                SET bol_ativo = CASE WHEN @ativo = 1 THEN 0 ELSE 1 END
@@ -336,7 +336,8 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_produto_adicional_item", item.Id);
 
-                sqlConn.Command.CommandText = string.Format(@"DELETE tab_produto_adicional_item
+                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_produto_adicional_item
+                                                                SET bol_excluido = 1, bol_ativo = 0
                                                             WHERE id_produto_adicional_item = @id_produto_adicional_item;");
 
                 sqlConn.Command.ExecuteNonQuery();
@@ -405,7 +406,8 @@ namespace ms_crud_rest.DAO
 	                                                            vlr_adicional_item,
 	                                                            bol_ativo
                                                             FROM tab_produto_adicional_item
-                                                            WHERE id_produto_adicional_item = @id_produto_adicional_item;");
+                                                            WHERE id_produto_adicional_item = @id_produto_adicional_item
+                                                            AND bol_excluido = 0;");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_produto_adicional_item", id);
@@ -482,8 +484,6 @@ namespace ms_crud_rest.DAO
                 sqlConn.CloseConnection();
             }
         }
-
-
 
         #endregion
     }

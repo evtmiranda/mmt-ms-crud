@@ -218,7 +218,8 @@ namespace ms_crud_rest.DAO
                                                             FROM tab_usuario_loja AS tul
                                                             INNER JOIN tab_loja AS tl
                                                             ON tul.id_loja = tl.id_loja
-                                                            WHERE nm_email = @email");
+                                                            WHERE nm_email = @email
+                                                            AND bol_excluido = 0");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@email", email);
@@ -277,7 +278,8 @@ namespace ms_crud_rest.DAO
                                                             ON tup.id_parceiro = tp.id_parceiro
                                                             INNER JOIN tab_endereco AS te
                                                             ON te.id_endereco = tp.id_endereco
-                                                            WHERE nm_email = @email");
+                                                            WHERE nm_email = @email
+                                                            AND bol_excluido = 0");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@email", email);
@@ -317,7 +319,8 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.CommandText = string.Format(@"SELECT 
                                                                 id_parceiro 
                                                             FROM tab_parceiro
-                                                            WHERE nm_codigo = @codigoParceiro");
+                                                            WHERE nm_codigo = @codigoParceiro
+                                                            AND bol_excluido = 0");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@codigoParceiro", sCodigoParceiro);
@@ -328,7 +331,7 @@ namespace ms_crud_rest.DAO
             }
             catch (Exception ex)
             {
-                logDAO.Adicionar(new Log { IdLoja = 0, Mensagem = "Erro ao consultar empresa", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                logDAO.Adicionar(new Log { IdLoja = 0, Mensagem = "Erro ao consultar parceiro", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
 
                 throw ex;
             }
@@ -338,5 +341,6 @@ namespace ms_crud_rest.DAO
             }
 
         }
+
     }
 }

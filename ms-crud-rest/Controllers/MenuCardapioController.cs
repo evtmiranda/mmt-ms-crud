@@ -101,7 +101,7 @@ namespace ms_crud_rest.Controllers
         {
             try
             {
-                cardapioDAO.Excluir(cardapio);
+                cardapioDAO.Desativar(cardapio);
                 return Request.CreateResponse(HttpStatusCode.OK, cardapio);
             }
             catch (Exception)

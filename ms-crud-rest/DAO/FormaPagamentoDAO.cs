@@ -53,7 +53,8 @@ namespace ms_crud_rest.DAO
 	                                                nm_forma_pagamento,
 	                                                bol_ativo
                                                 FROM tab_forma_pagamento
-                                                WHERE id_forma_pagamento = @id_forma_pagamento";
+                                                WHERE id_forma_pagamento = @id_forma_pagamento
+                                                AND bol_excluido = 0";
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_forma_pagamento", id);
@@ -107,7 +108,8 @@ namespace ms_crud_rest.DAO
 	                                                bol_ativo
                                                 FROM tab_forma_pagamento
                                                 WHERE nm_forma_pagamento = @nm_forma_pagamento
-                                                AND id_loja = @id_loja";
+                                                AND id_loja = @id_loja
+                                                AND bol_excluido = 0";
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@nm_forma_pagamento", nome);
@@ -161,7 +163,8 @@ namespace ms_crud_rest.DAO
 	                                                nm_forma_pagamento,
 	                                                bol_ativo
                                                 FROM tab_forma_pagamento
-                                                WHERE id_loja = @id_loja";
+                                                WHERE id_loja = @id_loja
+                                                AND bol_excluido = 0";
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
@@ -237,7 +240,8 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_forma_pagamento", formaPagamento.Id);
 
-                sqlConn.Command.CommandText = @"DELETE FROM tab_forma_pagamento
+                sqlConn.Command.CommandText = @"UPDATE tab_forma_pagamento
+                                                    SET bol_excluido = 1, bol_ativo = 0
                                                 WHERE id_forma_pagamento = @id_forma_pagamento";
 
                 sqlConn.Command.ExecuteNonQuery();

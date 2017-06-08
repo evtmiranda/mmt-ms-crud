@@ -34,7 +34,8 @@ namespace ms_crud_rest.DAO
                                                                 vlr_taxa_entrega,
 	                                                            bol_ativo
                                                             FROM tab_parceiro
-                                                            WHERE id_parceiro = @id_parceiro;");
+                                                            WHERE id_parceiro = @id_parceiro
+                                                            AND bol_excluido = 0;");
 
                 sqlConn.Command.Parameters.AddWithValue("@id_parceiro", idParceiro);
 
@@ -122,7 +123,8 @@ namespace ms_crud_rest.DAO
                                                                 vlr_taxa_entrega,
 	                                                            bol_ativo
                                                             FROM tab_parceiro
-                                                            WHERE id_loja = @id_loja");
+                                                            WHERE id_loja = @id_loja
+                                                            AND bol_excluido = 0");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
@@ -356,7 +358,8 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", parceiro.Ativo);
                 sqlConn.Command.Parameters.AddWithValue("@id_parceiro", parceiro.Id);
 
-                sqlConn.Command.CommandText = string.Format(@"DELETE tab_parceiro
+                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_parceiro
+                                                                SET bol_excluido = 1, bol_ativo = 0
                                                             WHERE id_parceiro = @id_parceiro;");
 
                 sqlConn.Command.ExecuteNonQuery();
@@ -383,9 +386,12 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", parceiro.Ativo);
                 sqlConn.Command.Parameters.AddWithValue("@id_parceiro", parceiro.Id);
 
-                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_parceiro
-	                                                            SET bol_ativo = @bol_ativo
-                                                            WHERE id_parceiro = @id_parceiro;");
+                sqlConn.Command.CommandText = @"DECLARE @ativo INT;
+                                                SET @ativo = (SELECT bol_ativo FROM tab_parceiro WHERE id_parceiro = @id_parceiro);
+
+                                                UPDATE tab_parceiro
+	                                                SET bol_ativo = CASE WHEN @ativo = 1 THEN 0 ELSE 1 END
+                                                WHERE id_parceiro = @id_parceiro;";
 
                 sqlConn.Command.ExecuteNonQuery();
             }
