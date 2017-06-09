@@ -1,4 +1,5 @@
 ﻿using ClassesMarmitex;
+using ms_crud_rest.Exceptions;
 using System;
 using System.Collections.Generic;
 
@@ -367,10 +368,13 @@ namespace ms_crud_rest.DAO
             }
         }
 
-        public List<Brinde> ListarPorParceiro(int idParceiro, int idLoja)
+        public DadosBrindeParceiro ListarPorParceiro(int idParceiro, int idLoja)
         {
             List<BrindeEntidade> listaBrindeEntidade = new List<BrindeEntidade>();
             List<Brinde> listaBrinde = new List<Brinde>();
+
+            List<DadosBrindeParceiroEntidade> listaDadosBrindeParceiroEntidade = new List<DadosBrindeParceiroEntidade>();
+            DadosBrindeParceiro dadosBrindeParceiro = new DadosBrindeParceiro();
 
             try
             {
@@ -388,7 +392,8 @@ namespace ms_crud_rest.DAO
                                                 INNER JOIN tab_brinde_parceiro AS tbp
                                                 ON tb.id_brinde = tbp.id_brinde
                                                 WHERE tbp.id_parceiro = @id_parceiro
-                                                AND tb.bol_excluido = 0";
+                                                AND tb.bol_excluido = 0
+                                                AND tbp.bol_excluido = 0";
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_parceiro", idParceiro);
@@ -397,17 +402,38 @@ namespace ms_crud_rest.DAO
 
                 if (sqlConn.Reader.HasRows)
                     listaBrindeEntidade = new ModuloClasse().PreencheClassePorDataReader<BrindeEntidade>(sqlConn.Reader);
-                else
-                    throw new KeyNotFoundException();
+
+                sqlConn.Reader.Close();
 
                 //transforma a entidade em objeto
                 foreach (var brinde in listaBrindeEntidade)
                     listaBrinde.Add(brinde.ToBrinde());
 
-                return listaBrinde;
+                //busca os dados do parceiro
+                sqlConn.Command.CommandText = @"SELECT
+                                                    id_loja,
+	                                                id_parceiro,
+	                                                nm_parceiro
+                                                FROM tab_parceiro
+                                                WHERE id_parceiro = @id_parceiro
+                                                AND bol_excluido = 0
+                                                AND bol_ativo = 1";
+
+                sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                if (sqlConn.Reader.HasRows)
+                    listaDadosBrindeParceiroEntidade = new ModuloClasse().PreencheClassePorDataReader<DadosBrindeParceiroEntidade>(sqlConn.Reader);
+                else
+                    throw new ParceiroNaoCadastradoException();
+
+                dadosBrindeParceiro = listaDadosBrindeParceiroEntidade[0].ToDadosBrindeParceiro();
+                dadosBrindeParceiro.Brindes = listaBrinde;
+
+                return dadosBrindeParceiro;
             }
-            catch (KeyNotFoundException)
+            catch (ParceiroNaoCadastradoException)
             {
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Tentativa de listar brindes de um parceiro que não existe ou não está ativo." + idParceiro, Descricao = "", StackTrace = "BrindeDAO/ListarPorParceiro" });
                 throw;
             }
             catch (Exception ex)

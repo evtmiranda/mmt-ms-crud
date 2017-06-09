@@ -95,10 +95,27 @@ namespace ClassesMarmitex
     public class DadosBrindeParceiro
     {
         public List<Brinde> Brindes { get; set; }
-        //public BrindeParceiro BrindeParceiro { get; set; }
+
         public int IdLoja { get; set; }
-        public int IdBrinde { get; set; }
         public int IdParceiro { get; set; }
-        public bool Ativo { get; set; }
+        public string NomeParceiro { get; set; }
+    }
+
+
+    public class DadosBrindeParceiroEntidade
+    {
+        [Column("id_loja")]
+        public int IdLoja { get; set; }
+
+        [Column("id_parceiro")]
+        public int IdParceiro { get; set; }
+
+        [Column("nm_parceiro")]
+        public string NomeParceiro { get; set; }
+
+        public DadosBrindeParceiro ToDadosBrindeParceiro()
+        {
+            return new DadosBrindeParceiro {IdLoja = this.IdLoja, IdParceiro = this.IdParceiro, NomeParceiro = this.NomeParceiro };
+        }
     }
 }
