@@ -24,7 +24,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_loja", brinde.IdLoja);
                 sqlConn.Command.Parameters.AddWithValue("@nm_brinde", brinde.Nome);
-                sqlConn.Command.Parameters.AddWithValue("@nm_descricao", brinde.Descricao);
+                sqlConn.Command.Parameters.AddWithValue("@nm_descricao", brinde.Descricao ?? "");
                 sqlConn.Command.Parameters.AddWithValue("@url_imagem", brinde.Imagem);
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", brinde.Ativo);
 
@@ -353,7 +353,15 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.CommandText = @"DECLARE @ativo INT;
                                                 SET @ativo = (SELECT bol_ativo FROM tab_brinde_parceiro WHERE id_brinde = @id_brinde AND bol_excluido = 0 AND id_parceiro = @id_parceiro);
-
+                                                
+                                                -- se ativar o brinde para o parceiro(tab_brinde_parceiro), o brinde(tab_brinde) também é ativado
+                                                IF(@ativo = 0)
+                                                    BEGIN
+                                                        UPDATE tab_brinde
+                                                            SET bol_ativo = 1
+                                                        WHERE id_brinde = @id_brinde
+                                                    END
+                                                
                                                 UPDATE tab_brinde_parceiro
 	                                                SET bol_ativo = CASE WHEN @ativo = 1 THEN 0 ELSE 1 END
                                                 WHERE id_brinde = @id_brinde
