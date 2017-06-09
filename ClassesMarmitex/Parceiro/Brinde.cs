@@ -98,7 +98,9 @@ namespace ClassesMarmitex
 
         public int IdLoja { get; set; }
         public int IdParceiro { get; set; }
+        public int IdBrinde { get; set; }
         public string NomeParceiro { get; set; }
+        public bool Ativo { get; set; }
     }
 
 

@@ -319,10 +319,12 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_brinde", brinde.Id);
+                sqlConn.Command.Parameters.AddWithValue("@id_parceiro", brinde.IdParceiro);
 
                 sqlConn.Command.CommandText = @"UPDATE tab_brinde_parceiro
                                                     SET bol_excluido = 1, bol_ativo = 0
-                                                WHERE id_brinde = @id_brinde";
+                                                WHERE id_brinde = @id_brinde
+                                                AND id_parceiro = @id_parceiro;";
 
                 sqlConn.Command.ExecuteNonQuery();
             }
@@ -347,13 +349,16 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", brinde.Ativo);
                 sqlConn.Command.Parameters.AddWithValue("@id_brinde", brinde.Id);
+                sqlConn.Command.Parameters.AddWithValue("@id_parceiro", brinde.IdParceiro);
 
                 sqlConn.Command.CommandText = @"DECLARE @ativo INT;
-                                                SET @ativo = (SELECT bol_ativo FROM tab_brinde_parceiro WHERE id_brinde = @id_brinde);
+                                                SET @ativo = (SELECT bol_ativo FROM tab_brinde_parceiro WHERE id_brinde = @id_brinde AND bol_excluido = 0 AND id_parceiro = @id_parceiro);
 
                                                 UPDATE tab_brinde_parceiro
 	                                                SET bol_ativo = CASE WHEN @ativo = 1 THEN 0 ELSE 1 END
-                                                WHERE id_brinde = @id_brinde;";
+                                                WHERE id_brinde = @id_brinde
+                                                AND bol_excluido = 0 
+                                                AND id_parceiro = @id_parceiro;";
 
                 sqlConn.Command.ExecuteNonQuery();
             }
@@ -416,8 +421,7 @@ namespace ms_crud_rest.DAO
 	                                                nm_parceiro
                                                 FROM tab_parceiro
                                                 WHERE id_parceiro = @id_parceiro
-                                                AND bol_excluido = 0
-                                                AND bol_ativo = 1";
+                                                AND bol_excluido = 0";
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
