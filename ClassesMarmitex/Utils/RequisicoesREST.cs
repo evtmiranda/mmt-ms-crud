@@ -45,34 +45,44 @@ namespace ClassesMarmitex
             //se for algum erro do protocolo HTTP, captura o retorno HTTP para utilizar no retorno do método
             catch (WebException wEx)
             {
-                string mensagemErro = "";
-
                 try
                 {
-                    mensagemErro = new StreamReader(wEx.Response.GetResponseStream()).ReadToEnd();
-                }
-                catch
-                {
-                    mensagemErro = "";
-                }
+                    string mensagemErro = "";
 
-                //cria um webResponse
-                var webResponse = wEx.Response as HttpWebResponse;
+                    try
+                    {
+                        mensagemErro = new StreamReader(wEx.Response.GetResponseStream()).ReadToEnd();
+                    }
+                    catch
+                    {
+                        mensagemErro = "";
+                    }
 
-                //verifica se não é erro do protocolo HTTP. Se não for, devolve um InternalServerError
-                if (wEx.Status != WebExceptionStatus.ProtocolError)
-                {
-                    retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
+                    //cria um webResponse
+                    var webResponse = wEx.Response as HttpWebResponse;
+
+                    //verifica se não é erro do protocolo HTTP. Se não for, devolve um InternalServerError
+                    if (wEx.Status != WebExceptionStatus.ProtocolError)
+                    {
+                        retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
+                        retorno.objeto = mensagemErro;
+
+                        return retorno;
+                    }
+
+                    //Retorna o status HTTP
+                    retorno.HttpStatusCode = webResponse.StatusCode;
                     retorno.objeto = mensagemErro;
 
                     return retorno;
                 }
+                catch (System.Exception)
+                {
+                    retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
+                    retorno.objeto = "";
 
-                //Retorna o status HTTP
-                retorno.HttpStatusCode = webResponse.StatusCode;
-                retorno.objeto = mensagemErro;
-
-                return retorno;
+                    return retorno;
+                }
             }
             //Se ocorrer qualquer outra exceção retorna um InternalServerError
             catch (System.Exception ex)
@@ -117,34 +127,44 @@ namespace ClassesMarmitex
             //se for algum erro do protocolo HTTP, captura o retorno HTTP para utilizar no retorno do método
             catch (WebException wEx)
             {
-                string mensagemErro = "";
-
                 try
                 {
-                    mensagemErro = new StreamReader(wEx.Response.GetResponseStream()).ReadToEnd();
-                }
-                catch
-                {
-                    mensagemErro = "";
-                }
+                    string mensagemErro = "";
 
-                //cria um webResponse
-                var webResponse = wEx.Response as HttpWebResponse;
+                    try
+                    {
+                        mensagemErro = new StreamReader(wEx.Response.GetResponseStream()).ReadToEnd();
+                    }
+                    catch
+                    {
+                        mensagemErro = "";
+                    }
 
-                //verifica se não é erro do protocolo HTTP. Se não for, devolve um InternalServerError
-                if (wEx.Status != WebExceptionStatus.ProtocolError)
-                {
-                    retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
+                    //cria um webResponse
+                    var webResponse = wEx.Response as HttpWebResponse;
+
+                    //verifica se não é erro do protocolo HTTP. Se não for, devolve um InternalServerError
+                    if (wEx.Status != WebExceptionStatus.ProtocolError)
+                    {
+                        retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
+                        retorno.objeto = mensagemErro;
+
+                        return retorno;
+                    }
+
+                    //Retorna o status HTTP
+                    retorno.HttpStatusCode = webResponse.StatusCode;
                     retorno.objeto = mensagemErro;
 
                     return retorno;
                 }
+                catch (System.Exception)
+                {
+                    retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
+                    retorno.objeto = "";
 
-                //Retorna o status HTTP
-                retorno.HttpStatusCode = webResponse.StatusCode;
-                retorno.objeto = mensagemErro;
-
-                return retorno;
+                    return retorno;
+                }
             }
             //Se ocorrer qualquer outra exceção retorna um InternalServerError
             catch (System.Exception ex)
@@ -192,34 +212,45 @@ namespace ClassesMarmitex
             //se for algum erro do protocolo HTTP, captura o retorno HTTP para utilizar no retorno do método
             catch (WebException wEx)
             {
-                string mensagemErro = "";
-
                 try
                 {
-                    mensagemErro = new StreamReader(wEx.Response.GetResponseStream()).ReadToEnd();
-                }
-                catch
-                {
-                    mensagemErro = "";
-                }
+                    string mensagemErro = "";
 
-                //cria um webResponse
-                var webResponse = wEx.Response as HttpWebResponse;
+                    try
+                    {
+                        mensagemErro = new StreamReader(wEx.Response.GetResponseStream()).ReadToEnd();
+                    }
+                    catch
+                    {
+                        mensagemErro = "";
+                    }
 
-                //verifica se não é erro do protocolo HTTP. Se não for, devolve um InternalServerError
-                if (wEx.Status != WebExceptionStatus.ProtocolError)
-                {
-                    retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
+                    //cria um webResponse
+                    var webResponse = wEx.Response as HttpWebResponse;
+
+                    //verifica se não é erro do protocolo HTTP. Se não for, devolve um InternalServerError
+                    if (wEx.Status != WebExceptionStatus.ProtocolError)
+                    {
+                        retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
+                        retorno.objeto = mensagemErro;
+
+                        return retorno;
+                    }
+
+                    //Retorna o status HTTP
+                    retorno.HttpStatusCode = webResponse.StatusCode;
                     retorno.objeto = mensagemErro;
 
                     return retorno;
                 }
+                catch (System.Exception)
+                {
+                    retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
+                    retorno.objeto = "";
 
-                //Retorna o status HTTP
-                retorno.HttpStatusCode = webResponse.StatusCode;
-                retorno.objeto = mensagemErro;
-
-                return retorno;
+                    return retorno;
+                }
+                
             }
             //Se ocorrer qualquer outra exceção retorna um InternalServerError
             catch (System.Exception ex)
