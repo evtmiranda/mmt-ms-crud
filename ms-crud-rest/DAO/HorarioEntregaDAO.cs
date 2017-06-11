@@ -539,9 +539,12 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", diaFuncionamento.Ativo);
                 sqlConn.Command.Parameters.AddWithValue("@id_dia_funcionamento", diaFuncionamento.Id);
 
-                sqlConn.Command.CommandText = @"UPDATE tab_dias_funcionamento
-	                                                SET bol_ativo = @bol_ativo
-                                                WHERE id_dia_funcionamento = @id_dia_funcionamento";
+                sqlConn.Command.CommandText = @"DECLARE @ativo INT;
+                                                SET @ativo = (SELECT bol_ativo FROM tab_dias_funcionamento WHERE id_dia_funcionamento = @id_dia_funcionamento);
+
+                                                UPDATE tab_dias_funcionamento
+	                                                SET bol_ativo = CASE WHEN @ativo = 1 THEN 0 ELSE 1 END
+                                                WHERE id_dia_funcionamento = @id_dia_funcionamento;";
 
                 sqlConn.Command.ExecuteNonQuery();
             }
