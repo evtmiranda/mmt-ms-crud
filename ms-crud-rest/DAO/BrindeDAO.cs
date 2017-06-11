@@ -268,6 +268,7 @@ namespace ms_crud_rest.DAO
             try
             {
                 sqlConn.StartConnection();
+                sqlConn.BeginTransaction();
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
 
                 sqlConn.Command.CommandText = @"INSERT INTO tab_brinde_parceiro(id_parceiro, id_brinde, bol_ativo)
@@ -298,9 +299,11 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", brinde.Ativo);
 
                 sqlConn.Command.ExecuteNonQuery();
+                sqlConn.Commit();
             }
             catch (Exception ex)
             {
+                sqlConn.Rollback();
                 logDAO.Adicionar(new Log { IdLoja = brinde.IdLoja, Mensagem = "Erro ao cadastrar o brinde parceiro", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
@@ -344,6 +347,7 @@ namespace ms_crud_rest.DAO
             try
             {
                 sqlConn.StartConnection();
+                sqlConn.BeginTransaction();
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
 
                 sqlConn.Command.Parameters.Clear();
@@ -369,9 +373,11 @@ namespace ms_crud_rest.DAO
                                                 AND id_parceiro = @id_parceiro;";
 
                 sqlConn.Command.ExecuteNonQuery();
+                sqlConn.Commit();
             }
             catch (Exception ex)
             {
+                sqlConn.Rollback();
                 logDAO.Adicionar(new Log { IdLoja = brinde.IdLoja, Mensagem = "Erro ao desativar o brinde parceiro", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }

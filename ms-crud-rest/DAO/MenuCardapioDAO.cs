@@ -202,6 +202,7 @@ namespace ms_crud_rest.DAO
             try
             {
                 sqlConn.StartConnection();
+                sqlConn.BeginTransaction();
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
 
                 sqlConn.Command.Parameters.Clear();
@@ -217,7 +218,7 @@ namespace ms_crud_rest.DAO
                                                             UPDATE tab_menu_cardapio
                                                                 SET bol_excluido = 1, bol_ativo = 0
                                                             WHERE id_menu_cardapio = @id_menu_cardapio;");
-                sqlConn.BeginTransaction();
+                
                 sqlConn.Command.ExecuteNonQuery();
                 sqlConn.Commit();
             }
@@ -238,6 +239,7 @@ namespace ms_crud_rest.DAO
             try
             {
                 sqlConn.StartConnection();
+                sqlConn.BeginTransaction();
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
 
                 sqlConn.Command.Parameters.Clear();
@@ -254,7 +256,7 @@ namespace ms_crud_rest.DAO
                                                 UPDATE tab_menu_cardapio
 	                                                SET bol_ativo = CASE WHEN @ativo = 1 THEN 0 ELSE 1 END
                                                 WHERE id_menu_cardapio = @id_menu_cardapio;";
-                sqlConn.BeginTransaction();
+                
                 sqlConn.Command.ExecuteNonQuery();
                 sqlConn.Commit();
             }
