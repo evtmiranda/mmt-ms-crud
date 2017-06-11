@@ -125,9 +125,16 @@ namespace ClassesMarmitex
         public int IdProdutoAdicional { get; set; }
         public string NomeProdutoAdicional { get; set; }
         public string DescricaoProdutoAdicional { get; set; }
+
+        [Required(ErrorMessage = "o preenchimento da quantidade mínima é obrigatório")]
         public int QtdMin { get; set; }
+
+        [Required(ErrorMessage = "o preenchimento da quantidade máxima é obrigatório")]
         public int QtdMax { get; set; }
+
+        [Required(ErrorMessage = "o preenchimento da ordem de exibição é obrigatório")]
         public int OrdemExibicao { get; set; }
+
         public bool Ativo { get; set; }
     }
 

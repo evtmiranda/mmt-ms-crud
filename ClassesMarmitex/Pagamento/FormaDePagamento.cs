@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClassesMarmitex
 {
@@ -6,7 +7,10 @@ namespace ClassesMarmitex
     {
         public int Id { get; set; }
         public int IdLoja { get; set; }
+
+        [Required(ErrorMessage = "o preenchimento do nome é obrigatório")]
         public string Nome { get; set; }
+
         public virtual bool Ativo { get; set; }
     }
 
