@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClassesMarmitex
@@ -16,6 +17,8 @@ namespace ClassesMarmitex
     {
         public int Id { get; set; }
         public int IdLoja { get; set; }
+
+        [Required(ErrorMessage = "o preenchimento do tempo é obrigatório")]
         public string Horario { get; set; }
         public bool HorarioDisponivel { get; set; }
         public bool Ativo { get; set; }
@@ -46,6 +49,8 @@ namespace ClassesMarmitex
     {
         public int Id { get; set; }
         public int IdLoja { get; set; }
+
+        [Required(ErrorMessage = "o preenchimento do tempo é obrigatório")]
         public int MinutosAntecedencia { get; set; }
         //public bool Ativo { get; set; }
     }
@@ -75,6 +80,8 @@ namespace ClassesMarmitex
     {
         public int Id { get; set; }
         public int IdLoja { get; set; }
+
+        [Required(ErrorMessage = "o preenchimento do tempo é obrigatório")]
         public int MinutosAntecedencia { get; set; }
     }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClassesMarmitex
@@ -8,7 +9,13 @@ namespace ClassesMarmitex
     {
         public int Id { get; set; }
         public int IdLoja { get; set; }
+
+        [Required(ErrorMessage = "o preenchimento do nome é obrigatório")]
+        [StringLength(200, ErrorMessage = "o tamanho máximo aceito para o nome é 200 caracteres")]
         public string Nome { get; set; }
+
+        [Required(ErrorMessage = "o preenchimento da descrição é obrigatório")]
+        [StringLength(200, ErrorMessage = "o tamanho máximo aceito para o nome é 200 caracteres")]
         public string Descricao { get; set; }
         public string Imagem { get; set; }
         public bool Ativo { get; set; }

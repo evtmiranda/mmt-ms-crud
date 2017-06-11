@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
     public class Produto
@@ -9,10 +10,21 @@
         public int Id { get; set; }
         public int IdMenuCardapio { get; set; }
         public int IdLoja { get; set; }
+
+        [Required(ErrorMessage = "o preenchimento do nome é obrigatório")]
+        [StringLength(200, ErrorMessage = "o tamanho máximo aceito para o nome é 200 caracteres")]
         public string Nome { get; set; }
+
+        [Required(ErrorMessage = "o preenchimento da descrição é obrigatório")]
+        [StringLength(200, ErrorMessage = "o tamanho máximo aceito para a descrição é 200 caracteres")]
         public string Descricao { get; set; }
+
+        [Required(ErrorMessage = "o preenchimento do valor é obrigatório")]
         public decimal Valor { get; set; }
+
+        [Required(ErrorMessage = "é necessário incluir uma imagem para o produto")]
         public string Imagem { get; set; }
+
         public List<DadosProdutoAdicional> DadosAdicionaisProdutos { get; set; }
         public bool Ativo { get; set; }
     }

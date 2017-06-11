@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClassesMarmitex
@@ -8,11 +9,24 @@ namespace ClassesMarmitex
     {
         public int Id { get; set; }
         public int IdLoja { get; set; }
+
+        [Required(ErrorMessage = "o preenchimento do nome é obrigatório")]
+        [StringLength(200, ErrorMessage = "o tamanho máximo aceito para o nome é 200 caracteres")]
         public string Nome { get; set; }
+
+        [Required(ErrorMessage = "o preenchimento da descrição é obrigatório")]
+        [StringLength(200, ErrorMessage = "o tamanho máximo aceito para a descrição é 200 caracteres")]
         public string Descricao { get; set; }
+
+        [Required(ErrorMessage = "defina a quantidade mínima do produto adicional")]
         public int QtdMin { get; set; }
+
+        [Required(ErrorMessage = "defina a quantidade máxima do produto adicional")]
         public int QtdMax { get; set; }
+
+        [Required(ErrorMessage = "o preenchimento da ordem de exibição é obrigatório")]
         public int OrdemExibicao { get; set; }
+
         public List<DadosProdutoAdicionalItem> ItensAdicionais { get; set; }
         public bool Ativo { get; set; }
     }
@@ -58,9 +72,19 @@ namespace ClassesMarmitex
         public int Id { get; set; }
         public int IdProdutoAdicional { get; set; }
         public int IdLoja { get; set; }
+
+        [Required(ErrorMessage = "o preenchimento do nome é obrigatório")]
+        [StringLength(200, ErrorMessage = "o tamanho máximo aceito para o nome é 200 caracteres")]
         public string Nome { get; set; }
+
+        [Required(ErrorMessage = "o preenchimento da descrição é obrigatório")]
+        [StringLength(200, ErrorMessage = "o tamanho máximo aceito para a descrição é 200 caracteres")]
         public string Descricao { get; set; }
+
+        [Required(ErrorMessage = "o preenchimento do valor é obrigatório")]
         public decimal Valor { get; set; }
+
+        [Required(ErrorMessage = "o preenchimento da quantidade é obrigatório")]
         public int Qtd { get; set; }
         public bool Ativo { get; set; }
     }
