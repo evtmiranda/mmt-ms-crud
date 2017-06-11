@@ -185,6 +185,54 @@ namespace ms_crud_rest.Controllers
 
         #endregion
 
+        #region tempo antecedencia cancelamento
+
+        [HttpGet]
+        [Route("api/HorarioEntrega/TempoAntecedenciaCancelamento/{id}/{idLoja}")]
+        public HttpResponseMessage BuscarTempoAntecedenciaCancelamento(int id, int idLoja)
+        {
+            try
+            {
+                TempoAntecedenciaCancelamentoEntrega tempoAntecedenciaCancelamentoEntrega = new TempoAntecedenciaCancelamentoEntrega();
+
+                tempoAntecedenciaCancelamentoEntrega = horarioEntregaDAO.BuscarTempoAntecedenciaCancelamento(id, idLoja);
+
+                return Request.CreateResponse(HttpStatusCode.OK, tempoAntecedenciaCancelamentoEntrega);
+            }
+            catch (KeyNotFoundException)
+            {
+                return Request.CreateResponse(HttpStatusCode.NoContent);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível consultar o tempo de antecedência. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/HorarioEntrega/TempoAntecedenciaCancelamento/Atualizar")]
+        public HttpResponseMessage AtualizarTempoAntecedenciaCancelamento([FromBody] TempoAntecedenciaCancelamentoEntrega tempoAntecedenciaCancelamentoEntrega)
+        {
+            try
+            {
+                horarioEntregaDAO.AtualizarTempoAntecedenciaCancelamento(tempoAntecedenciaCancelamentoEntrega);
+
+                return Request.CreateResponse(HttpStatusCode.OK, tempoAntecedenciaCancelamentoEntrega);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível atualizar o tempo de antecedência. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        #endregion
+
         #region dias de funcionamento
 
         [HttpPost]

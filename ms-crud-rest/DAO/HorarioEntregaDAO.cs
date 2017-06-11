@@ -186,6 +186,9 @@ namespace ms_crud_rest.DAO
             TempoAntecedenciaEntrega tempoAntecedencia = new TempoAntecedenciaEntrega();
             List<TempoAntecedenciaEntregaEntidade> listaTempoAntecedenciaEntidade = new List<TempoAntecedenciaEntregaEntidade>();
 
+            TempoAntecedenciaCancelamentoEntrega tempoAntecedenciaCancelamento = new TempoAntecedenciaCancelamentoEntrega();
+            List<TempoAntecedenciaCancelamentoEntregaEntidade> listaTempoAntecedenciaCancelamentoEntidade = new List<TempoAntecedenciaCancelamentoEntregaEntidade>();
+
             List<DiasDeFuncionamento> listaDiasFuncionamento = new List<DiasDeFuncionamento>();
             List<DiasDeFuncionamentoEntidade> listaDiasFuncionamentoEntidade = new List<DiasDeFuncionamentoEntidade>();
 
@@ -248,6 +251,29 @@ namespace ms_crud_rest.DAO
 
                 #endregion
 
+                #region tempo de antecedencia cancelamento
+
+                //habilita ou não um horário de entrega de acordo com o tempo mínimo de atecedência definido
+                sqlConn.Command.CommandText = @"SELECT
+	                                                id_tempo_antecedencia,
+	                                                id_loja,
+	                                                nr_minutos_antecedencia
+                                                FROM tab_horario_entrega_tempo_anteced_cancel_pedido
+                                                WHERE id_loja = @id_loja";
+
+                sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                if (sqlConn.Reader.HasRows)
+                    listaTempoAntecedenciaCancelamentoEntidade = new ModuloClasse().PreencheClassePorDataReader<TempoAntecedenciaCancelamentoEntregaEntidade>(sqlConn.Reader);
+                else
+                    throw new KeyNotFoundException("Não foi encontrado o tempo mínimo de antecedência de cancelamento");
+
+                tempoAntecedenciaCancelamento = listaTempoAntecedenciaCancelamentoEntidade.FirstOrDefault().ToTempoAntecedenciaCancelamentoEntrega();
+
+                sqlConn.Reader.Close();
+
+                #endregion
+
                 #region dias de funcionamento
 
                 sqlConn.Command.CommandText = @"SELECT
@@ -282,6 +308,7 @@ namespace ms_crud_rest.DAO
                 {
                     HorariosEntrega = listaHorarios,
                     TempoAntecedenciaEntrega = tempoAntecedencia,
+                    TempoAntecedenciaCancelamentoEntrega = tempoAntecedenciaCancelamento,
                     DiasDeFuncionamento = listaDiasFuncionamento
                 };
 
@@ -407,6 +434,87 @@ namespace ms_crud_rest.DAO
             catch (Exception ex)
             {
                 logDAO.Adicionar(new Log { IdLoja = tempoAntecedenciaEntrega.IdLoja, Mensagem = "Erro ao atualizar o tempo de antecedência", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
+        }
+
+        #endregion
+
+        #region tempo antecedencia cancelamento pedido
+
+        public TempoAntecedenciaCancelamentoEntrega BuscarTempoAntecedenciaCancelamento(int id, int idLoja)
+        {
+            TempoAntecedenciaCancelamentoEntrega tempoAntecedenciaCancelamentoEntrega = new TempoAntecedenciaCancelamentoEntrega();
+            List<TempoAntecedenciaCancelamentoEntregaEntidade> listaTempoAntecedenciaEntregaEntidade;
+
+            try
+            {
+                sqlConn.StartConnection();
+
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+                sqlConn.Command.CommandText = string.Format(@"SELECT
+	                                                            id_tempo_antecedencia,
+	                                                            id_loja,
+	                                                            nr_minutos_antecedencia
+                                                            FROM tab_horario_entrega_tempo_anteced_cancel_pedido
+                                                            WHERE id_tempo_antecedencia = @id_tempo_antecedencia");
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@id_tempo_antecedencia", id);
+
+                sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                listaTempoAntecedenciaEntregaEntidade = new ModuloClasse().PreencheClassePorDataReader<TempoAntecedenciaCancelamentoEntregaEntidade>(sqlConn.Reader);
+
+                if (listaTempoAntecedenciaEntregaEntidade.Count == 0)
+                    throw new KeyNotFoundException();
+
+                tempoAntecedenciaCancelamentoEntrega = listaTempoAntecedenciaEntregaEntidade[0].ToTempoAntecedenciaCancelamentoEntrega();
+
+                return tempoAntecedenciaCancelamentoEntrega;
+            }
+            catch (KeyNotFoundException keyEx)
+            {
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Tempo de antecedência de cancelamento nao encontrado com id " + id, Descricao = keyEx.Message ?? "", StackTrace = keyEx.StackTrace ?? "" });
+                throw keyEx;
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao buscar o tempo de antecedência de cancelamento com id " + id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+                sqlConn.Reader.Close();
+            }
+        }
+
+        public void AtualizarTempoAntecedenciaCancelamento(TempoAntecedenciaCancelamentoEntrega tempoAntecedenciaCancelamentoEntrega)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@nr_minutos_antecedencia", tempoAntecedenciaCancelamentoEntrega.MinutosAntecedencia);
+                sqlConn.Command.Parameters.AddWithValue("@id_loja", tempoAntecedenciaCancelamentoEntrega.IdLoja);
+                sqlConn.Command.Parameters.AddWithValue("@id_tempo_antecedencia", tempoAntecedenciaCancelamentoEntrega.Id);
+
+                sqlConn.Command.CommandText = @"UPDATE tab_horario_entrega_tempo_anteced_cancel_pedido
+	                                                SET nr_minutos_antecedencia = @nr_minutos_antecedencia
+                                                WHERE id_tempo_antecedencia = @id_tempo_antecedencia";
+
+                sqlConn.Command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = tempoAntecedenciaCancelamentoEntrega.IdLoja, Mensagem = "Erro ao atualizar o tempo de antecedência de cancelamento", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }
             finally

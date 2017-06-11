@@ -8,6 +8,7 @@ namespace ClassesMarmitex
     {
         public List<HorarioEntrega> HorariosEntrega { get; set; }
         public TempoAntecedenciaEntrega TempoAntecedenciaEntrega { get; set; }
+        public TempoAntecedenciaCancelamentoEntrega TempoAntecedenciaCancelamentoEntrega { get; set; }
         public List<DiasDeFuncionamento> DiasDeFuncionamento { get; set; }
     }
 
@@ -67,6 +68,31 @@ namespace ClassesMarmitex
         public TempoAntecedenciaEntrega ToTempoAntecedenciaEntrega()
         {
             return new TempoAntecedenciaEntrega { Id = this.Id, IdLoja = this.IdLoja, MinutosAntecedencia = this.MinutosAntecedencia/*, Ativo = this.Ativo */};
+        }
+    }
+
+    public class TempoAntecedenciaCancelamentoEntrega
+    {
+        public int Id { get; set; }
+        public int IdLoja { get; set; }
+        public int MinutosAntecedencia { get; set; }
+    }
+
+    [Table("tab_horario_entrega_tempo_anteced_cancel_pedido")]
+    public class TempoAntecedenciaCancelamentoEntregaEntidade
+    {
+        [Column("id_tempo_antecedencia")]
+        public int Id { get; set; }
+
+        [Column("id_loja")]
+        public int IdLoja { get; set; }
+
+        [Column("nr_minutos_antecedencia")]
+        public int MinutosAntecedencia { get; set; }
+
+        public TempoAntecedenciaCancelamentoEntrega ToTempoAntecedenciaCancelamentoEntrega()
+        {
+            return new TempoAntecedenciaCancelamentoEntrega { Id = this.Id, IdLoja = this.IdLoja, MinutosAntecedencia = this.MinutosAntecedencia};
         }
     }
 
