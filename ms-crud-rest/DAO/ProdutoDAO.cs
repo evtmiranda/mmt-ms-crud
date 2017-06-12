@@ -16,6 +16,10 @@ namespace ms_crud_rest.DAO
             List<ProdutoEntidade> listaProdutoEntidade = new List<ProdutoEntidade>();
             List<Produto> listaProduto = new List<Produto>();
 
+            List<int> listaDiasVendaInt = new List<int>();
+            List<DiasVenda> listaDiasVenda = new List<DiasVenda>();
+            List<DiasVendaEntidade> listaDiasVendaEntidade = new List<DiasVendaEntidade>();
+
             List<DadosProdutoAdicionalEntidade> listaProdutoAdicionalEntidade = new List<DadosProdutoAdicionalEntidade>();
             List<DadosProdutoAdicional> listaProdutoAdicional = new List<DadosProdutoAdicional>();
 
@@ -28,7 +32,6 @@ namespace ms_crud_rest.DAO
             try
             {
                 sqlConn.StartConnection();
-
 
                 #region Produtos
                 //busca o produtos
@@ -58,6 +61,30 @@ namespace ms_crud_rest.DAO
                 foreach (var produtoEntidade in listaProdutoEntidade)
                 {
                     listaProduto.Add(produtoEntidade.ToProduto());
+                }
+
+                //limpa os dados da execução anterior
+                sqlConn.Command.CommandText = "";
+                if (sqlConn.Reader != null)
+                    sqlConn.Reader.Close();
+
+                #endregion
+
+                #region Dias de venda do produto
+
+                sqlConn.Command.CommandText = @"SELECT
+                                                    id_dia_semana
+                                                FROM tab_produto_dia_semana
+                                                WHERE id_produto = @id_produto";
+
+                sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                if (sqlConn.Reader.HasRows)
+                    listaDiasVendaEntidade = new ModuloClasse().PreencheClassePorDataReader<DiasVendaEntidade>(sqlConn.Reader);
+
+                foreach (var diasVenda in listaDiasVendaEntidade)
+                {
+                    listaDiasVenda.Add(diasVenda.ToDiasVenda());
                 }
 
                 //limpa os dados da execução anterior
@@ -200,6 +227,14 @@ namespace ms_crud_rest.DAO
                     listaProduto[i].DadosAdicionaisProdutos = listaProdutoAdicionalFiltrada;
                 }
 
+                //transforma a lista de "DiasVenda" em uma lista de inteiros
+                foreach (DiasVenda diaVenda in listaDiasVenda)
+                {
+                    listaDiasVendaInt.Add(diaVenda.DiaSemana);
+                }
+
+                listaProduto.FirstOrDefault().ProdutoDiasVenda = listaDiasVendaInt;
+
                 return listaProduto.FirstOrDefault();
             }
             catch (KeyNotFoundException keyEx)
@@ -225,6 +260,10 @@ namespace ms_crud_rest.DAO
         {
             List<ProdutoEntidade> listaProdutoEntidade = new List<ProdutoEntidade>();
             List<Produto> listaProduto = new List<Produto>();
+
+            List<int> listaDiasVendaInt = new List<int>();
+            List<DiasVenda> listaDiasVenda = new List<DiasVenda>();
+            List<DiasVendaEntidade> listaDiasVendaEntidade = new List<DiasVendaEntidade>();
 
             List<DadosProdutoAdicionalEntidade> listaProdutoAdicionalEntidade = new List<DadosProdutoAdicionalEntidade>();
             List<DadosProdutoAdicional> listaProdutoAdicional = new List<DadosProdutoAdicional>();
@@ -276,6 +315,54 @@ namespace ms_crud_rest.DAO
                     sqlConn.Reader.Close();
 
                 #endregion
+
+                #region Dias de venda do produto
+
+                foreach (var produto in listaProduto)
+                {
+                    //limpa os dados da execução anterior
+                    sqlConn.Command.CommandText = "";
+                    if (sqlConn.Reader != null)
+                        sqlConn.Reader.Close();
+
+
+                    sqlConn.Command.Parameters.Clear();
+                    sqlConn.Command.Parameters.AddWithValue("@id_produto", produto.Id);
+
+                    sqlConn.Command.CommandText = @"SELECT
+                                                    id_dia_semana
+                                                FROM tab_produto_dia_semana
+                                                WHERE id_produto = @id_produto";
+
+                    sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                    if (sqlConn.Reader.HasRows)
+                        listaDiasVendaEntidade = new ModuloClasse().PreencheClassePorDataReader<DiasVendaEntidade>(sqlConn.Reader);
+
+                    foreach (var diasVenda in listaDiasVendaEntidade)
+                    {
+                        listaDiasVenda.Add(diasVenda.ToDiasVenda());
+                    }
+
+                    //transforma a lista de "DiasVenda" em uma lista de inteiros
+                    foreach (DiasVenda diaVenda in listaDiasVenda)
+                    {
+                        listaDiasVendaInt.Add(diaVenda.DiaSemana);
+                    }
+
+                    produto.ProdutoDiasVenda = listaDiasVendaInt;
+                }
+
+                #endregion
+
+                //limpa os dados da execução anterior
+                sqlConn.Command.CommandText = "";
+                if (sqlConn.Reader != null)
+                    sqlConn.Reader.Close();
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@id_menu_cardapio", idMenuCardapio);
+
 
                 #region Adicionais Produtos
                 //busca os dados adicionais dos produtos
@@ -433,14 +520,17 @@ namespace ms_crud_rest.DAO
 
         public override void Adicionar(Produto produto)
         {
+            int idProduto;
+
             try
             {
                 sqlConn.StartConnection();
+                sqlConn.BeginTransaction();
 
                 //busca o produtos
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
                 sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_produto(id_menu_cardapio, nm_produto, nm_descricao, vlr_produto, url_imagem, bol_ativo)
-                                                          VALUES(@id_menu_cardapio, @nm_produto, @nm_descricao, @vlr_produto, @url_imagem, @bol_ativo);");
+                                                          VALUES(@id_menu_cardapio, @nm_produto, @nm_descricao, @vlr_produto, @url_imagem, @bol_ativo); SELECT @@IDENTITY");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_menu_cardapio", produto.IdMenuCardapio);
@@ -450,14 +540,27 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.AddWithValue("@url_imagem", produto.Imagem);
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", produto.Ativo);
 
-                sqlConn.Command.ExecuteNonQuery();
+                idProduto = Convert.ToInt32(sqlConn.Command.ExecuteScalar());
+
+                foreach (int diasVenda in produto.ProdutoDiasVenda)
+                {
+                    sqlConn.Command.Parameters.Clear();
+                    sqlConn.Command.Parameters.AddWithValue("@id_produto", idProduto);
+                    sqlConn.Command.Parameters.AddWithValue("@id_dia_semana", diasVenda);
+
+                    sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_produto_dia_semana(id_produto, id_dia_semana)
+                                                          VALUES(@id_produto, @id_dia_semana);");
+                    sqlConn.Command.ExecuteNonQuery();
+                }
+
+                sqlConn.Commit();
             }
             catch (Exception ex)
             {
+                sqlConn.Rollback();
                 logDAO.Adicionar(new Log { IdLoja = produto.IdLoja, Mensagem = "Erro ao adicionar o produto", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw;
             }
-
         }
 
         public override void ExcluirPorId(int id, int idLoja)
@@ -590,10 +693,7 @@ namespace ms_crud_rest.DAO
             try
             {
                 sqlConn.StartConnection();
-
-                sqlConn.Command.CommandType = System.Data.CommandType.Text;
-
-                #region atualiza os dados do produto
+                sqlConn.BeginTransaction();
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_produto", produto.Id);
@@ -604,6 +704,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.AddWithValue("@url_imagem", produto.Imagem);
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", produto.Ativo);
 
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
                 sqlConn.Command.CommandText = string.Format(@"UPDATE tab_produto
 	                                                            SET id_menu_cardapio = @id_menu_cardapio,
 		                                                            nm_produto = @nm_produto,
@@ -615,11 +716,28 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.ExecuteNonQuery();
 
-                #endregion
+                //exclui os dias de venda da semana para depois inserir novamente
+                sqlConn.Command.CommandText = string.Format(@"DELETE FROM tab_produto_dia_semana WHERE id_produto = @id_produto");
+                sqlConn.Command.ExecuteNonQuery();
+
+                //insere os dias de venda na semana para este produto
+                foreach (int diasVenda in produto.ProdutoDiasVenda)
+                {
+                    sqlConn.Command.Parameters.Clear();
+                    sqlConn.Command.Parameters.AddWithValue("@id_produto", produto.Id);
+                    sqlConn.Command.Parameters.AddWithValue("@id_dia_semana", diasVenda);
+
+                    sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_produto_dia_semana(id_produto, id_dia_semana)
+                                                          VALUES(@id_produto, @id_dia_semana);");
+                    sqlConn.Command.ExecuteNonQuery();
+                }
+
+                sqlConn.Commit();
 
             }
             catch (Exception ex)
             {
+                sqlConn.Rollback();
                 logDAO.Adicionar(new Log { IdLoja = produto.IdLoja, Mensagem = "Erro ao atualizar os dados do produto", Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
                 throw ex;
             }

@@ -19,10 +19,14 @@
         [StringLength(200, ErrorMessage = "o tamanho máximo aceito para a descrição é 200 caracteres")]
         public string Descricao { get; set; }
 
+        //public List<ProdutoDiasVenda> ProdutoDiasVenda { get; set; }
+
+        public List<int> ProdutoDiasVenda { get; set; }
+
         [Required(ErrorMessage = "o preenchimento do valor é obrigatório")]
         public decimal Valor { get; set; }
 
-        [Required(ErrorMessage = "é necessário incluir uma imagem para o produto")]
+        //[Required(ErrorMessage = "é necessário incluir uma imagem para o produto")]
         public string Imagem { get; set; }
 
         public List<DadosProdutoAdicional> DadosAdicionaisProdutos { get; set; }
@@ -86,13 +90,28 @@
         }
     }
 
-    ///// <summary>
-    ///// Classe para armazenar um produto e seus produtos adicionais. 
-    ///// Utilizada na tela de produtos do painel admin
-    ///// </summary>
-    //public class ProdutoDetalhes
-    //{
-    //    public Produto Produto { get; set; }
-    //    public List<DadosProdutoAdicionalProduto> ProdutosAdicionais { get; set; }
-    //}
+    public class DiasVenda
+    {
+        public int DiaSemana { get; set; }
+    }
+
+    [Table("tab_produto_dia_semana")]
+    public class DiasVendaEntidade
+    {
+        [Column("id_dia_semana")]
+        public int DiaSemana { get; set; }
+
+        public DiasVenda ToDiasVenda()
+        {
+            return new DiasVenda { DiaSemana = this.DiaSemana };
+        }
+    }
+
+    //classe para exibição dos dias de semana
+    public class DiasSemana
+    {
+        public int Id { get; set; }
+        public string DiaSemana { get; set; }
+    }
+
 }
