@@ -130,6 +130,22 @@ namespace ms_crud_rest.DAO
 
                 if (qtdUsuario == 0)
                     throw new UsuarioNaoAutenticadoException();
+
+                //insere log de acesso
+                try
+                {
+                    sqlConn.Command.CommandText = @"INSERT INTO tab_acessos_usuario_parceiro(id_usuario_parceiro)
+                                                    SELECT
+                                                       id_usuario_parceiro
+                                                    FROM tab_usuario_parceiro
+                                                    WHERE nm_email = @email";
+
+                    sqlConn.Command.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    logDAO.Adicionar(new Log { IdLoja = usuario.IdLoja, Mensagem = "Erro ao inserir log de acesso usuário", Descricao = ex.Message, StackTrace = ex.StackTrace ?? "" });
+                }
             }
             catch (UsuarioNaoAutenticadoException)
             {
@@ -182,6 +198,22 @@ namespace ms_crud_rest.DAO
 
                 if (qtdUsuario == 0)
                     throw new UsuarioNaoAutenticadoException();
+
+                //insere log de acesso
+                try
+                {
+                    sqlConn.Command.CommandText = @"INSERT INTO tab_acessos_usuario_loja(id_usuario_loja)
+                                                    SELECT
+                                                       id_usuario_loja
+                                                    FROM tab_usuario_loja
+                                                    WHERE nm_email = @email";
+
+                    sqlConn.Command.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    logDAO.Adicionar(new Log { IdLoja = usuario.IdLoja, Mensagem = "Erro ao inserir log de acesso usuário", Descricao = ex.Message, StackTrace = ex.StackTrace ?? "" });
+                }
             }
             catch (UsuarioNaoAutenticadoException)
             {
@@ -288,7 +320,8 @@ namespace ms_crud_rest.DAO
                                                             INNER JOIN tab_endereco AS te
                                                             ON te.id_endereco = tp.id_endereco
                                                             WHERE nm_email = @email
-                                                            AND bol_excluido = 0");
+                                                            AND tup.bol_excluido = 0
+                                                            AND tp.bol_excluido = 0");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@email", email);
