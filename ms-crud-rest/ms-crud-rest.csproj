@@ -197,6 +197,7 @@
     <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\BrindeController.cs" />
+    <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\FormaPagamentoController.cs" />
     <Compile Include="Controllers\HorarioEntregaController.cs" />
     <Compile Include="Controllers\MenuCardapioController.cs" />
@@ -207,6 +208,7 @@
     <Compile Include="Controllers\ProdutoController.cs" />
     <Compile Include="Controllers\UsuarioController.cs" />
     <Compile Include="DAO\BrindeDAO.cs" />
+    <Compile Include="DAO\DashboardDAO.cs" />
     <Compile Include="DAO\FormaPagamentoDAO.cs" />
     <Compile Include="DAO\GenericDAO.cs" />
     <Compile Include="DAO\HorarioEntregaDAO.cs" />
