@@ -212,6 +212,31 @@ namespace ms_crud_rest.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("api/HorarioEntrega/TempoAntecedenciaCancelamento/{idLoja}")]
+        public HttpResponseMessage BuscarTempoAntecedenciaCancelamento(int idLoja)
+        {
+            try
+            {
+                TempoAntecedenciaCancelamentoEntrega tempoAntecedenciaCancelamentoEntrega = new TempoAntecedenciaCancelamentoEntrega();
+
+                tempoAntecedenciaCancelamentoEntrega = horarioEntregaDAO.BuscarTempoAntecedenciaCancelamento(idLoja);
+
+                return Request.CreateResponse(HttpStatusCode.OK, tempoAntecedenciaCancelamentoEntrega);
+            }
+            catch (KeyNotFoundException)
+            {
+                return Request.CreateResponse(HttpStatusCode.NoContent);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível consultar o tempo de antecedência. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
         [HttpPost]
         [Route("api/HorarioEntrega/TempoAntecedenciaCancelamento/Atualizar")]
         public HttpResponseMessage AtualizarTempoAntecedenciaCancelamento([FromBody] TempoAntecedenciaCancelamentoEntrega tempoAntecedenciaCancelamentoEntrega)
@@ -225,6 +250,27 @@ namespace ms_crud_rest.Controllers
             catch (Exception)
             {
                 string mensagem = "Não foi possível atualizar o tempo de antecedência. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/HorarioEntrega/TempoAntecedenciaCancelamento/PermitirCancelamento/{id}/{idLoja}")]
+        public HttpResponseMessage PermitirCancelamento(int id, int idLoja)
+        {
+            try
+            {
+                bool permitirCancelamento = false;
+
+                permitirCancelamento = horarioEntregaDAO.PermitirCancelamento(id, idLoja);
+
+                return Request.CreateResponse(HttpStatusCode.OK, permitirCancelamento);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível verificar se é permitido cancelar. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
 
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);

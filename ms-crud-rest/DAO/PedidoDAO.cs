@@ -185,10 +185,10 @@ namespace ms_crud_rest.DAO
                 if (estadoPedido == EstadoPedido.Fila)
                     listaPedidos = listaPedidos.FindAll(p => p.PedidoStatus.IdStatus == 0);
 
-                if (estadoPedido == EstadoPedido.EmAndamento)
+                if (estadoPedido == EstadoPedido.Entregue)
                     listaPedidos = listaPedidos.FindAll(p => p.PedidoStatus.IdStatus == 1);
 
-                if (estadoPedido == EstadoPedido.Entregue)
+                if (estadoPedido == EstadoPedido.Cancelado)
                     listaPedidos = listaPedidos.FindAll(p => p.PedidoStatus.IdStatus == 2);
 
             }
@@ -793,7 +793,7 @@ namespace ms_crud_rest.DAO
         /// seta todos os status do pedido como inativo e insere o status atual
         /// </summary>
         /// <param name="p">Pedido</param>
-        public void AtualizarStatusPedido(Pedido p)
+        public void AtualizarStatusPedido(Pedido p, string motivoCancelamento = null)
         {
             try
             {
@@ -805,6 +805,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_pedido", p.Id);
                 sqlConn.Command.Parameters.AddWithValue("@id_status", p.PedidoStatus.IdStatus);
+                sqlConn.Command.Parameters.AddWithValue("@motivoCancelamento", motivoCancelamento ?? "");
 
                 //seta o tipo do comando
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
@@ -824,9 +825,14 @@ namespace ms_crud_rest.DAO
                 #region insere o novo status do pedido
 
                 //monta o insert
-                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_pedido_status(id_pedido, id_status)
-                                                              VALUES(@id_pedido, @id_status);");
+                //se for cancelamento, insere com o motivo do cancelamento
 
+                if(p.PedidoStatus.IdStatus == EstadoPedido.Cancelado.GetHashCode())
+                    sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_pedido_status(id_pedido, id_status, nm_motivo_cancelamento)
+                                                                  VALUES(@id_pedido, @id_status, @motivoCancelamento);");
+                else
+                    sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_pedido_status(id_pedido, id_status)
+                                                                  VALUES(@id_pedido, @id_status);");
 
                 //roda o insert
                 sqlConn.Command.ExecuteNonQuery();

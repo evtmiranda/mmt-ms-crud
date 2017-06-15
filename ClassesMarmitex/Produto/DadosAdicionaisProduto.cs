@@ -14,7 +14,6 @@ namespace ClassesMarmitex
         [StringLength(200, ErrorMessage = "o tamanho máximo aceito para o nome é 200 caracteres")]
         public string Nome { get; set; }
 
-        [Required(ErrorMessage = "o preenchimento da descrição é obrigatório")]
         [StringLength(200, ErrorMessage = "o tamanho máximo aceito para a descrição é 200 caracteres")]
         public string Descricao { get; set; }
 
@@ -77,7 +76,6 @@ namespace ClassesMarmitex
         [StringLength(200, ErrorMessage = "o tamanho máximo aceito para o nome é 200 caracteres")]
         public string Nome { get; set; }
 
-        [Required(ErrorMessage = "o preenchimento da descrição é obrigatório")]
         [StringLength(200, ErrorMessage = "o tamanho máximo aceito para a descrição é 200 caracteres")]
         public string Descricao { get; set; }
 

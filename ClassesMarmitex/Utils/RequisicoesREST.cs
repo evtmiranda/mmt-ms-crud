@@ -9,10 +9,11 @@ namespace ClassesMarmitex
     {
         public string urlBase = "http://localhost:29783/";
 
-        public DadosRequisicaoRest Post(string recurso, object objeto)
+        public DadosRequisicaoRest Post(string recurso, object objeto = null)
         {
             DadosRequisicaoRest retorno = new DadosRequisicaoRest();
             string conteudo = "";
+            string json = "";
 
             //faz o post de um objeto em um determinado recurso
             try
@@ -21,7 +22,7 @@ namespace ClassesMarmitex
                 request.Method = "POST";
                 request.Accept = "application/json";
 
-                string json = JsonConvert.SerializeObject(objeto);
+                json = JsonConvert.SerializeObject(objeto);
 
                 byte[] jsonBytes = Encoding.UTF8.GetBytes(json);
                 request.GetRequestStream().Write(jsonBytes, 0, jsonBytes.Length);
@@ -88,7 +89,7 @@ namespace ClassesMarmitex
             catch (System.Exception ex)
             {
                 retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
-                retorno.objeto = ex.Message != null ? ex.Message : "";
+                retorno.objeto = ex.Message ?? "";
 
                 return retorno;
             }
@@ -170,7 +171,7 @@ namespace ClassesMarmitex
             catch (System.Exception ex)
             {
                 retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
-                retorno.objeto = ex.Message != null ? ex.Message : "";
+                retorno.objeto = ex.Message ?? "";
 
                 return retorno;
             }
@@ -250,13 +251,13 @@ namespace ClassesMarmitex
 
                     return retorno;
                 }
-                
+
             }
             //Se ocorrer qualquer outra exceção retorna um InternalServerError
             catch (System.Exception ex)
             {
                 retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
-                retorno.objeto = ex.Message != null ? ex.Message : "";
+                retorno.objeto = ex.Message ?? "";
 
                 return retorno;
             }

@@ -79,6 +79,8 @@
         /// 0 = na fila, 1 = entregue, 2 = cancelado
         /// </summary>
         public int IdStatusPedido { get; set; }
+
+        public string MotivoCancelamento { get; set; }
     }
 
     public class PedidoStatus
@@ -86,11 +88,12 @@
         public int Id { get; set; }
         public int IdPedido { get; set; }
         public int IdStatus { get; set; }
+        public string MotivoCancelamento { get; set; }
         public DateTime DataStatus { get; set; }
         public int Ativo { get; set; }
     }
 
-    [Table("tab_pedido_status")]
+    [Table("use marmitex")]
     public class PedidoStatusEntidade
     {
         [Column("id_status_pedido")]
@@ -126,8 +129,14 @@
     public enum EstadoPedido
     {
         Fila,
-        EmAndamento,
         Entregue,
+        Cancelado,
         Todos
+    }
+
+    public class DadosCancelamento
+    {
+        public int IdPedido { get; set; }
+        public string MotivoCancelamento { get; set; }
     }
 }

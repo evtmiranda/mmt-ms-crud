@@ -19,7 +19,13 @@ namespace ClassesMarmitex
         [Column("PedidosAtrasados")]
         public int PedidosAtrasados { get; set; }
 
+        [Column("PedidosFila")]
+        public int PedidosFila { get; set; }
+
         [Column("PedidosEntregues")]
         public int PedidosEntregues { get; set; }
+
+        [Column("PediosCancelados")]
+        public int PediosCancelados { get; set; }
     }
 }

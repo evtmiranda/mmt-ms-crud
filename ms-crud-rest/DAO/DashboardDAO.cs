@@ -19,18 +19,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.StartConnection();
 
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
-                sqlConn.Command.CommandText = @"DROP TABLE IF EXISTS #tmp_dashboard;
-
-                                                CREATE TABLE #tmp_dashboard(
-	                                                pedidos int,
-	                                                vendas decimal(10,2),
-	                                                visitas int,
-	                                                parceiros int,
-	                                                pedidos_atrasados int,
-	                                                pedidos_entregues int
-                                                );
-
-                                                DECLARE @pedidos INT;
+                sqlConn.Command.CommandText = @"DECLARE @pedidos INT;
                                                 SET @pedidos = (
 	                                                SELECT
 		                                                COUNT(1)
@@ -47,11 +36,15 @@ namespace ms_crud_rest.DAO
 	                                                SELECT
 		                                                SUM(vlr_total_pedido)
 	                                                FROM tab_pedido AS tp
+	                                                INNER JOIN tab_pedido_status AS tps
+	                                                ON tp.id_pedido = tps.id_pedido
 	                                                INNER JOIN tab_usuario_parceiro AS tup
 	                                                ON tp.id_usuario_parceiro = tup.id_usuario_parceiro
 	                                                INNER JOIN tab_parceiro AS tparceiro
 	                                                ON tparceiro.id_parceiro = tup.id_parceiro
 	                                                WHERE tparceiro.id_loja = @id_loja
+	                                                AND tps.bol_ativo = 1
+	                                                AND tps.id_status <> 2
 	                                                AND CONVERT(DATE, dt_pedido) = CONVERT(DATE, GETDATE()));
 
                                                 DECLARE @visitas INT;
@@ -93,6 +86,7 @@ namespace ms_crud_rest.DAO
 	                                                WHERE tparceiro.id_loja = @id_loja
 	                                                AND CONVERT(DATE, dt_pedido) = CONVERT(DATE, GETDATE())
 	                                                AND tps.id_status = 0
+	                                                AND tps.bol_ativo = 1
 	                                                AND dt_entrega <= GETDATE());
 
                                                 DECLARE @pedidos_entregues INT;
@@ -108,19 +102,50 @@ namespace ms_crud_rest.DAO
 	                                                ON tparceiro.id_parceiro = tup.id_parceiro
 	                                                WHERE tparceiro.id_loja = @id_loja
 	                                                AND CONVERT(DATE, dt_pedido) = CONVERT(DATE, GETDATE())
-	                                                AND tps.id_status = 1);
+	                                                AND tps.id_status = 1
+	                                                AND tps.bol_ativo = 1);
 
-                                                INSERT INTO #tmp_dashboard(pedidos, vendas, visitas, parceiros, pedidos_atrasados, pedidos_entregues)
-                                                VALUES(@pedidos, @vendas, @visitas, @parceiros, @pedidos_atrasados, @pedidos_entregues);
+                                                DECLARE @pedidos_fila INT;
+                                                SET @pedidos_fila = (
+	                                                SELECT
+		                                                COUNT(1)
+	                                                FROM tab_pedido AS tp
+	                                                INNER JOIN tab_pedido_status AS tps
+	                                                ON tp.id_pedido = tps.id_pedido
+	                                                INNER JOIN tab_usuario_parceiro AS tup
+	                                                ON tp.id_usuario_parceiro = tup.id_usuario_parceiro
+	                                                INNER JOIN tab_parceiro AS tparceiro
+	                                                ON tparceiro.id_parceiro = tup.id_parceiro
+	                                                WHERE tparceiro.id_loja = @id_loja
+	                                                AND CONVERT(DATE, dt_pedido) = CONVERT(DATE, GETDATE())
+	                                                AND tps.id_status = 0
+	                                                AND tps.bol_ativo = 1);
+
+                                                DECLARE @pedidos_cancelados INT;
+                                                SET @pedidos_cancelados = (
+	                                                SELECT
+		                                                COUNT(1)
+	                                                FROM tab_pedido AS tp
+	                                                INNER JOIN tab_pedido_status AS tps
+	                                                ON tp.id_pedido = tps.id_pedido
+	                                                INNER JOIN tab_usuario_parceiro AS tup
+	                                                ON tp.id_usuario_parceiro = tup.id_usuario_parceiro
+	                                                INNER JOIN tab_parceiro AS tparceiro
+	                                                ON tparceiro.id_parceiro = tup.id_parceiro
+	                                                WHERE tparceiro.id_loja = @id_loja
+	                                                AND CONVERT(DATE, dt_pedido) = CONVERT(DATE, GETDATE())
+	                                                AND tps.id_status = 2
+	                                                AND tps.bol_ativo = 1);
 
                                                 SELECT 
-	                                                pedidos AS Pedidos, 
-	                                                vendas AS Vendas, 
-	                                                visitas AS Visitas, 
-	                                                parceiros AS Parceiros, 
-	                                                pedidos_atrasados AS PedidosAtrasados, 
-	                                                pedidos_entregues AS PedidosEntregues 
-                                                FROM #tmp_dashboard;";
+	                                                @pedidos AS Pedidos, 
+	                                                @vendas AS Vendas, 
+	                                                @visitas AS Visitas, 
+	                                                @parceiros AS Parceiros, 
+	                                                @pedidos_atrasados AS PedidosAtrasados,
+	                                                @pedidos_fila AS PedidosFila,
+	                                                @pedidos_entregues AS PedidosEntregues,
+	                                                @pedidos_cancelados AS PediosCancelados";
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);

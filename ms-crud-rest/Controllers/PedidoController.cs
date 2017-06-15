@@ -120,6 +120,7 @@ namespace ms_crud_rest.Controllers
             }
         }
 
+        [HttpPost]
         [Route("api/Pedido/AtualizarStatusPedido/{idLoja}")]
         public HttpResponseMessage AtualizarStatusPedido([FromBody] DadosAtualizarStatusPedido dadosPedido, int idLoja)
         {
@@ -134,13 +135,40 @@ namespace ms_crud_rest.Controllers
                     IdStatus = dadosPedido.IdStatusPedido
                 };
 
-                pedidoDAO.AtualizarStatusPedido(pedidoAtual);
+                pedidoDAO.AtualizarStatusPedido(pedidoAtual, dadosPedido.MotivoCancelamento);
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception)
             {
                 string mensagem = "Não foi possível atualizar o pedido. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/Pedido/CancelarPedido/{idPedido}/{idLoja}/{motivoCancelamento}")]
+        public HttpResponseMessage CancelarPedido(int idPedido, int idLoja, string motivoCancelamento)
+        {
+            Pedido pedido = new Pedido();
+
+            try
+            {
+                Pedido pedidoAtual = pedidoDAO.BuscarPorId(idPedido, idLoja);
+
+                pedidoAtual.PedidoStatus = new PedidoStatus()
+                {
+                    IdStatus = EstadoPedido.Cancelado.GetHashCode()
+                };
+
+                pedidoDAO.AtualizarStatusPedido(pedidoAtual, motivoCancelamento);
+
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível cancelar o pedido. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }

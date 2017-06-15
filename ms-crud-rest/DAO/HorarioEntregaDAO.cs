@@ -494,6 +494,54 @@ namespace ms_crud_rest.DAO
             }
         }
 
+        public TempoAntecedenciaCancelamentoEntrega BuscarTempoAntecedenciaCancelamento(int idLoja)
+        {
+            TempoAntecedenciaCancelamentoEntrega tempoAntecedenciaCancelamentoEntrega = new TempoAntecedenciaCancelamentoEntrega();
+            List<TempoAntecedenciaCancelamentoEntregaEntidade> listaTempoAntecedenciaEntregaEntidade;
+
+            try
+            {
+                sqlConn.StartConnection();
+
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+                sqlConn.Command.CommandText = string.Format(@"SELECT
+	                                                            id_tempo_antecedencia,
+	                                                            id_loja,
+	                                                            nr_minutos_antecedencia
+                                                            FROM tab_horario_entrega_tempo_anteced_cancel_pedido
+                                                            WHERE id_loja = @id_loja");
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
+
+                sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                listaTempoAntecedenciaEntregaEntidade = new ModuloClasse().PreencheClassePorDataReader<TempoAntecedenciaCancelamentoEntregaEntidade>(sqlConn.Reader);
+
+                if (listaTempoAntecedenciaEntregaEntidade.Count == 0)
+                    throw new KeyNotFoundException();
+
+                tempoAntecedenciaCancelamentoEntrega = listaTempoAntecedenciaEntregaEntidade[0].ToTempoAntecedenciaCancelamentoEntrega();
+
+                return tempoAntecedenciaCancelamentoEntrega;
+            }
+            catch (KeyNotFoundException keyEx)
+            {
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Tempo de antecedência de cancelamento nao encontrado para a loja com id " + idLoja, Descricao = keyEx.Message ?? "", StackTrace = keyEx.StackTrace ?? "" });
+                throw keyEx;
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao buscar o tempo de antecedência de cancelamento para a loja com id " + idLoja, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+                sqlConn.Reader.Close();
+            }
+        }
+
         public void AtualizarTempoAntecedenciaCancelamento(TempoAntecedenciaCancelamentoEntrega tempoAntecedenciaCancelamentoEntrega)
         {
             try
@@ -521,6 +569,52 @@ namespace ms_crud_rest.DAO
             {
                 sqlConn.CloseConnection();
             }
+        }
+
+        public bool PermitirCancelamento(int id, int idLoja)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+                sqlConn.Command.CommandText = string.Format(@"DECLARE @dtAtual DATETIME;
+                                                            SET @dtAtual = GETDATE();
+
+                                                            DECLARE @dtEntrega DATETIME;
+                                                            SET @dtEntrega = (SELECT dt_entrega FROM tab_pedido WHERE id_pedido = @id_pedido);
+
+                                                            DECLARE @minutosAntecedencia INT;
+                                                            SET @minutosAntecedencia = (SELECT DATEDIFF(MINUTE, @dtAtual, @dtEntrega));
+
+                                                            DECLARE @minutosAntecedenciaPermitido INT;
+                                                            SET @minutosAntecedenciaPermitido = (SELECT nr_minutos_antecedencia FROM tab_horario_entrega_tempo_anteced_cancel_pedido WHERE id_loja = @id_loja);
+
+                                                            DECLARE @permitirCancelamento INT;
+
+                                                            IF(@minutosAntecedencia>@minutosAntecedenciaPermitido)
+                                                            BEGIN
+	                                                            SET @permitirCancelamento = 1;
+                                                            END
+                                                            ELSE
+                                                            BEGIN
+	                                                            SET @permitirCancelamento = 0;
+                                                            END
+
+                                                            SELECT @permitirCancelamento;");
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
+                sqlConn.Command.Parameters.AddWithValue("@id_pedido", id);
+
+                return Convert.ToBoolean(sqlConn.Command.ExecuteScalar());
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao verificar permissão de cancelamento de pedido. id do pedido: " + id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+
         }
 
         #endregion

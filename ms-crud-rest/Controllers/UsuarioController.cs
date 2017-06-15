@@ -93,6 +93,9 @@
                 //busca o parceiro
                 int idParceiro = usuarioDAO.BuscarIdParceiro(usuario.CodigoParceiro);
 
+                if (idParceiro == 0)
+                    throw new ParceiroNaoCadastradoException("Código da empresa não é válido");
+
                 usuario.IdParceiro = idParceiro;
 
                 int idUsuarioCadastrado = usuarioDAO.CadastrarUsuarioParceiro(usuario);
@@ -100,6 +103,12 @@
                 return Request.CreateResponse(HttpStatusCode.Created);
             }
             catch (UsuarioJaExisteException eneEx)
+            {
+                string mensagem = eneEx.Message;
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.Unauthorized, error);
+            }
+            catch (ParceiroNaoCadastradoException eneEx)
             {
                 string mensagem = eneEx.Message;
                 HttpError error = new HttpError(mensagem);
@@ -241,7 +250,7 @@
 
                 return Request.CreateResponse(HttpStatusCode.NotFound, error);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 string mensagem = string.Format("Estamos com dificuldade em consultar os dados. Por favor, tente novamente");
                 HttpError error = new HttpError(mensagem);
