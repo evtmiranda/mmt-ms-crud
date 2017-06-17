@@ -3,6 +3,7 @@ using ClassesMarmitex;
 using ms_crud_rest.Exceptions;
 using System.Collections.Generic;
 using System.Linq;
+using ClassesMarmitex.Utils;
 
 namespace ms_crud_rest.DAO
 {
@@ -426,8 +427,7 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.CommandText = @"UPDATE tab_horario_entrega_tempo_anteced_pedido
 	                                                SET nr_minutos_antecedencia = @nr_minutos_antecedencia
-                                                WHERE id_tempo_antecedencia = @id_tempo_antecedencia
-                                                AND id_loja = @id_loja";
+                                                WHERE id_tempo_antecedencia = @id_tempo_antecedencia";
 
                 sqlConn.Command.ExecuteNonQuery();
             }

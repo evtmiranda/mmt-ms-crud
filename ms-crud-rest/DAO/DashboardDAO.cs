@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using ClassesMarmitex;
+using ClassesMarmitex.Utils;
 
 namespace ms_crud_rest.DAO
 {

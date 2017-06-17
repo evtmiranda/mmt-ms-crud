@@ -3,6 +3,7 @@ using ms_crud_rest.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ClassesMarmitex.Utils;
 
 namespace ms_crud_rest.DAO
 {
@@ -151,7 +152,7 @@ namespace ms_crud_rest.DAO
 
             try
             {
-                listaPedidos = ConsultarPedidos(idUsuarioParceiro);
+                listaPedidos = ConsultarPedidos(idUsuarioParceiro, idLoja);
             }
             catch (KeyNotFoundException keyEx)
             {
@@ -210,7 +211,7 @@ namespace ms_crud_rest.DAO
         /// </summary>
         /// <param name="idUsuarioParceiro">Id do usuário parceiro (cliente)</param>
         /// <param name="idLoja">id da loja</param>
-        private List<Pedido> ConsultarPedidos(int idUsuarioParceiro = 0, int idLoja = 0, bool ehDoDia = false)
+        private List<Pedido> ConsultarPedidos(int idUsuarioParceiro, int idLoja, bool ehDoDia = false)
         {
             List<Pedido> listaPedidos = new List<Pedido>();
             List<PedidoEntidade> listaPedidosEntidade = new List<PedidoEntidade>();

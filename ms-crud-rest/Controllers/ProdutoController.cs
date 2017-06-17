@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using ClassesMarmitex.Utils;
 
 namespace ms_crud_rest.Controllers
 {
@@ -212,9 +213,9 @@ namespace ms_crud_rest.Controllers
         }
 
         /// <summary>
-        /// Inativa um produto adicional do produto
+        /// Exclui um produto adicional do produto
         /// </summary>
-        /// <param name="produtoAdicional">produto que será atualizado</param>
+        /// <param name="produtoAdicional">produto que será excluido</param>
         /// <returns></returns>
         [HttpPost]
         [Route("api/Produto/ExcluirProdutoAdicional")]
@@ -228,6 +229,28 @@ namespace ms_crud_rest.Controllers
             catch (Exception)
             {
                 string mensagem = "Não foi possível excluir o produto adicional. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        /// <summary>
+        /// Inativa um produto adicional do produto
+        /// </summary>
+        /// <param name="produtoAdicional">produto que será atualizado</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/Produto/DesativarProdutoAdicional")]
+        public HttpResponseMessage DesativarProdutoAdicional([FromBody] DadosProdutoAdicionalProduto produtoAdicional)
+        {
+            try
+            {
+                produtoDAO.DesativarProdutoAdicional(produtoAdicional);
+                return Request.CreateResponse(HttpStatusCode.OK, produtoAdicional);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível desativar o produto adicional. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }

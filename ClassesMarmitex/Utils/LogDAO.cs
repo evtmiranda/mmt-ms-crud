@@ -32,7 +32,7 @@ namespace ClassesMarmitex.Utils
 
                 sqlConn.Command.ExecuteNonQuery();
             }
-            catch (System.Exception ex)
+            catch (System.Exception)
             {
                 //lascou
             }

@@ -3,6 +3,7 @@ using ms_crud_rest.Exceptions;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using ClassesMarmitex.Utils;
 
 namespace ms_crud_rest.DAO
 {
@@ -110,7 +111,7 @@ namespace ms_crud_rest.DAO
                                                             ON tpap.id_produto_adicional = tpa.id_produto_adicional
                                                             INNER JOIN tab_produto AS tp
                                                             ON tp.id_produto = tpap.id_produto
-                                                            AND tp.id_produto = @id_produto
+                                                            WHERE tp.id_produto = @id_produto
                                                             AND tpap.bol_excluido = 0
                                                             AND tpa.bol_excluido = 0
                                                             AND tp.bol_excluido = 0;");
@@ -374,14 +375,14 @@ namespace ms_crud_rest.DAO
 	                                                            tpap.nr_qtd_min,
 	                                                            tpap.nr_qtd_max,
 	                                                            tpap.nr_ordem_exibicao,
-	                                                            tpa.bol_ativo
+	                                                            tpap.bol_ativo
                                                             FROM tab_produto_adicional_produto AS tpap
                                                             INNER JOIN tab_produto_adicional AS tpa
                                                             ON tpap.id_produto_adicional = tpa.id_produto_adicional
                                                             INNER JOIN tab_produto AS tp
                                                             ON tp.id_produto = tpap.id_produto
-                                                            AND tp.id_menu_cardapio = @id_menu_cardapio
-                                                            WHERE tpap.bol_excluido = 0
+                                                            WHERE tp.id_menu_cardapio = @id_menu_cardapio
+                                                            AND tpap.bol_excluido = 0
                                                             AND tpa.bol_excluido = 0
                                                             AND tp.bol_excluido = 0
                                                             ORDER BY tpap.nr_ordem_exibicao ASC;");
@@ -684,9 +685,9 @@ namespace ms_crud_rest.DAO
         }
 
         /// <summary>
-        /// Atualiza os dados de um parceiro
+        /// Atualiza os dados de um produto
         /// </summary>
-        /// <param name="parceiro">parceiro que será atualizado</param>
+        /// <param name="produto">produto que será atualizado</param>
         /// <returns></returns>
         public override void Atualizar(Produto produto)
         {
@@ -953,9 +954,12 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", produtoAdicional.Ativo);
                 sqlConn.Command.Parameters.AddWithValue("@id_produto_adicional_produto", produtoAdicional.Id);
 
-                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_produto_adicional_produto
-	                                                            SET bol_ativo = @bol_ativo
-                                                            WHERE id_produto_adicional_produto = @id_produto_adicional_produto;");
+                sqlConn.Command.CommandText = @"DECLARE @ativo INT;
+                                                SET @ativo = (SELECT bol_ativo FROM tab_produto_adicional_produto WHERE id_produto_adicional_produto = @id_produto_adicional_produto);
+
+                                                UPDATE tab_produto_adicional_produto
+	                                                SET bol_ativo = CASE WHEN @ativo = 1 THEN 0 ELSE 1 END
+                                                WHERE id_produto_adicional_produto = @id_produto_adicional_produto;";
 
                 sqlConn.Command.ExecuteNonQuery();
             }

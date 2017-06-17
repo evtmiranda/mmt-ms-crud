@@ -2,6 +2,7 @@
 using ms_crud_rest.Exceptions;
 using System;
 using System.Collections.Generic;
+using ClassesMarmitex.Utils;
 
 namespace ms_crud_rest.DAO
 {
@@ -235,7 +236,7 @@ namespace ms_crud_rest.DAO
         /// </summary>
         /// <param name="email">email do usuário</param>
         /// <returns>UsuarioLoja</returns>
-        public UsuarioLoja BuscarUsuarioLojaPorEmail(string email)
+        public UsuarioLoja BuscarUsuarioLojaPorEmail(string email, string dominioLoja)
         {
             UsuarioLoja usuarioLoja;
             List<UsuarioLojaEntidade> listaUsuarioLojaEntidade;
@@ -259,12 +260,14 @@ namespace ms_crud_rest.DAO
                                                             FROM tab_usuario_loja AS tul
                                                             INNER JOIN tab_loja AS tl
                                                             ON tul.id_loja = tl.id_loja
-                                                            WHERE nm_email = @email
+                                                            WHERE tl.nm_dominio_loja = @dominioLoja
+                                                            AND nm_email = @email
                                                             AND tul.bol_excluido = 0
                                                             AND tl.bol_excluido = 0");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@email", email);
+                sqlConn.Command.Parameters.AddWithValue("@dominioLoja", dominioLoja.Replace("'", ""));
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 
@@ -293,7 +296,7 @@ namespace ms_crud_rest.DAO
         /// </summary>
         /// <param name="email">email do usuário</param>
         /// <returns>UsuarioParceiro</returns>
-        public UsuarioParceiro BuscarUsuarioParceiroPorEmail(string email)
+        public UsuarioParceiro BuscarUsuarioParceiroPorEmail(string email, string dominioLoja)
         {
             UsuarioParceiro usuarioParceiro = new UsuarioParceiro();
             List<UsuarioParceiroEntidade> listaUsuarioParceiroEntidade;
@@ -324,11 +327,13 @@ namespace ms_crud_rest.DAO
                                                             INNER JOIN tab_endereco AS te
                                                             ON te.id_endereco = tp.id_endereco
                                                             WHERE nm_email = @email
+                                                            AND tl.nm_dominio_loja = @dominioLoja
                                                             AND tup.bol_excluido = 0
                                                             AND tp.bol_excluido = 0");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@email", email);
+                sqlConn.Command.Parameters.AddWithValue("@dominioLoja", dominioLoja.Replace("'", ""));
 
                 sqlConn.Reader = sqlConn.Command.ExecuteReader();
 

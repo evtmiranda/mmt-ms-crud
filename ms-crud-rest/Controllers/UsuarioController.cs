@@ -8,6 +8,7 @@
     using System.Net.Http;
     using System.Net;
     using System;
+    using ClassesMarmitex.Utils;
 
     public class UsuarioController : ApiController
     {
@@ -46,15 +47,15 @@
         /// <param name="usuario">objeto com todos os dados do usuário</param>
         /// <returns></returns>
         [HttpPost]
-        [Route("api/Usuario/Cadastrar/UsuarioLoja")]
-        public HttpResponseMessage CadastrarUsuarioLoja([FromBody] UsuarioLoja usuario)
+        [Route("api/Usuario/Cadastrar/UsuarioLoja/{dominioLoja}")]
+        public HttpResponseMessage CadastrarUsuarioLoja([FromBody] UsuarioLoja usuario, [FromUri] string dominioLoja)
         {
             try
             {
                 UsuarioLoja usuarioLoja = new UsuarioLoja();
 
                 //verifica se já existe algum usuário com este e-mail
-                usuarioLoja = usuarioDAO.BuscarUsuarioLojaPorEmail(usuario.Email);
+                usuarioLoja = usuarioDAO.BuscarUsuarioLojaPorEmail(usuario.Email, dominioLoja);
 
                 if (usuarioLoja != null)
                     throw new UsuarioJaExisteException();
@@ -78,17 +79,17 @@
         }
 
         [HttpPost]
-        [Route("api/Usuario/Cadastrar/UsuarioParceiro")]
-        public HttpResponseMessage CadastrarUsuarioParceiro([FromBody] UsuarioParceiro usuario)
+        [Route("api/Usuario/Cadastrar/UsuarioParceiro/{dominioLoja}")]
+        public HttpResponseMessage CadastrarUsuarioParceiro([FromBody] UsuarioParceiro usuario, [FromUri] string dominioLoja)
         {
             try
             {
                 UsuarioParceiro usuarioParceiro = new UsuarioParceiro();
                 //verifica se já existe algum usuário com este e-mail
-                usuarioParceiro = usuarioDAO.BuscarUsuarioParceiroPorEmail(usuario.Email);
+                usuarioParceiro = usuarioDAO.BuscarUsuarioParceiroPorEmail(usuario.Email, dominioLoja);
 
                 if (usuarioParceiro.Id != 0)
-                    throw new UsuarioJaExisteException();
+                    throw new UsuarioJaExisteException("Já existe um usuário cadastrado com este e-mail. Se esqueceu a senha, é possível enviar uma nova para o seu e-mail clicando no link abaixo...");
 
                 //busca o parceiro
                 int idParceiro = usuarioDAO.BuscarIdParceiro(usuario.CodigoParceiro);
@@ -221,8 +222,8 @@
         /// <param name="tipoUsuario">Define se é usuario de loja ou de parceiro</param>
         /// <returns></returns>
         [HttpPost]
-        [Route("api/usuario/buscarPorEmail/{tipoUsuario}")]
-        public HttpResponseMessage BuscarUsuarioPorEmail([FromBody] Usuario usuario, [FromUri] TipoUsuario tipoUsuario)
+        [Route("api/usuario/buscarPorEmail/{tipoUsuario}/{dominioLoja}")]
+        public HttpResponseMessage BuscarUsuarioPorEmail([FromBody] Usuario usuario, [FromUri] TipoUsuario tipoUsuario, [FromUri] string dominioLoja)
         {
             try
             {
@@ -230,7 +231,7 @@
                 {
                     UsuarioLoja usuarioLoja;
 
-                    usuarioLoja = usuarioDAO.BuscarUsuarioLojaPorEmail(usuario.Email);
+                    usuarioLoja = usuarioDAO.BuscarUsuarioLojaPorEmail(usuario.Email, dominioLoja);
 
                     return Request.CreateResponse(HttpStatusCode.OK, usuarioLoja);
                 }
@@ -238,7 +239,7 @@
                 {
                     UsuarioParceiro usuarioParceiro;
 
-                    usuarioParceiro = usuarioDAO.BuscarUsuarioParceiroPorEmail(usuario.Email);
+                    usuarioParceiro = usuarioDAO.BuscarUsuarioParceiroPorEmail(usuario.Email, dominioLoja);
 
                     return Request.CreateResponse(HttpStatusCode.OK, usuarioParceiro);
                 }

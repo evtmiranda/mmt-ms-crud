@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Web.Http;
+using ClassesMarmitex.Utils;
 
 namespace ms_crud_rest.DAO
 {

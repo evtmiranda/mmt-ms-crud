@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using ClassesMarmitex;
+using ClassesMarmitex.Utils;
 using ms_crud_rest.DAO;
 
 namespace ms_crud_rest.Controllers
