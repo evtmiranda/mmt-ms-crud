@@ -22,13 +22,13 @@ namespace ms_crud_rest.DAO
                                                                     VALUES(@id_loja, @nm_descricao, @nm_mensagem, @nm_stack_trace);");
 
                 sqlConn.Command.Parameters.AddWithValue("@id_loja", log.IdLoja);
-                sqlConn.Command.Parameters.AddWithValue("@nm_descricao", log.Descricao);
-                sqlConn.Command.Parameters.AddWithValue("@nm_mensagem", log.Mensagem);
-                sqlConn.Command.Parameters.AddWithValue("@nm_stack_trace", log.StackTrace);
+                sqlConn.Command.Parameters.AddWithValue("@nm_descricao", log.Descricao ?? "");
+                sqlConn.Command.Parameters.AddWithValue("@nm_mensagem", log.Mensagem ?? "");
+                sqlConn.Command.Parameters.AddWithValue("@nm_stack_trace", log.StackTrace ?? "");
 
                 sqlConn.Command.ExecuteNonQuery();
             }
-            catch (System.Exception)
+            catch (System.Exception ex)
             {
                 //lascou
             }

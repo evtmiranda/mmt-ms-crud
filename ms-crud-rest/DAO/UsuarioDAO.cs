@@ -104,7 +104,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.StartConnection();
 
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
-                    sqlConn.Command.CommandText = string.Format(@"SELECT
+                sqlConn.Command.CommandText = string.Format(@"SELECT
 	                                                                COUNT(1) 
                                                                 FROM tab_usuario_parceiro AS tup
                                                                 INNER JOIN tab_parceiro AS tp
@@ -248,6 +248,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.CommandText = string.Format(@"SELECT
                                                                 tul.id_usuario_loja,	
                                                                 tul.id_loja,
+                                                                tl.nm_loja,
                                                                 tul.nm_usuario,
                                                                 tul.nm_apelido,
                                                                 tul.nm_email,
@@ -282,7 +283,7 @@ namespace ms_crud_rest.DAO
             {
                 sqlConn.CloseConnection();
 
-                if(sqlConn.Reader != null)
+                if (sqlConn.Reader != null)
                     sqlConn.Reader.Close();
             }
         }
@@ -304,7 +305,8 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
                 sqlConn.Command.CommandText = string.Format(@"SELECT
 	                                                            id_usuario_parceiro,
-	                                                            id_loja,
+	                                                            tl.id_loja,
+                                                                tl.nm_loja,
 	                                                            tup.id_parceiro,
 	                                                            nm_usuario,	
 	                                                            nm_apelido,
@@ -317,6 +319,8 @@ namespace ms_crud_rest.DAO
                                                             FROM tab_usuario_parceiro AS tup
                                                             INNER JOIN tab_parceiro AS tp
                                                             ON tup.id_parceiro = tp.id_parceiro
+                                                            INNER JOIN tab_loja AS tl
+                                                            ON tl.id_loja = tp.id_loja
                                                             INNER JOIN tab_endereco AS te
                                                             ON te.id_endereco = tp.id_endereco
                                                             WHERE nm_email = @email
@@ -344,7 +348,7 @@ namespace ms_crud_rest.DAO
             {
                 sqlConn.CloseConnection();
 
-                if(sqlConn.Reader != null)
+                if (sqlConn.Reader != null)
                     sqlConn.Reader.Close();
             }
         }

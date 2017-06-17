@@ -68,6 +68,7 @@
     <Compile Include="Utils\DadosGet.cs" />
     <Compile Include="Utils\DadosPostAjax.cs" />
     <Compile Include="Utils\HttpRequestMarmitex.cs" />
+    <Compile Include="Utils\LogDAO.cs" />
     <Compile Include="Utils\ModuloClasse.cs" />
     <Compile Include="Utils\OAuth.cs" />
     <Compile Include="Utils\Requisicoes.cs" />

@@ -20,6 +20,8 @@ namespace ClassesMarmitex
 
         public int IdLoja { get; set; }
 
+        public string NomeLoja { get; set; }
+
         [StringLength(200, ErrorMessage = "o tamanho máximo aceito para o apelido é 200 caracteres")]
         public string Apelido { get; set; }
 
@@ -51,6 +53,9 @@ namespace ClassesMarmitex
         [Column("id_loja")]
         public int IdLoja { get; set; }
 
+        [Column("nm_loja")]
+        public string NomeLoja { get; set; }
+
         [Column("nm_usuario")]
         public string Nome { get; set; }
 
@@ -77,7 +82,7 @@ namespace ClassesMarmitex
 
         public UsuarioLoja ToUsuarioLoja()
         {
-            return new UsuarioLoja { Id = this.Id, IdLoja = this.IdLoja, Nome = this.Nome, Apelido = this.Apelido, Email = this.Email, Senha = this.Senha, NivelPermissao = this.NivelPermissao, Ativo = this.Ativo, Imagem = this.Imagem };
+            return new UsuarioLoja { Id = this.Id, IdLoja = this.IdLoja, NomeLoja = this.NomeLoja, Nome = this.Nome, Apelido = this.Apelido, Email = this.Email, Senha = this.Senha, NivelPermissao = this.NivelPermissao, Ativo = this.Ativo, Imagem = this.Imagem };
         }
     }
 
@@ -109,6 +114,9 @@ namespace ClassesMarmitex
 
         [Column("id_loja")]
         public int IdLoja { get; set; }
+
+        [Column("nm_loja")]
+        public string NomeLoja { get; set; }
 
         [Column("nm_usuario")]
         public string Nome { get; set; }
@@ -142,7 +150,7 @@ namespace ClassesMarmitex
 
         public UsuarioParceiro ToUsuarioParceiro()
         {
-            return new UsuarioParceiro { Id = this.Id, IdLoja = this.IdLoja, IdParceiro = this.IdParceiro, Nome = this.Nome, Apelido = this.Apelido, Email = this.Email, NumeroCelular = this.NumeroCelular, Senha = this.Senha, Ativo = this.Ativo, Endereco = this.Endereco, TaxaEntrega = this.TaxaEntrega };
+            return new UsuarioParceiro { Id = this.Id, IdLoja = this.IdLoja, NomeLoja = this.NomeLoja, IdParceiro = this.IdParceiro, Nome = this.Nome, Apelido = this.Apelido, Email = this.Email, NumeroCelular = this.NumeroCelular, Senha = this.Senha, Ativo = this.Ativo, Endereco = this.Endereco, TaxaEntrega = this.TaxaEntrega };
         }
     }
 }

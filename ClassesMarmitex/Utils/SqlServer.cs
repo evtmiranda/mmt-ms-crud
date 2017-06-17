@@ -52,14 +52,14 @@
 
         public bool ExisteStringConexao()
         {
-            return ConfigurationManager.ConnectionStrings["marmitex"] != null ? true : false;
+            return ConfigurationManager.ConnectionStrings["tasaindo"] != null ? true : false;
         }
 
         public string RetornaStringConexao()
         {
             string strConnection = string.Empty;
 
-            strConnection = ConfigurationManager.ConnectionStrings["marmitex"].ConnectionString;
+            strConnection = ConfigurationManager.ConnectionStrings["tasaindo"].ConnectionString;
 
             //1 - String criptografada | 2 - String aberta
             //if (ConfigurationManager.AppSettings["ModoDesenvolvimento"] == "1")

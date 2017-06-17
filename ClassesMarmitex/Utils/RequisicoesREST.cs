@@ -2,15 +2,22 @@
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Configuration;
+using ClassesMarmitex.Utils;
 
 namespace ClassesMarmitex
 {
     public class RequisicoesREST
     {
-        public string urlBase = "http://localhost:29783/";
+        public string urlBase = ConfigurationManager.AppSettings.Get("UrlCrudTaSaindo");
 
         public DadosRequisicaoRest Post(string recurso, object objeto = null)
         {
+            SqlServer sqlConn = new SqlServer();
+            LogDAO logDAO = new LogDAO(sqlConn);
+
+            
+
             DadosRequisicaoRest retorno = new DadosRequisicaoRest();
             string conteudo = "";
             string json = "";
@@ -19,6 +26,9 @@ namespace ClassesMarmitex
             try
             {
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlBase + "/api/" + recurso);
+
+                logDAO.Adicionar(new Log { IdLoja = 1, Descricao = "POST", Mensagem = request.Address.AbsoluteUri });
+
                 request.Method = "POST";
                 request.Accept = "application/json";
 
@@ -97,6 +107,11 @@ namespace ClassesMarmitex
 
         public DadosRequisicaoRest Get(string recurso, int id = 0)
         {
+            SqlServer sqlConn = new SqlServer();
+            LogDAO logDAO = new LogDAO(sqlConn);
+
+
+
             DadosRequisicaoRest retorno = new DadosRequisicaoRest();
             string conteudo;
 
@@ -104,6 +119,8 @@ namespace ClassesMarmitex
             try
             {
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlBase + "/api/" + recurso);
+
+                logDAO.Adicionar(new Log { IdLoja = 1, Descricao = "POST", Mensagem = request.Address.AbsoluteUri });
 
                 if (id != 0)
                     request.Headers.Add("id", id.ToString());
