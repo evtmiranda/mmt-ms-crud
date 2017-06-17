@@ -39,6 +39,7 @@ namespace ClassesMarmitex
     }
     public class UsuarioLoja : Usuario
     {
+        [Required(ErrorMessage = "o preenchimento da permissão é obrigatório")]
         public int NivelPermissao { get; set; }
         public string UrlLoja { get; set; }
         public string Imagem { get; set; }

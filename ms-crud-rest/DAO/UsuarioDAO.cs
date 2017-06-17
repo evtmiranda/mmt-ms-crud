@@ -23,14 +23,17 @@ namespace ms_crud_rest.DAO
                 sqlConn.StartConnection();
 
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
-                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_usuario_loja(id_parceiro, nm_nome, nm_apelido, nm_email, nm_senha)
-                                                            VALUES(@id_parceiro, @nm_nome, @nm_apelido, @nm_email, @nm_senha);");
+                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_usuario_loja(id_loja, nm_usuario, nm_apelido, nm_email, nm_senha, nr_nivel_permissao, bol_ativo)
+                                                            VALUES(@id_loja, @nm_usuario, @nm_apelido, @nm_email, @nm_senha, @nr_nivel_permissao, @bol_ativo);");
 
                 sqlConn.Command.Parameters.Clear();
-                sqlConn.Command.Parameters.AddWithValue("@nm_nome", usuario.Nome);
-                sqlConn.Command.Parameters.AddWithValue("@nm_apelido", usuario.Apelido);
+                sqlConn.Command.Parameters.AddWithValue("@id_loja", usuario.IdLoja);
+                sqlConn.Command.Parameters.AddWithValue("@nm_usuario", usuario.Nome);
+                sqlConn.Command.Parameters.AddWithValue("@nm_apelido", usuario.Apelido ?? usuario.Nome);
                 sqlConn.Command.Parameters.AddWithValue("@nm_email", usuario.Email);
                 sqlConn.Command.Parameters.AddWithValue("@nm_senha", usuario.Senha);
+                sqlConn.Command.Parameters.AddWithValue("@nr_nivel_permissao", usuario.NivelPermissao);
+                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", usuario.Ativo);
 
                 var varRetorno = sqlConn.Command.ExecuteScalar();
 
@@ -89,6 +92,80 @@ namespace ms_crud_rest.DAO
             {
                 sqlConn.CloseConnection();
             }
+        }
+
+        public void AtualizarUsuarioLoja(UsuarioLoja usuarioLoja)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@nm_usuario", usuarioLoja.Nome);
+                sqlConn.Command.Parameters.AddWithValue("@nm_apelido", usuarioLoja.Apelido ?? usuarioLoja.Nome);
+                sqlConn.Command.Parameters.AddWithValue("@nm_email", usuarioLoja.Email);
+                sqlConn.Command.Parameters.AddWithValue("@nm_senha", usuarioLoja.Senha);
+                sqlConn.Command.Parameters.AddWithValue("@id_usuario_loja", usuarioLoja.Id);
+
+
+                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_usuario_loja
+	                                                            SET nm_usuario = @nm_usuario,
+		                                                            nm_apelido = @nm_apelido,
+                                                                    nm_email = @nm_email,
+		                                                            nm_senha = @nm_senha
+                                                            WHERE id_usuario_loja = @id_usuario_loja;");
+
+                sqlConn.Command.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = usuarioLoja.IdLoja, Mensagem = "Erro ao atualizar os dados do usuario: " + usuarioLoja.Id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
+        }
+
+        public void AtualizarUsuarioParceiro(UsuarioParceiro usuarioParceiro)
+        {
+            //try
+            //{
+            //    sqlConn.StartConnection();
+
+            //    sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+            //    sqlConn.Command.Parameters.Clear();
+            //    sqlConn.Command.Parameters.AddWithValue("@nm_usuario", usuarioLoja.Nome);
+            //    sqlConn.Command.Parameters.AddWithValue("@nm_apelido", usuarioLoja.Apelido ?? usuarioLoja.Nome);
+            //    sqlConn.Command.Parameters.AddWithValue("@nm_email", usuarioLoja.Email);
+            //    sqlConn.Command.Parameters.AddWithValue("@nm_senha", usuarioLoja.Senha);
+            //    sqlConn.Command.Parameters.AddWithValue("@id_usuario_loja", usuarioLoja.Id);
+
+
+            //    sqlConn.Command.CommandText = string.Format(@"UPDATE tab_usuario_loja
+	           //                                                 SET nm_usuario = @nm_usuario,
+		          //                                                  nm_apelido = @nm_apelido,
+            //                                                        nm_email = @nm_email,
+		          //                                                  nm_senha = @nm_senha
+            //                                                WHERE id_usuario_loja = @id_usuario_loja;");
+
+            //    sqlConn.Command.ExecuteNonQuery();
+
+            //}
+            //catch (Exception ex)
+            //{
+            //    logDAO.Adicionar(new Log { IdLoja = usuarioLoja.IdLoja, Mensagem = "Erro ao atualizar os dados do usuario: " + usuarioLoja.Id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+            //    throw ex;
+            //}
+            //finally
+            //{
+            //    sqlConn.CloseConnection();
+            //}
         }
 
         /// <summary>
@@ -232,13 +309,71 @@ namespace ms_crud_rest.DAO
         }
 
         /// <summary>
+        /// Faz a busca de um usuário de loja através do id
+        /// </summary>
+        /// <param name="id">id do usuário</param>
+        /// <returns>UsuarioLoja</returns>
+        public UsuarioLoja BuscarUsuarioLoja(int idUsuario)
+        {
+            UsuarioLoja usuarioLoja;
+            List<UsuarioLojaEntidade> listaUsuarioLojaEntidade;
+
+            try
+            {
+                sqlConn.StartConnection();
+
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+                sqlConn.Command.CommandText = string.Format(@"SELECT
+                                                                tul.id_usuario_loja,	
+                                                                tul.id_loja,
+                                                                tl.nm_loja,
+                                                                tul.nm_usuario,
+                                                                tul.nm_apelido,
+                                                                tul.nm_email,
+                                                                tul.nm_senha,
+                                                                tul.nr_nivel_permissao,
+                                                                tul.bol_ativo,
+                                                                tl.url_imagem
+                                                            FROM tab_usuario_loja AS tul
+                                                            INNER JOIN tab_loja AS tl
+                                                            ON tul.id_loja = tl.id_loja
+                                                            WHERE tul.id_usuario_loja = @id_usuario_loja
+                                                            AND tul.bol_excluido = 0
+                                                            AND tl.bol_excluido = 0");
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@id_usuario_loja", idUsuario);
+
+                sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                listaUsuarioLojaEntidade = new ModuloClasse().PreencheClassePorDataReader<UsuarioLojaEntidade>(sqlConn.Reader);
+
+                usuarioLoja = listaUsuarioLojaEntidade[0].ToUsuarioLoja();
+
+                return usuarioLoja;
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { Mensagem = "Erro ao buscar os dados do usuário", Descricao = ex.Message, StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+
+                if (sqlConn.Reader != null)
+                    sqlConn.Reader.Close();
+            }
+        }
+
+        /// <summary>
         /// Faz a busca de um usuário de loja através do e-mail
         /// </summary>
         /// <param name="email">email do usuário</param>
         /// <returns>UsuarioLoja</returns>
         public UsuarioLoja BuscarUsuarioLojaPorEmail(string email, string dominioLoja)
         {
-            UsuarioLoja usuarioLoja;
+            UsuarioLoja usuarioLoja = new UsuarioLoja();
             List<UsuarioLojaEntidade> listaUsuarioLojaEntidade;
 
             try
@@ -273,9 +408,133 @@ namespace ms_crud_rest.DAO
 
                 listaUsuarioLojaEntidade = new ModuloClasse().PreencheClassePorDataReader<UsuarioLojaEntidade>(sqlConn.Reader);
 
-                usuarioLoja = listaUsuarioLojaEntidade[0].ToUsuarioLoja();
+                if (listaUsuarioLojaEntidade.Count > 1)
+                    usuarioLoja = listaUsuarioLojaEntidade[0].ToUsuarioLoja();
+                else
+                    usuarioLoja = null;
 
                 return usuarioLoja;
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { Mensagem = "Erro ao buscar os dados do usuário", Descricao = ex.Message, StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+
+                if (sqlConn.Reader != null)
+                    sqlConn.Reader.Close();
+            }
+        }
+
+        public List<UsuarioLoja> ListarUsuariosLoja(int idLoja)
+        {
+            List<UsuarioLoja> listaUsuarioLoja = new List<UsuarioLoja>();
+            List<UsuarioLojaEntidade> listaUsuarioLojaEntidade;
+
+            try
+            {
+                sqlConn.StartConnection();
+
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+                sqlConn.Command.CommandText = string.Format(@"SELECT
+                                                                tul.id_usuario_loja,	
+                                                                tul.id_loja,
+                                                                tl.nm_loja,
+                                                                tul.nm_usuario,
+                                                                tul.nm_apelido,
+                                                                tul.nm_email,
+                                                                tul.nm_senha,
+                                                                tul.nr_nivel_permissao,
+                                                                tul.bol_ativo,
+                                                                tl.url_imagem
+                                                            FROM tab_usuario_loja AS tul
+                                                            INNER JOIN tab_loja AS tl
+                                                            ON tul.id_loja = tl.id_loja
+                                                            WHERE tl.id_loja = @id_loja
+                                                            AND tul.bol_excluido = 0
+                                                            AND tl.bol_excluido = 0");
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@id_loja", idLoja);
+
+                sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                listaUsuarioLojaEntidade = new ModuloClasse().PreencheClassePorDataReader<UsuarioLojaEntidade>(sqlConn.Reader);
+
+                foreach (var usuarioEntidade in listaUsuarioLojaEntidade)
+                {
+                    listaUsuarioLoja.Add(usuarioEntidade.ToUsuarioLoja());
+                }
+
+                return listaUsuarioLoja;
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { Mensagem = "Erro ao listar os usuários da loja: " + idLoja, Descricao = ex.Message, StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+
+                if (sqlConn.Reader != null)
+                    sqlConn.Reader.Close();
+            }
+        }
+
+        /// <summary>
+        /// faz a busca de um usuário de parceiros através do id
+        /// </summary>
+        /// <param name="id">id do usuário</param>
+        /// <returns>UsuarioParceiro</returns>
+        public UsuarioParceiro BuscarUsuarioParceiro(int idUsuario)
+        {
+            UsuarioParceiro usuarioParceiro = new UsuarioParceiro();
+            List<UsuarioParceiroEntidade> listaUsuarioParceiroEntidade;
+
+            try
+            {
+                sqlConn.StartConnection();
+
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+                sqlConn.Command.CommandText = string.Format(@"SELECT
+	                                                            id_usuario_parceiro,
+	                                                            tl.id_loja,
+                                                                tl.nm_loja,
+	                                                            tup.id_parceiro,
+	                                                            nm_usuario,	
+	                                                            nm_apelido,
+	                                                            nm_email,
+	                                                            nm_celular,
+	                                                            nm_senha,
+	                                                            tup.bol_ativo,
+	                                                            concat(nm_logradouro, ', ', nm_numero_endereco, ' - ', nm_bairro, ', ', nm_cidade) AS endereco,
+                                                                tp.vlr_taxa_entrega
+                                                            FROM tab_usuario_parceiro AS tup
+                                                            INNER JOIN tab_parceiro AS tp
+                                                            ON tup.id_parceiro = tp.id_parceiro
+                                                            INNER JOIN tab_loja AS tl
+                                                            ON tl.id_loja = tp.id_loja
+                                                            INNER JOIN tab_endereco AS te
+                                                            ON te.id_endereco = tp.id_endereco
+                                                            WHERE id_usuario_parceiro = @id_usuario_parceiro
+                                                            AND tup.bol_excluido = 0
+                                                            AND tp.bol_excluido = 0");
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@id_usuario_parceiro", idUsuario);
+
+                sqlConn.Reader = sqlConn.Command.ExecuteReader();
+
+                listaUsuarioParceiroEntidade = new ModuloClasse().PreencheClassePorDataReader<UsuarioParceiroEntidade>(sqlConn.Reader);
+
+                if (listaUsuarioParceiroEntidade.Count > 0)
+                    usuarioParceiro = listaUsuarioParceiroEntidade[0].ToUsuarioParceiro();
+
+                return usuarioParceiro;
             }
             catch (Exception ex)
             {
@@ -393,5 +652,91 @@ namespace ms_crud_rest.DAO
 
         }
 
+        public void ExcluirUsuarioLoja(UsuarioLoja usuarioLoja)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", usuarioLoja.Ativo);
+                sqlConn.Command.Parameters.AddWithValue("@id_usuario_loja", usuarioLoja.Id);
+
+                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_usuario_loja
+                                                                SET bol_excluido = 1, bol_ativo = 0
+                                                            WHERE id_usuario_loja = @id_usuario_loja;");
+
+                sqlConn.Command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = usuarioLoja.IdLoja, Mensagem = "Erro ao excluir o usuario: " + usuarioLoja.Id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
+        }
+
+        public void DesativarUsuarioLoja(UsuarioLoja usuarioLoja)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", usuarioLoja.Ativo);
+                sqlConn.Command.Parameters.AddWithValue("@id_usuario_loja", usuarioLoja.Id);
+
+                sqlConn.Command.CommandText = @"DECLARE @ativo INT;
+                                                SET @ativo = (SELECT bol_ativo FROM tab_usuario_loja WHERE id_usuario_loja = @id_usuario_loja);
+
+                                                UPDATE tab_usuario_loja
+	                                                SET bol_ativo = CASE WHEN @ativo = 1 THEN 0 ELSE 1 END
+                                                WHERE id_usuario_loja = @id_usuario_loja;";
+
+                sqlConn.Command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = usuarioLoja.IdLoja, Mensagem = "Erro ao desativar o usuario: " + usuarioLoja.Id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
+        }
+
+        public void ExcluirUsuarioParceiro(UsuarioParceiro usuarioParceiro)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", usuarioParceiro.Ativo);
+                sqlConn.Command.Parameters.AddWithValue("@id_usuario_parceiro", usuarioParceiro.Id);
+
+                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_usuario_parceiro
+                                                                SET bol_excluido = 1, bol_ativo = 0
+                                                            WHERE id_usuario_parceiro = @id_usuario_parceiro;");
+
+                sqlConn.Command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = usuarioParceiro.IdLoja, Mensagem = "Erro ao excluir o usuario: " + usuarioParceiro.Id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
+        }
     }
 }

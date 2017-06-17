@@ -268,7 +268,7 @@ namespace ms_crud_rest.DAO
                                                                 WHERE 1 = 1");
 
                     if (ehDoDia)
-                        sqlConn.Command.CommandText += " AND dt_entrega BETWEEN CONVERT(DATETIME,FORMAT(GETDATE(), 'yyyy-dd-MM 00:00')) AND CONVERT(DATETIME,FORMAT(GETDATE(), 'yyyy-dd-MM 23:59'))";
+                        sqlConn.Command.CommandText += " AND dt_entrega BETWEEN CONVERT(DATETIME,FORMAT(GETDATE(), 'yyyy-dd-MM 00:00'), 103) AND CONVERT(DATETIME,FORMAT(GETDATE(), 'yyyy-dd-MM 23:59'), 103)";
 
                     sqlConn.Command.CommandText += " AND id_usuario_parceiro = @id_usuario_parceiro";
 
@@ -295,7 +295,7 @@ namespace ms_crud_rest.DAO
                                                                 WHERE 1 = 1");
 
                     if (ehDoDia)
-                        sqlConn.Command.CommandText += " AND dt_entrega BETWEEN CONVERT(DATETIME,FORMAT(GETDATE(), 'yyyy-dd-MM 00:00')) AND CONVERT(DATETIME,FORMAT(GETDATE(), 'yyyy-dd-MM 23:59'))";
+                        sqlConn.Command.CommandText += " AND dt_entrega BETWEEN CONVERT(DATETIME,FORMAT(GETDATE(), 'yyyy-dd-MM 00:00'), 103) AND CONVERT(DATETIME,FORMAT(GETDATE(), 'yyyy-dd-MM 23:59'), 103)";
 
                     sqlConn.Command.CommandText += " AND tparc.id_loja = @id_loja";
 
@@ -368,6 +368,7 @@ namespace ms_crud_rest.DAO
                                                         tup.id_usuario_parceiro,
                                                         tup.id_parceiro,
                                                         tp.id_loja,
+                                                        tl.nm_loja,
                                                         tup.nm_usuario,
                                                         tup.nm_apelido,
                                                         tup.nm_email,
@@ -381,6 +382,8 @@ namespace ms_crud_rest.DAO
                                                     ON tup.id_parceiro = tp.id_parceiro
                                                     INNER JOIN tab_endereco AS te
                                                     ON te.id_endereco = tp.id_endereco
+                                                    INNER JOIN tab_loja AS tl
+                                                    ON tl.id_loja = tp.id_loja
                                                     WHERE tup.id_usuario_parceiro = @id_usuario_parceiro;";
 
                     sqlConn.Command.Parameters.AddWithValue("@id_usuario_parceiro", pedido.Cliente.Id);

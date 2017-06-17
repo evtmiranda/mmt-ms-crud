@@ -24,28 +24,92 @@
         }
 
         [HttpGet]
-        public HttpResponseMessage BuscarUsuario(int id)
+        [Route("api/Usuario/BuscarUsuarioLoja/{id}")]
+        public HttpResponseMessage BuscarUsuarioLoja(int id)
         {
             try
             {
-                Usuario usuario = null;
-
-                if (usuario == null)
-                    throw new KeyNotFoundException();
-
-                return Request.CreateResponse(HttpStatusCode.OK, usuario);
+                UsuarioLoja usuarioLoja = new UsuarioLoja();
+                usuarioLoja = usuarioDAO.BuscarUsuarioLoja(id);
+                return Request.CreateResponse(HttpStatusCode.OK, usuarioLoja);
             }
             catch (KeyNotFoundException)
             {
-                return Request.CreateResponse(HttpStatusCode.NoContent);
+                string mensagem = "Usuário não encontrado";
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi consultar o usuário. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
 
-        /// <summary>
-        /// Cadastro de um usuário do tipo loja
-        /// </summary>
-        /// <param name="usuario">objeto com todos os dados do usuário</param>
-        /// <returns></returns>
+        [HttpGet]
+        [Route("api/Usuario/BuscarUsuarioParceiro/{id}")]
+        public HttpResponseMessage BuscarUsuarioParceiro(int id)
+        {
+            try
+            {
+                UsuarioParceiro usuarioParceiro = new UsuarioParceiro();
+                usuarioParceiro = usuarioDAO.BuscarUsuarioParceiro(id);
+                return Request.CreateResponse(HttpStatusCode.OK, usuarioParceiro);
+            }
+            catch (KeyNotFoundException)
+            {
+                string mensagem = "Usuário não encontrado";
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi consultar o usuário. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/usuario/buscarPorEmail/{tipoUsuario}/{dominioLoja}")]
+        public HttpResponseMessage BuscarUsuarioPorEmail([FromBody] Usuario usuario, [FromUri] TipoUsuario tipoUsuario, [FromUri] string dominioLoja)
+        {
+            try
+            {
+                if (tipoUsuario == TipoUsuario.Loja)
+                {
+                    UsuarioLoja usuarioLoja;
+
+                    usuarioLoja = usuarioDAO.BuscarUsuarioLojaPorEmail(usuario.Email, dominioLoja);
+
+                    return Request.CreateResponse(HttpStatusCode.OK, usuarioLoja);
+                }
+                else
+                {
+                    UsuarioParceiro usuarioParceiro;
+
+                    usuarioParceiro = usuarioDAO.BuscarUsuarioParceiroPorEmail(usuario.Email, dominioLoja);
+
+                    return Request.CreateResponse(HttpStatusCode.OK, usuarioParceiro);
+                }
+            }
+            catch (KeyNotFoundException)
+            {
+                string mensagem = string.Format("O usuario com e-mail {0} não foi encontrado", usuario.Email);
+                HttpError error = new HttpError(mensagem);
+
+                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+            }
+            catch (Exception)
+            {
+                string mensagem = string.Format("Estamos com dificuldade em consultar os dados. Por favor, tente novamente");
+                HttpError error = new HttpError(mensagem);
+
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
         [HttpPost]
         [Route("api/Usuario/Cadastrar/UsuarioLoja/{dominioLoja}")]
         public HttpResponseMessage CadastrarUsuarioLoja([FromBody] UsuarioLoja usuario, [FromUri] string dominioLoja)
@@ -123,65 +187,67 @@
             }
         }
 
-        [HttpDelete]
-        public HttpResponseMessage ExcluirUsuario([FromUri] int id)
+        [HttpPost]
+        [Route("api/Usuario/AtualizarUsuarioLoja")]
+        public HttpResponseMessage AtualizarUsuarioLoja([FromBody] UsuarioLoja usuarioLoja)
         {
             try
             {
-                //usuarioDAO.ExcluirPorId(id);
-
-                return Request.CreateResponse(HttpStatusCode.OK);
+                usuarioDAO.AtualizarUsuarioLoja(usuarioLoja);
+                return Request.CreateResponse(HttpStatusCode.OK, usuarioLoja);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string mensagem = string.Format("nao foi possivel cadastrar o usuario. erro: {0}", ex);
+                string mensagem = "Não foi possível atualizar o usuario. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
 
-        [HttpPatch]
-        public HttpResponseMessage AtualizarUsuario([FromBody] Usuario usuario, [FromUri] int id)
+        [HttpPost]
+        [Route("api/Usuario/AtualizarUsuarioParceiro")]
+        public HttpResponseMessage AtualizarUsuarioParceiro([FromBody] UsuarioParceiro usuarioParceiro)
         {
             try
             {
-                Usuario usuarioAtual = usuarioDAO.BuscarPorId(id, usuario.IdLoja);
-
-                if (usuarioAtual == null)
-                    return Request.CreateResponse(HttpStatusCode.NotFound);
-
-                usuarioAtual.Email = usuario.Email;
-                usuarioDAO.Atualizar(usuarioAtual);
-
-                return Request.CreateResponse(HttpStatusCode.OK);
+                usuarioDAO.AtualizarUsuarioParceiro(usuarioParceiro);
+                return Request.CreateResponse(HttpStatusCode.OK, usuarioParceiro);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string mensagem = string.Format("Não foi possivel atualizar o usuario. erro: {0}", ex);
+                string mensagem = "Não foi possível atualizar o usuario. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
 
-        //retorna todos os usuários existentes
         [HttpGet]
-        [Route("api/usuario/listar/{idLoja}")]
-        public HttpResponseMessage ListarUsuarios(TipoUsuario tipoUsuario, [FromUri] int idLoja)
+        [Route("api/usuario/listar/{tipoUsuario}/{idLoja}")]
+        public HttpResponseMessage ListarUsuarios([FromUri] TipoUsuario tipoUsuario, [FromUri] int idLoja)
         {
             try
             {
-                IList<Usuario> usuarios = usuarioDAO.Listar(idLoja);
-                return Request.CreateResponse(HttpStatusCode.OK, usuarios);
+                List<UsuarioLoja> listaUsuarioLoja = new List<UsuarioLoja>();
+                List<UsuarioParceiro> listaUsuarioParceiro = new List<UsuarioParceiro>();
+
+                if (tipoUsuario == TipoUsuario.Loja)
+                {
+                    listaUsuarioLoja = usuarioDAO.ListarUsuariosLoja(idLoja);
+                    return Request.CreateResponse(HttpStatusCode.OK, listaUsuarioLoja);
+                }
+                else
+                    return null;
             }
-            catch (KeyNotFoundException)
+            //se ocorrer algum erro no processamento
+            catch (Exception ex)
             {
-                string mensagem = string.Format("nao foram encontrados usuarios");
+                //retorna mensagem de erro e status de erro
+                string mensagem = string.Format("Não foi possivel listar os usuarios. erro: {0}", ex);
                 HttpError error = new HttpError(mensagem);
-                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
 
-        //método para autenticação de usuário
         [HttpPost]
         [Route("api/Usuario/Autenticar/{tipoUsuario}/{dominioLoja}")]
         public HttpResponseMessage AutenticarUsuario([FromBody] Usuario usuario, [FromUri] TipoUsuario tipoUsuario, [FromUri] string dominioLoja)
@@ -215,47 +281,36 @@
             }
         }
 
-        /// <summary>
-        /// Busca os dados de um usuário através do seu e-mail
-        /// </summary>
-        /// <param name="usuario">Dados do usuário</param>
-        /// <param name="tipoUsuario">Define se é usuario de loja ou de parceiro</param>
-        /// <returns></returns>
         [HttpPost]
-        [Route("api/usuario/buscarPorEmail/{tipoUsuario}/{dominioLoja}")]
-        public HttpResponseMessage BuscarUsuarioPorEmail([FromBody] Usuario usuario, [FromUri] TipoUsuario tipoUsuario, [FromUri] string dominioLoja)
+        [Route("api/Usuario/ExcluirUsuarioLoja")]
+        public HttpResponseMessage ExcluirUsuarioLoja([FromBody] UsuarioLoja usuarioLoja)
         {
             try
             {
-                if (tipoUsuario == TipoUsuario.Loja)
-                {
-                    UsuarioLoja usuarioLoja;
-
-                    usuarioLoja = usuarioDAO.BuscarUsuarioLojaPorEmail(usuario.Email, dominioLoja);
-
-                    return Request.CreateResponse(HttpStatusCode.OK, usuarioLoja);
-                }
-                else
-                {
-                    UsuarioParceiro usuarioParceiro;
-
-                    usuarioParceiro = usuarioDAO.BuscarUsuarioParceiroPorEmail(usuario.Email, dominioLoja);
-
-                    return Request.CreateResponse(HttpStatusCode.OK, usuarioParceiro);
-                }
-            }
-            catch (KeyNotFoundException)
-            {
-                string mensagem = string.Format("O usuario com e-mail {0} não foi encontrado", usuario.Email);
-                HttpError error = new HttpError(mensagem);
-
-                return Request.CreateResponse(HttpStatusCode.NotFound, error);
+                usuarioDAO.ExcluirUsuarioLoja(usuarioLoja);
+                return Request.CreateResponse(HttpStatusCode.OK, usuarioLoja);
             }
             catch (Exception)
             {
-                string mensagem = string.Format("Estamos com dificuldade em consultar os dados. Por favor, tente novamente");
+                string mensagem = "Não foi possível excluir o usuário. Por favor, tente novamente ou entre em contato com nosso suporte.";
                 HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
 
+        [HttpPost]
+        [Route("api/Usuario/DesativarUsuarioLoja")]
+        public HttpResponseMessage DesativarUsuarioLoja([FromBody] UsuarioLoja usuarioLoja)
+        {
+            try
+            {
+                usuarioDAO.DesativarUsuarioLoja(usuarioLoja);
+                return Request.CreateResponse(HttpStatusCode.OK, usuarioLoja);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível desativar o usuário. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
             }
         }
