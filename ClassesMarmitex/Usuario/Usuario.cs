@@ -99,6 +99,9 @@ namespace ClassesMarmitex
         [StringLength(15, ErrorMessage = "por favor, verifique o número de celular digitado")]
         public string NumeroCelular { get; set; }
 
+        [Required(ErrorMessage = "o preenchimento da dica de localização é obrigatório")]
+        public string DicaDeLocalizacao { get; set; }
+
         public string Endereco { get; set; }
 
         public decimal TaxaEntrega { get; set; }
@@ -131,6 +134,9 @@ namespace ClassesMarmitex
         [Column("nm_celular")]
         public string NumeroCelular { get; set; }
 
+        [Column("nm_dica_localizacao")]
+        public string DicaDeLocalizacao { get; set; }
+
         [Column("nm_senha")]
         public string Senha { get; set; }
 
@@ -151,7 +157,10 @@ namespace ClassesMarmitex
 
         public UsuarioParceiro ToUsuarioParceiro()
         {
-            return new UsuarioParceiro { Id = this.Id, IdLoja = this.IdLoja, NomeLoja = this.NomeLoja, IdParceiro = this.IdParceiro, Nome = this.Nome, Apelido = this.Apelido, Email = this.Email, NumeroCelular = this.NumeroCelular, Senha = this.Senha, Ativo = this.Ativo, Endereco = this.Endereco, TaxaEntrega = this.TaxaEntrega };
+            return new UsuarioParceiro { Id = this.Id, IdLoja = this.IdLoja, NomeLoja = this.NomeLoja, IdParceiro = this.IdParceiro,
+                Nome = this.Nome, Apelido = this.Apelido, Email = this.Email, NumeroCelular = this.NumeroCelular,
+                DicaDeLocalizacao = this.DicaDeLocalizacao, Senha = this.Senha, Ativo = this.Ativo, Endereco = this.Endereco,
+                TaxaEntrega = this.TaxaEntrega };
         }
     }
 }

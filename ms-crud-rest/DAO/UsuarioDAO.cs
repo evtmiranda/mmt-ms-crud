@@ -66,16 +66,18 @@ namespace ms_crud_rest.DAO
                 sqlConn.StartConnection();
 
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
-                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_usuario_parceiro(id_parceiro, nm_usuario, nm_apelido, nm_email, nm_celular, nm_senha)
-                                                            VALUES(@id_parceiro, @nm_usuario, @nm_apelido, @nm_email, @nm_celular, @nm_senha); SELECT @@IDENTITY;");
+                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_usuario_parceiro(id_parceiro, nm_usuario, nm_apelido, nm_email, nm_celular, nm_dica_localizacao, nm_senha, bol_ativo)
+                                                            VALUES(@id_parceiro, @nm_usuario, @nm_apelido, @nm_email, @nm_celular, @nm_dica_localizacao, @nm_senha, @bol_ativo); SELECT @@IDENTITY;");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_parceiro", usuario.IdParceiro);
                 sqlConn.Command.Parameters.AddWithValue("@nm_usuario", usuario.Nome);
-                sqlConn.Command.Parameters.AddWithValue("@nm_apelido", usuario.Apelido);
+                sqlConn.Command.Parameters.AddWithValue("@nm_apelido", usuario.Apelido ?? usuario.Nome);
                 sqlConn.Command.Parameters.AddWithValue("@nm_email", usuario.Email);
                 sqlConn.Command.Parameters.AddWithValue("@nm_celular", usuario.NumeroCelular);
+                sqlConn.Command.Parameters.AddWithValue("@nm_dica_localizacao", usuario.DicaDeLocalizacao);
                 sqlConn.Command.Parameters.AddWithValue("@nm_senha", usuario.Senha);
+                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", usuario.Ativo);
 
                 var varRetorno = sqlConn.Command.ExecuteScalar();
 
@@ -108,13 +110,15 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.AddWithValue("@nm_email", usuarioLoja.Email);
                 sqlConn.Command.Parameters.AddWithValue("@nm_senha", usuarioLoja.Senha);
                 sqlConn.Command.Parameters.AddWithValue("@id_usuario_loja", usuarioLoja.Id);
+                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", usuarioLoja.Ativo);
 
 
                 sqlConn.Command.CommandText = string.Format(@"UPDATE tab_usuario_loja
 	                                                            SET nm_usuario = @nm_usuario,
 		                                                            nm_apelido = @nm_apelido,
                                                                     nm_email = @nm_email,
-		                                                            nm_senha = @nm_senha
+		                                                            nm_senha = @nm_senha,
+                                                                    bol_ativo = @bol_ativo
                                                             WHERE id_usuario_loja = @id_usuario_loja;");
 
                 sqlConn.Command.ExecuteNonQuery();
@@ -408,7 +412,7 @@ namespace ms_crud_rest.DAO
 
                 listaUsuarioLojaEntidade = new ModuloClasse().PreencheClassePorDataReader<UsuarioLojaEntidade>(sqlConn.Reader);
 
-                if (listaUsuarioLojaEntidade.Count > 1)
+                if (listaUsuarioLojaEntidade.Count > 0)
                     usuarioLoja = listaUsuarioLojaEntidade[0].ToUsuarioLoja();
                 else
                     usuarioLoja = null;
@@ -509,6 +513,7 @@ namespace ms_crud_rest.DAO
 	                                                            nm_apelido,
 	                                                            nm_email,
 	                                                            nm_celular,
+                                                                nm_dica_localizacao,
 	                                                            nm_senha,
 	                                                            tup.bol_ativo,
 	                                                            concat(nm_logradouro, ', ', nm_numero_endereco, ' - ', nm_bairro, ', ', nm_cidade) AS endereco,
@@ -574,6 +579,7 @@ namespace ms_crud_rest.DAO
 	                                                            nm_apelido,
 	                                                            nm_email,
 	                                                            nm_celular,
+                                                                nm_dica_localizacao,
 	                                                            nm_senha,
 	                                                            tup.bol_ativo,
 	                                                            concat(nm_logradouro, ', ', nm_numero_endereco, ' - ', nm_bairro, ', ', nm_cidade) AS endereco,
