@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Dashboard\Dashboard.cs" />
+    <Compile Include="Email\Email.cs" />
     <Compile Include="HorarioEntrega\HorarioEntrega.cs" />
     <Compile Include="Loja\Loja.cs" />
     <Compile Include="Endereco\Endereco.cs" />

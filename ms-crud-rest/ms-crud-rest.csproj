@@ -115,6 +115,9 @@
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.105.2.3\lib\net452\RestSharp.dll</HintPath>
+    </Reference>
     <Reference Include="Swashbuckle.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cd1bb07a5ac7c7bc, processorArchitecture=MSIL">
       <HintPath>..\packages\Swashbuckle.Core.5.5.3\lib\net40\Swashbuckle.Core.dll</HintPath>
     </Reference>
@@ -198,6 +201,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\BrindeController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
+    <Compile Include="Controllers\EmailController.cs" />
     <Compile Include="Controllers\FormaPagamentoController.cs" />
     <Compile Include="Controllers\HorarioEntregaController.cs" />
     <Compile Include="Controllers\MenuCardapioController.cs" />
@@ -209,6 +213,7 @@
     <Compile Include="Controllers\UsuarioController.cs" />
     <Compile Include="DAO\BrindeDAO.cs" />
     <Compile Include="DAO\DashboardDAO.cs" />
+    <Compile Include="DAO\EmailDAO.cs" />
     <Compile Include="DAO\FormaPagamentoDAO.cs" />
     <Compile Include="DAO\GenericDAO.cs" />
     <Compile Include="DAO\HorarioEntregaDAO.cs" />

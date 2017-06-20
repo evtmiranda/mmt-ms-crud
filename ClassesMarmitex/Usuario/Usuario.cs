@@ -155,12 +155,18 @@ namespace ClassesMarmitex
         [Column("vlr_taxa_entrega")]
         public decimal TaxaEntrega { get; set; }
 
+        /// <summary>
+        /// o código vem da tab_parceiro
+        /// </summary>
+        [Column("nm_codigo")]
+        public string CodigoParceiro { get; set; }
+
         public UsuarioParceiro ToUsuarioParceiro()
         {
             return new UsuarioParceiro { Id = this.Id, IdLoja = this.IdLoja, NomeLoja = this.NomeLoja, IdParceiro = this.IdParceiro,
                 Nome = this.Nome, Apelido = this.Apelido, Email = this.Email, NumeroCelular = this.NumeroCelular,
                 DicaDeLocalizacao = this.DicaDeLocalizacao, Senha = this.Senha, Ativo = this.Ativo, Endereco = this.Endereco,
-                TaxaEntrega = this.TaxaEntrega };
+                TaxaEntrega = this.TaxaEntrega, CodigoParceiro = this.CodigoParceiro };
         }
     }
 }

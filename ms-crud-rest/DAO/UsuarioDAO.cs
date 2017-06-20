@@ -66,8 +66,8 @@ namespace ms_crud_rest.DAO
                 sqlConn.StartConnection();
 
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
-                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_usuario_parceiro(id_parceiro, nm_usuario, nm_apelido, nm_email, nm_celular, nm_dica_localizacao, nm_senha, bol_ativo)
-                                                            VALUES(@id_parceiro, @nm_usuario, @nm_apelido, @nm_email, @nm_celular, @nm_dica_localizacao, @nm_senha, @bol_ativo); SELECT @@IDENTITY;");
+                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_usuario_parceiro(id_parceiro, nm_usuario, nm_apelido, nm_email, nm_celular, nm_dica_localizacao, nm_senha)
+                                                            VALUES(@id_parceiro, @nm_usuario, @nm_apelido, @nm_email, @nm_celular, @nm_dica_localizacao, @nm_senha); SELECT @@IDENTITY;");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_parceiro", usuario.IdParceiro);
@@ -77,7 +77,6 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.AddWithValue("@nm_celular", usuario.NumeroCelular);
                 sqlConn.Command.Parameters.AddWithValue("@nm_dica_localizacao", usuario.DicaDeLocalizacao);
                 sqlConn.Command.Parameters.AddWithValue("@nm_senha", usuario.Senha);
-                sqlConn.Command.Parameters.AddWithValue("@bol_ativo", usuario.Ativo);
 
                 var varRetorno = sqlConn.Command.ExecuteScalar();
 
@@ -137,39 +136,43 @@ namespace ms_crud_rest.DAO
 
         public void AtualizarUsuarioParceiro(UsuarioParceiro usuarioParceiro)
         {
-            //try
-            //{
-            //    sqlConn.StartConnection();
+            try
+            {
+                sqlConn.StartConnection();
 
-            //    sqlConn.Command.CommandType = System.Data.CommandType.Text;
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
 
-            //    sqlConn.Command.Parameters.Clear();
-            //    sqlConn.Command.Parameters.AddWithValue("@nm_usuario", usuarioLoja.Nome);
-            //    sqlConn.Command.Parameters.AddWithValue("@nm_apelido", usuarioLoja.Apelido ?? usuarioLoja.Nome);
-            //    sqlConn.Command.Parameters.AddWithValue("@nm_email", usuarioLoja.Email);
-            //    sqlConn.Command.Parameters.AddWithValue("@nm_senha", usuarioLoja.Senha);
-            //    sqlConn.Command.Parameters.AddWithValue("@id_usuario_loja", usuarioLoja.Id);
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@nm_usuario", usuarioParceiro.Nome);
+                sqlConn.Command.Parameters.AddWithValue("@nm_apelido", usuarioParceiro.Apelido ?? usuarioParceiro.Nome);
+                sqlConn.Command.Parameters.AddWithValue("@nm_email", usuarioParceiro.Email);
+                sqlConn.Command.Parameters.AddWithValue("@nm_celular", usuarioParceiro.NumeroCelular);
+                sqlConn.Command.Parameters.AddWithValue("@nm_dica_localizacao", usuarioParceiro.DicaDeLocalizacao);
+                sqlConn.Command.Parameters.AddWithValue("@nm_senha", usuarioParceiro.Senha);
+                sqlConn.Command.Parameters.AddWithValue("@id_usuario_parceiro", usuarioParceiro.Id);
 
 
-            //    sqlConn.Command.CommandText = string.Format(@"UPDATE tab_usuario_loja
-	           //                                                 SET nm_usuario = @nm_usuario,
-		          //                                                  nm_apelido = @nm_apelido,
-            //                                                        nm_email = @nm_email,
-		          //                                                  nm_senha = @nm_senha
-            //                                                WHERE id_usuario_loja = @id_usuario_loja;");
+                sqlConn.Command.CommandText = string.Format(@"UPDATE tab_usuario_parceiro
+	                                                            SET nm_usuario = @nm_usuario,
+		                                                            nm_apelido = @nm_apelido,
+                                                                    nm_email = @nm_email,
+                                                                    nm_celular = @nm_celular,
+                                                                    nm_dica_localizacao = @nm_dica_localizacao,
+		                                                            nm_senha = @nm_senha
+                                                            WHERE id_usuario_parceiro = @id_usuario_parceiro;");
 
-            //    sqlConn.Command.ExecuteNonQuery();
+                sqlConn.Command.ExecuteNonQuery();
 
-            //}
-            //catch (Exception ex)
-            //{
-            //    logDAO.Adicionar(new Log { IdLoja = usuarioLoja.IdLoja, Mensagem = "Erro ao atualizar os dados do usuario: " + usuarioLoja.Id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
-            //    throw ex;
-            //}
-            //finally
-            //{
-            //    sqlConn.CloseConnection();
-            //}
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = usuarioParceiro.IdLoja, Mensagem = "Erro ao atualizar os dados do usuario: " + usuarioParceiro.Id, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw ex;
+            }
+            finally
+            {
+                sqlConn.CloseConnection();
+            }
         }
 
         /// <summary>
@@ -517,7 +520,8 @@ namespace ms_crud_rest.DAO
 	                                                            nm_senha,
 	                                                            tup.bol_ativo,
 	                                                            concat(nm_logradouro, ', ', nm_numero_endereco, ' - ', nm_bairro, ', ', nm_cidade) AS endereco,
-                                                                tp.vlr_taxa_entrega
+                                                                tp.vlr_taxa_entrega,
+                                                                tp.nm_codigo
                                                             FROM tab_usuario_parceiro AS tup
                                                             INNER JOIN tab_parceiro AS tp
                                                             ON tup.id_parceiro = tp.id_parceiro
@@ -583,7 +587,8 @@ namespace ms_crud_rest.DAO
 	                                                            nm_senha,
 	                                                            tup.bol_ativo,
 	                                                            concat(nm_logradouro, ', ', nm_numero_endereco, ' - ', nm_bairro, ', ', nm_cidade) AS endereco,
-                                                                tp.vlr_taxa_entrega
+                                                                tp.vlr_taxa_entrega,
+                                                                tp.nm_codigo
                                                             FROM tab_usuario_parceiro AS tup
                                                             INNER JOIN tab_parceiro AS tp
                                                             ON tup.id_parceiro = tp.id_parceiro
@@ -606,8 +611,13 @@ namespace ms_crud_rest.DAO
 
                 if (listaUsuarioParceiroEntidade.Count > 0)
                     usuarioParceiro = listaUsuarioParceiroEntidade[0].ToUsuarioParceiro();
+                else
+                    throw new KeyNotFoundException("Usuário não encontrado");
 
                 return usuarioParceiro;
+            }
+            catch(KeyNotFoundException){
+                throw;
             }
             catch (Exception ex)
             {
