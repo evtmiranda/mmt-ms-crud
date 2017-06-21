@@ -93,7 +93,7 @@
         public int Ativo { get; set; }
     }
 
-    [Table("use marmitex")]
+    [Table("tab_pedido_status")]
     public class PedidoStatusEntidade
     {
         [Column("id_status_pedido")]
@@ -108,6 +108,9 @@
         [Column("dt_status")]
         public DateTime DataStatus { get; set; }
 
+        [Column("nm_motivo_cancelamento")]
+        public string MotivoCancelamento { get; set; }
+
         [Column("bol_ativo")]
         public int Ativo { get; set; }
 
@@ -119,6 +122,7 @@
                 IdPedido = this.IdPedido,
                 IdStatus = this.IdStatus,
                 DataStatus = this.DataStatus,
+                MotivoCancelamento = this.MotivoCancelamento,
                 Ativo = this.Ativo
             };
 

@@ -88,7 +88,7 @@ namespace ms_crud_rest.DAO
 	                                                AND CONVERT(DATE, dt_pedido) = CONVERT(DATE, GETDATE())
 	                                                AND tps.id_status = 0
 	                                                AND tps.bol_ativo = 1
-	                                                AND dt_entrega <= GETDATE());
+	                                                AND dt_entrega <= DATEADD(hh, -3, GETDATE()));
 
                                                 DECLARE @pedidos_entregues INT;
                                                 SET @pedidos_entregues = (

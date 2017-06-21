@@ -333,6 +333,7 @@ namespace ms_crud_rest.DAO
 	                                                    id_pedido,
 	                                                    id_status,
 	                                                    dt_status,
+                                                        nm_motivo_cancelamento,
 	                                                    bol_ativo
                                                     FROM tab_pedido_status
                                                     WHERE id_pedido = @id_pedido;";
@@ -373,10 +374,12 @@ namespace ms_crud_rest.DAO
                                                         tup.nm_apelido,
                                                         tup.nm_email,
                                                         tup.nm_celular,
+                                                        tup.nm_dica_localizacao,
                                                         tup.nm_senha,
                                                         tup.bol_ativo,
 	                                                    concat(nm_logradouro, ', ', nm_numero_endereco, ' - ', nm_bairro, ', ', nm_cidade) AS endereco,
-                                                        tp.vlr_taxa_entrega
+                                                        tp.vlr_taxa_entrega,
+                                                        tp.nm_codigo
                                                     FROM tab_usuario_parceiro AS tup
                                                     INNER JOIN tab_parceiro AS tp
                                                     ON tup.id_parceiro = tp.id_parceiro

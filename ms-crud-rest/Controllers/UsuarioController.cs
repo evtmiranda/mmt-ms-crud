@@ -150,7 +150,19 @@
             {
                 UsuarioParceiro usuarioParceiro = new UsuarioParceiro();
                 //verifica se já existe algum usuário com este e-mail
-                usuarioParceiro = usuarioDAO.BuscarUsuarioParceiroPorEmail(usuario.Email, dominioLoja);
+                try
+                {
+                    usuarioParceiro = usuarioDAO.BuscarUsuarioParceiroPorEmail(usuario.Email, dominioLoja);
+                }
+                catch (KeyNotFoundException)
+                {
+                    //não faz nada
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+                
 
                 if (usuarioParceiro.Id != 0)
                     throw new UsuarioJaExisteException("Já existe um usuário cadastrado com este e-mail. Se esqueceu a senha, é possível enviar uma nova para o seu e-mail clicando no link abaixo...");

@@ -108,6 +108,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.AddWithValue("@nm_apelido", usuarioLoja.Apelido ?? usuarioLoja.Nome);
                 sqlConn.Command.Parameters.AddWithValue("@nm_email", usuarioLoja.Email);
                 sqlConn.Command.Parameters.AddWithValue("@nm_senha", usuarioLoja.Senha);
+                sqlConn.Command.Parameters.AddWithValue("@nr_nivel_permissao", usuarioLoja.NivelPermissao); 
                 sqlConn.Command.Parameters.AddWithValue("@id_usuario_loja", usuarioLoja.Id);
                 sqlConn.Command.Parameters.AddWithValue("@bol_ativo", usuarioLoja.Ativo);
 
@@ -117,6 +118,7 @@ namespace ms_crud_rest.DAO
 		                                                            nm_apelido = @nm_apelido,
                                                                     nm_email = @nm_email,
 		                                                            nm_senha = @nm_senha,
+                                                                    nr_nivel_permissao = @nr_nivel_permissao,
                                                                     bol_ativo = @bol_ativo
                                                             WHERE id_usuario_loja = @id_usuario_loja;");
 

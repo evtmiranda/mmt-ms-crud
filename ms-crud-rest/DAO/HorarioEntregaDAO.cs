@@ -579,7 +579,7 @@ namespace ms_crud_rest.DAO
 
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
                 sqlConn.Command.CommandText = string.Format(@"DECLARE @dtAtual DATETIME;
-                                                            SET @dtAtual = GETDATE();
+                                                            SET @dtAtual = DATEADD(hh, -3, GETDATE());
 
                                                             DECLARE @dtEntrega DATETIME;
                                                             SET @dtEntrega = (SELECT dt_entrega FROM tab_pedido WHERE id_pedido = @id_pedido);
