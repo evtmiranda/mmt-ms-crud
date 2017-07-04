@@ -76,7 +76,7 @@
     {
         public int IdPedido { get; set; }
         /// <summary>
-        /// 0 = na fila, 1 = entregue, 2 = cancelado
+        /// 0 = na fila, 1 = em andamento, 2 = entregue, 3 = cancelado
         /// </summary>
         public int IdStatusPedido { get; set; }
 
@@ -133,6 +133,7 @@
     public enum EstadoPedido
     {
         Fila,
+        EmAndamento,
         Entregue,
         Cancelado,
         Todos

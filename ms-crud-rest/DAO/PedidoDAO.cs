@@ -141,6 +141,36 @@ namespace ms_crud_rest.DAO
             }
         }
 
+        public string ConsultarEmailUsuarioPedido(int idPedido, int idLoja)
+        {
+            try
+            {
+                sqlConn.StartConnection();
+                sqlConn.Command.CommandType = System.Data.CommandType.Text;
+                sqlConn.Command.CommandText = @"SELECT
+	                                                tup.nm_email
+                                                FROM tab_pedido AS tp
+                                                INNER JOIN tab_usuario_parceiro AS tup
+                                                ON tp.id_usuario_parceiro = tup.id_usuario_parceiro
+                                                WHERE id_pedido = @id_pedido";
+
+                sqlConn.Command.Parameters.Clear();
+                sqlConn.Command.Parameters.AddWithValue("@id_pedido", idPedido);
+
+                return sqlConn.Command.ExecuteScalar().ToString();
+            }
+            catch (Exception ex)
+            {
+                logDAO.Adicionar(new Log { IdLoja = idLoja, Mensagem = "Erro ao buscar o e-mail do usuário que realizou o pedido: " + idPedido, Descricao = ex.Message ?? "", StackTrace = ex.StackTrace ?? "" });
+                throw;
+            }
+            finally
+            {
+                if(sqlConn != null)
+                    sqlConn.CloseConnection();
+            }
+        }
+
         /// <summary>
         /// Busca todos os pedidos de um determinado cliente
         /// </summary>
@@ -186,11 +216,14 @@ namespace ms_crud_rest.DAO
                 if (estadoPedido == EstadoPedido.Fila)
                     listaPedidos = listaPedidos.FindAll(p => p.PedidoStatus.IdStatus == 0);
 
-                if (estadoPedido == EstadoPedido.Entregue)
+                if (estadoPedido == EstadoPedido.EmAndamento)
                     listaPedidos = listaPedidos.FindAll(p => p.PedidoStatus.IdStatus == 1);
 
-                if (estadoPedido == EstadoPedido.Cancelado)
+                if (estadoPedido == EstadoPedido.Entregue)
                     listaPedidos = listaPedidos.FindAll(p => p.PedidoStatus.IdStatus == 2);
+
+                if (estadoPedido == EstadoPedido.Cancelado)
+                    listaPedidos = listaPedidos.FindAll(p => p.PedidoStatus.IdStatus == 3);
 
             }
             catch (KeyNotFoundException)
@@ -268,7 +301,7 @@ namespace ms_crud_rest.DAO
                                                                 WHERE 1 = 1");
 
                     if (ehDoDia)
-                        sqlConn.Command.CommandText += " AND dt_entrega BETWEEN CONVERT(DATETIME,FORMAT(GETDATE(), 'yyyy-dd-MM 00:00'), 103) AND CONVERT(DATETIME,FORMAT(GETDATE(), 'yyyy-dd-MM 23:59'), 103)";
+                        sqlConn.Command.CommandText += " AND dt_entrega BETWEEN CONVERT(DATETIME,FORMAT(DATEADD(hh, -3, GETDATE()), 'yyyy-dd-MM 00:00'), 103) AND CONVERT(DATETIME,FORMAT(DATEADD(hh, -3, GETDATE()), 'yyyy-dd-MM 23:59'), 103)";
 
                     sqlConn.Command.CommandText += " AND id_usuario_parceiro = @id_usuario_parceiro";
 
@@ -295,7 +328,7 @@ namespace ms_crud_rest.DAO
                                                                 WHERE 1 = 1");
 
                     if (ehDoDia)
-                        sqlConn.Command.CommandText += " AND dt_entrega BETWEEN CONVERT(DATETIME,FORMAT(GETDATE(), 'yyyy-dd-MM 00:00'), 103) AND CONVERT(DATETIME,FORMAT(GETDATE(), 'yyyy-dd-MM 23:59'), 103)";
+                        sqlConn.Command.CommandText += " AND dt_entrega BETWEEN CONVERT(DATETIME,FORMAT(DATEADD(hh, -3, GETDATE()), 'yyyy-dd-MM 00:00'), 103) AND CONVERT(DATETIME,FORMAT(DATEADD(hh, -3, GETDATE()), 'yyyy-dd-MM 23:59'), 103)";
 
                     sqlConn.Command.CommandText += " AND tparc.id_loja = @id_loja";
 
@@ -377,6 +410,7 @@ namespace ms_crud_rest.DAO
                                                         tup.nm_dica_localizacao,
                                                         tup.nm_senha,
                                                         tup.bol_ativo,
+                                                        tup.bol_aceita_crm,
 	                                                    concat(nm_logradouro, ', ', nm_numero_endereco, ' - ', nm_bairro, ', ', nm_cidade) AS endereco,
                                                         tp.vlr_taxa_entrega,
                                                         tp.nm_codigo

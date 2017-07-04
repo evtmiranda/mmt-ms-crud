@@ -66,8 +66,8 @@ namespace ms_crud_rest.DAO
                 sqlConn.StartConnection();
 
                 sqlConn.Command.CommandType = System.Data.CommandType.Text;
-                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_usuario_parceiro(id_parceiro, nm_usuario, nm_apelido, nm_email, nm_celular, nm_dica_localizacao, nm_senha)
-                                                            VALUES(@id_parceiro, @nm_usuario, @nm_apelido, @nm_email, @nm_celular, @nm_dica_localizacao, @nm_senha); SELECT @@IDENTITY;");
+                sqlConn.Command.CommandText = string.Format(@"INSERT INTO tab_usuario_parceiro(id_parceiro, nm_usuario, nm_apelido, nm_email, nm_celular, nm_dica_localizacao, nm_senha, bol_aceita_crm)
+                                                            VALUES(@id_parceiro, @nm_usuario, @nm_apelido, @nm_email, @nm_celular, @nm_dica_localizacao, @nm_senha, @bol_aceita_crm); SELECT @@IDENTITY;");
 
                 sqlConn.Command.Parameters.Clear();
                 sqlConn.Command.Parameters.AddWithValue("@id_parceiro", usuario.IdParceiro);
@@ -77,6 +77,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.AddWithValue("@nm_celular", usuario.NumeroCelular);
                 sqlConn.Command.Parameters.AddWithValue("@nm_dica_localizacao", usuario.DicaDeLocalizacao);
                 sqlConn.Command.Parameters.AddWithValue("@nm_senha", usuario.Senha);
+                sqlConn.Command.Parameters.AddWithValue("@bol_aceita_crm", usuario.AceitaReceberCRM); 
 
                 var varRetorno = sqlConn.Command.ExecuteScalar();
 
@@ -152,7 +153,7 @@ namespace ms_crud_rest.DAO
                 sqlConn.Command.Parameters.AddWithValue("@nm_dica_localizacao", usuarioParceiro.DicaDeLocalizacao);
                 sqlConn.Command.Parameters.AddWithValue("@nm_senha", usuarioParceiro.Senha);
                 sqlConn.Command.Parameters.AddWithValue("@id_usuario_parceiro", usuarioParceiro.Id);
-
+                sqlConn.Command.Parameters.AddWithValue("@bol_aceita_crm", usuarioParceiro.AceitaReceberCRM);
 
                 sqlConn.Command.CommandText = string.Format(@"UPDATE tab_usuario_parceiro
 	                                                            SET nm_usuario = @nm_usuario,
@@ -160,7 +161,8 @@ namespace ms_crud_rest.DAO
                                                                     nm_email = @nm_email,
                                                                     nm_celular = @nm_celular,
                                                                     nm_dica_localizacao = @nm_dica_localizacao,
-		                                                            nm_senha = @nm_senha
+		                                                            nm_senha = @nm_senha,
+                                                                    bol_aceita_crm = @bol_aceita_crm
                                                             WHERE id_usuario_parceiro = @id_usuario_parceiro;");
 
                 sqlConn.Command.ExecuteNonQuery();
@@ -521,6 +523,7 @@ namespace ms_crud_rest.DAO
                                                                 nm_dica_localizacao,
 	                                                            nm_senha,
 	                                                            tup.bol_ativo,
+                                                                tup.bol_aceita_crm,
 	                                                            concat(nm_logradouro, ', ', nm_numero_endereco, ' - ', nm_bairro, ', ', nm_cidade) AS endereco,
                                                                 tp.vlr_taxa_entrega,
                                                                 tp.nm_codigo
@@ -588,6 +591,7 @@ namespace ms_crud_rest.DAO
                                                                 nm_dica_localizacao,
 	                                                            nm_senha,
 	                                                            tup.bol_ativo,
+                                                                bol_aceita_crm,
 	                                                            concat(nm_logradouro, ', ', nm_numero_endereco, ' - ', nm_bairro, ', ', nm_cidade) AS endereco,
                                                                 tp.vlr_taxa_entrega,
                                                                 tp.nm_codigo

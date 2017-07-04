@@ -322,6 +322,9 @@ namespace ms_crud_rest.DAO
                 foreach (var produto in listaProduto)
                 {
                     //limpa os dados da execução anterior
+                    listaDiasVenda = new List<DiasVenda>();
+                    listaDiasVendaInt = new List<int>();
+
                     sqlConn.Command.CommandText = "";
                     if (sqlConn.Reader != null)
                         sqlConn.Reader.Close();

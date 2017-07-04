@@ -53,6 +53,7 @@
     <Compile Include="Endereco\Endereco.cs" />
     <Compile Include="Pagamento\FormaDePagamento.cs" />
     <Compile Include="Utils\Constantes.cs" />
+    <Compile Include="Utils\Email.cs" />
     <Compile Include="Utils\Log.cs" />
     <Compile Include="Parceiro\Brinde.cs" />
     <Compile Include="Parceiro\Parceiro.cs" />
@@ -72,7 +73,6 @@
     <Compile Include="Utils\LogDAO.cs" />
     <Compile Include="Utils\ModuloClasse.cs" />
     <Compile Include="Utils\OAuth.cs" />
-    <Compile Include="Utils\Requisicoes.cs" />
     <Compile Include="Utils\RequisicoesREST.cs" />
     <Compile Include="Utils\SqlServer.cs" />
     <Compile Include="Utils\Token.cs" />

@@ -94,6 +94,38 @@ namespace ms_crud_rest.Controllers
         }
 
         /// <summary>
+        /// Busca o e-mail do usuário que realizou determinado pedido
+        /// </summary>
+        /// <param name="idPedido">Id do pedido</param>
+        /// <param name="idLoja">Id da loja onde o pedido foi realizado</param>
+        /// <returns>e-mail do usuário que realizou o pedido</returns>
+        [HttpGet]
+        [Route("api/Pedido/BuscarEmailUsuarioPedido/{idPedido}/{idLoja}")]
+        public HttpResponseMessage BuscarEmailUsuarioPedido(int idPedido, int idLoja)
+        {
+            string emailUsuario;
+
+            try
+            {
+                emailUsuario = pedidoDAO.ConsultarEmailUsuarioPedido(idPedido, idLoja);
+
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK, emailUsuario);
+
+                return response;
+            }
+            catch (KeyNotFoundException)
+            {
+                return Request.CreateResponse(HttpStatusCode.NoContent);
+            }
+            catch (Exception)
+            {
+                string mensagem = "Não foi possível buscar o e-mail do usuário. Por favor, tente novamente ou entre em contato com nosso suporte.";
+                HttpError error = new HttpError(mensagem);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
+        /// <summary>
         /// Busca todos os pedidos de um determinado cliente
         /// </summary>
         /// <param name="idUsuarioParceiro">id do cliente para consultar os pedidos</param>

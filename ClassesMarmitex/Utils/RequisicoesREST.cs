@@ -16,8 +16,6 @@ namespace ClassesMarmitex
             SqlServer sqlConn = new SqlServer();
             LogDAO logDAO = new LogDAO(sqlConn);
 
-            
-
             DadosRequisicaoRest retorno = new DadosRequisicaoRest();
             string conteudo = "";
             string json = "";
@@ -27,7 +25,7 @@ namespace ClassesMarmitex
             {
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlBase + "/api/" + recurso);
 
-                logDAO.Adicionar(new Log { IdLoja = 1, Descricao = "POST", Mensagem = request.Address.AbsoluteUri });
+                logDAO.Adicionar(new Log { IdLoja = 3, Descricao = "POST", Mensagem = request.Address.AbsoluteUri });
 
                 request.Method = "POST";
                 request.Accept = "application/json";
@@ -58,6 +56,8 @@ namespace ClassesMarmitex
             {
                 try
                 {
+                    logDAO.Adicionar(new Log { IdLoja = 3, Mensagem = "Erro ao fazer requisição", Descricao = wEx.Message ?? wEx.ToString(), StackTrace = wEx.StackTrace ?? "" });
+
                     string mensagemErro = "";
 
                     try
@@ -87,8 +87,10 @@ namespace ClassesMarmitex
 
                     return retorno;
                 }
-                catch (System.Exception)
+                catch (System.Exception ex)
                 {
+                    logDAO.Adicionar(new Log { IdLoja = 3, Mensagem = "Erro ao fazer requisição", Descricao = ex.Message ?? ex.ToString(), StackTrace = ex.StackTrace ?? "" });
+
                     retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
                     retorno.objeto = "";
 
@@ -98,6 +100,8 @@ namespace ClassesMarmitex
             //Se ocorrer qualquer outra exceção retorna um InternalServerError
             catch (System.Exception ex)
             {
+                logDAO.Adicionar(new Log { IdLoja = 3, Mensagem = "Erro ao fazer requisição", Descricao = ex.Message ?? ex.ToString(), StackTrace = ex.StackTrace ?? "" });
+
                 retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
                 retorno.objeto = ex.Message ?? "";
 
@@ -109,8 +113,6 @@ namespace ClassesMarmitex
         {
             SqlServer sqlConn = new SqlServer();
             LogDAO logDAO = new LogDAO(sqlConn);
-
-
 
             DadosRequisicaoRest retorno = new DadosRequisicaoRest();
             string conteudo;
@@ -147,6 +149,8 @@ namespace ClassesMarmitex
             {
                 try
                 {
+                    logDAO.Adicionar(new Log { IdLoja = 3, Mensagem = "Erro ao fazer requisição", Descricao = wEx.Message ?? wEx.ToString(), StackTrace = wEx.StackTrace ?? "" });
+
                     string mensagemErro = "";
 
                     try
@@ -176,8 +180,9 @@ namespace ClassesMarmitex
 
                     return retorno;
                 }
-                catch (System.Exception)
+                catch (System.Exception ex)
                 {
+                    logDAO.Adicionar(new Log { IdLoja = 3, Mensagem = "Erro ao fazer requisição", Descricao = ex.Message ?? ex.ToString(), StackTrace = ex.StackTrace ?? "" });
                     retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
                     retorno.objeto = "";
 
@@ -187,6 +192,8 @@ namespace ClassesMarmitex
             //Se ocorrer qualquer outra exceção retorna um InternalServerError
             catch (System.Exception ex)
             {
+                logDAO.Adicionar(new Log { IdLoja = 3, Mensagem = "Erro ao fazer requisição", Descricao = ex.Message ?? ex.ToString(), StackTrace = ex.StackTrace ?? "" });
+
                 retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
                 retorno.objeto = ex.Message ?? "";
 
@@ -196,6 +203,9 @@ namespace ClassesMarmitex
 
         public DadosRequisicaoRest Patch(string recurso, object objeto)
         {
+            SqlServer sqlConn = new SqlServer();
+            LogDAO logDAO = new LogDAO(sqlConn);
+
             DadosRequisicaoRest retorno = new DadosRequisicaoRest();
             string conteudo = "";
 
@@ -232,6 +242,8 @@ namespace ClassesMarmitex
             {
                 try
                 {
+                    logDAO.Adicionar(new Log { IdLoja = 3, Mensagem = "Erro ao fazer requisição", Descricao = wEx.Message ?? wEx.ToString(), StackTrace = wEx.StackTrace ?? "" });
+
                     string mensagemErro = "";
 
                     try
@@ -261,8 +273,10 @@ namespace ClassesMarmitex
 
                     return retorno;
                 }
-                catch (System.Exception)
+                catch (System.Exception ex)
                 {
+                    logDAO.Adicionar(new Log { IdLoja = 3, Mensagem = "Erro ao fazer requisição", Descricao = ex.Message ?? ex.ToString(), StackTrace = ex.StackTrace ?? "" });
+
                     retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
                     retorno.objeto = "";
 
@@ -273,6 +287,8 @@ namespace ClassesMarmitex
             //Se ocorrer qualquer outra exceção retorna um InternalServerError
             catch (System.Exception ex)
             {
+                logDAO.Adicionar(new Log { IdLoja = 3, Mensagem = "Erro ao fazer requisição", Descricao = ex.Message ?? ex.ToString(), StackTrace = ex.StackTrace ?? "" });
+
                 retorno.HttpStatusCode = HttpStatusCode.InternalServerError;
                 retorno.objeto = ex.Message ?? "";
 

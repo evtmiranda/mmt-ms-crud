@@ -102,8 +102,16 @@ namespace ClassesMarmitex
         [Required(ErrorMessage = "o preenchimento da dica de localização é obrigatório")]
         public string DicaDeLocalizacao { get; set; }
 
+        public bool AceitaReceberCRM { get; set; }
+
+        /// <summary>
+        /// o endereco vem da tab_parceiro e tab_endereco
+        /// </summary>
         public string Endereco { get; set; }
 
+        /// <summary>
+        /// O valor da taxa vem da tab_parceiro
+        /// </summary>
         public decimal TaxaEntrega { get; set; }
     }
 
@@ -143,6 +151,9 @@ namespace ClassesMarmitex
         [Column("bol_ativo")]
         public bool Ativo { get; set; }
 
+        [Column("bol_aceita_crm")]
+        public bool AceitaReceberCRM { get; set; }
+
         /// <summary>
         /// o endereco vem da tab_parceiro e tab_endereco
         /// </summary>
@@ -165,8 +176,8 @@ namespace ClassesMarmitex
         {
             return new UsuarioParceiro { Id = this.Id, IdLoja = this.IdLoja, NomeLoja = this.NomeLoja, IdParceiro = this.IdParceiro,
                 Nome = this.Nome, Apelido = this.Apelido, Email = this.Email, NumeroCelular = this.NumeroCelular,
-                DicaDeLocalizacao = this.DicaDeLocalizacao, Senha = this.Senha, Ativo = this.Ativo, Endereco = this.Endereco,
-                TaxaEntrega = this.TaxaEntrega, CodigoParceiro = this.CodigoParceiro };
+                DicaDeLocalizacao = this.DicaDeLocalizacao, Senha = this.Senha, Ativo = this.Ativo, AceitaReceberCRM = this.AceitaReceberCRM,
+                Endereco = this.Endereco, TaxaEntrega = this.TaxaEntrega, CodigoParceiro = this.CodigoParceiro };
         }
     }
 }
