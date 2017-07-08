@@ -30,7 +30,7 @@ namespace ms_crud_rest.DAO
 	                                                INNER JOIN tab_parceiro AS tparceiro
 	                                                ON tparceiro.id_parceiro = tup.id_parceiro
 	                                                WHERE tparceiro.id_loja = @id_loja
-	                                                AND CONVERT(DATE, dt_pedido) = CONVERT(DATE, GETDATE()));
+	                                                AND CONVERT(DATE, dt_pedido) = CONVERT(DATE, DATEADD(HOUR, -3, GETDATE())));
 
                                                 DECLARE @vendas DECIMAL(10,2);
                                                 SET @vendas = (
@@ -46,7 +46,7 @@ namespace ms_crud_rest.DAO
 	                                                WHERE tparceiro.id_loja = @id_loja
 	                                                AND tps.bol_ativo = 1
 	                                                AND tps.id_status <> 2
-	                                                AND CONVERT(DATE, dt_pedido) = CONVERT(DATE, GETDATE()));
+	                                                AND CONVERT(DATE, dt_pedido) = CONVERT(DATE, DATEADD(HOUR, -3, GETDATE())));
 
                                                 DECLARE @visitas INT;
                                                 SET @visitas = (
@@ -58,7 +58,7 @@ namespace ms_crud_rest.DAO
 	                                                INNER JOIN tab_parceiro AS tp
 	                                                ON tp.id_parceiro = tup.id_parceiro
 	                                                WHERE tp.id_loja = @id_loja
-	                                                AND CONVERT(DATE, dt_acesso) = CONVERT(DATE, GETDATE()));
+	                                                AND CONVERT(DATE, dt_acesso) = CONVERT(DATE, DATEADD(HOUR, -3, GETDATE())));
 
                                                 DECLARE @parceiros INT;
                                                 SET @parceiros = (
@@ -70,7 +70,7 @@ namespace ms_crud_rest.DAO
 	                                                INNER JOIN tab_parceiro AS tp
 	                                                ON tp.id_parceiro = tup.id_parceiro
 	                                                WHERE tp.id_loja = @id_loja
-	                                                AND CONVERT(DATE, dt_acesso) = CONVERT(DATE, GETDATE()));
+	                                                AND CONVERT(DATE, dt_acesso) = CONVERT(DATE, DATEADD(HOUR, -3, GETDATE())));
 
 
                                                 DECLARE @pedidos_atrasados INT;
@@ -85,7 +85,7 @@ namespace ms_crud_rest.DAO
 	                                                INNER JOIN tab_parceiro AS tparceiro
 	                                                ON tparceiro.id_parceiro = tup.id_parceiro
 	                                                WHERE tparceiro.id_loja = @id_loja
-	                                                AND CONVERT(DATE, dt_pedido) = CONVERT(DATE, GETDATE())
+	                                                AND CONVERT(DATE, dt_pedido) = CONVERT(DATE, DATEADD(HOUR, -3, GETDATE()))
 	                                                AND tps.id_status = 0
 	                                                AND tps.bol_ativo = 1
 	                                                AND dt_entrega <= DATEADD(hh, -3, GETDATE()));
@@ -102,7 +102,7 @@ namespace ms_crud_rest.DAO
 	                                                INNER JOIN tab_parceiro AS tparceiro
 	                                                ON tparceiro.id_parceiro = tup.id_parceiro
 	                                                WHERE tparceiro.id_loja = @id_loja
-	                                                AND CONVERT(DATE, dt_pedido) = CONVERT(DATE, GETDATE())
+	                                                AND CONVERT(DATE, dt_pedido) = CONVERT(DATE, DATEADD(HOUR, -3, GETDATE()))
 	                                                AND tps.id_status = 1
 	                                                AND tps.bol_ativo = 1);
 
@@ -118,7 +118,7 @@ namespace ms_crud_rest.DAO
 	                                                INNER JOIN tab_parceiro AS tparceiro
 	                                                ON tparceiro.id_parceiro = tup.id_parceiro
 	                                                WHERE tparceiro.id_loja = @id_loja
-	                                                AND CONVERT(DATE, dt_pedido) = CONVERT(DATE, GETDATE())
+	                                                AND CONVERT(DATE, dt_pedido) = CONVERT(DATE, DATEADD(HOUR, -3, GETDATE()))
 	                                                AND tps.id_status = 0
 	                                                AND tps.bol_ativo = 1);
 
@@ -134,7 +134,7 @@ namespace ms_crud_rest.DAO
 	                                                INNER JOIN tab_parceiro AS tparceiro
 	                                                ON tparceiro.id_parceiro = tup.id_parceiro
 	                                                WHERE tparceiro.id_loja = @id_loja
-	                                                AND CONVERT(DATE, dt_pedido) = CONVERT(DATE, GETDATE())
+	                                                AND CONVERT(DATE, dt_pedido) = CONVERT(DATE, DATEADD(HOUR, -3, GETDATE()))
 	                                                AND tps.id_status = 2
 	                                                AND tps.bol_ativo = 1);
 
