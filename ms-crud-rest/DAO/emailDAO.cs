@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -17,11 +17,11 @@ namespace ms_crud_rest.DAO
                 BaseUrl = new Uri("https://api.mailgun.net/v3"),
                 Authenticator =
             new HttpBasicAuthenticator("api",
-                                      "key-eb7fea3c28be413594c443e8f50925fd")
+                                      "")
             };
 
             RestRequest request = new RestRequest();
-            request.AddParameter("domain", "email.tasaindo.com.br", ParameterType.UrlSegment);
+            request.AddParameter("domain", "", ParameterType.UrlSegment);
             request.Resource = "{domain}/messages";
             request.AddParameter("from", emailUnitario.From.Trim());
             request.AddParameter("to", emailUnitario.To);
